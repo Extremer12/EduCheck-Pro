@@ -97,7 +97,7 @@ async function getStudentData() {
         });
         
         // Actualizar localStorage con los datos más recientes
-        setUserData('students', students);
+        setUserData('students', JSON.stringify(students));
         
         return students;
     } catch (error) {

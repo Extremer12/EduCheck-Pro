@@ -175,7 +175,7 @@
                             <i class="fas fa-calendar"></i>
                             Filtrar por fecha
                         </label>
-                        <input type="date" id="activity-date-filter">
+                        <input type="date" id="activity-date-filter" title="Seleccionar fecha para filtrar actividades" aria-label="Filtrar actividades por fecha">
                     </div>
                 </div>
 
@@ -186,7 +186,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h3 id="modal-activity-title"></h3>
-                        <button class="close-modal"><i class="fas fa-times"></i></button>
+                        <button class="close-modal" label="Cerrar ventana" title="Cerrar ventana"><i class="fas fa-times"></i></button>
                     </div>
                     <div class="modal-body">
                         <table class="attendance-table">
@@ -212,7 +212,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h3><i class="fas fa-users"></i> Mis Alumnos</h3>
-                        <button class="close-modal" title="Cerrar ventana"><i class="fas fa-times"></i></button>
+                        <button class="close-modal" aria-label="Cerrar ventana" title="Cerrar ventana"><i class="fas fa-times"></i></button>
                     </div>
                     <div class="modal-body">
                         <div id="students-list-container" class="students-list">
@@ -372,12 +372,5 @@
     .catch(err => console.error("Error al registrar SW", err));
 }
 </script>
-
-</body>
-</html>
-<!-- Busca el botón en la línea 189 y añade un texto o un atributo aria-label -->
-<button class="some-button" aria-label="Descripción de la acción del botón">
-    <i class="fas fa-icon" aria-hidden="true"></i>
-</button>
 </body>
 </html>

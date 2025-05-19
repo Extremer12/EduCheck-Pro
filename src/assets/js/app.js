@@ -133,15 +133,25 @@ function addActivity(event) {
                 };
 
                 // Guardar en localStorage
-                let activities = [];
-                const savedActivities = getUserData('activities');
-                
-                if (savedActivities) {
-                    activities = JSON.parse(savedActivities);
+            let activities = [];
+            const savedActivities = getUserData('activities');
+            
+            if (savedActivities) {
+                // Verificar si savedActivities es un string o un objeto
+                if (typeof savedActivities === 'string') {
+                    try {
+                        activities = JSON.parse(savedActivities);
+                    } catch (e) {
+                        console.error('Error al parsear actividades:', e);
+                        activities = [];
+                    }
+                } else if (Array.isArray(savedActivities)) {
+                    activities = savedActivities;
                 }
+            }
                 
                 activities.unshift(activity);
-                setUserData('activities', JSON.stringify(activities));
+                setUserData('activities', JSON.stringify(activities)); // Añadimos JSON.stringify aquí
 
                 // Limpiar el formulario
                 document.querySelector('.activity-form').reset();
@@ -172,11 +182,21 @@ function addActivity(event) {
             const savedActivities = getUserData('activities');
             
             if (savedActivities) {
-                activities = JSON.parse(savedActivities);
+                // Verificar si savedActivities es un string o un objeto
+                if (typeof savedActivities === 'string') {
+                    try {
+                        activities = JSON.parse(savedActivities);
+                    } catch (e) {
+                        console.error('Error al parsear actividades:', e);
+                        activities = [];
+                    }
+                } else if (Array.isArray(savedActivities)) {
+                    activities = savedActivities;
+                }
             }
             
             activities.unshift(activity);
-            setUserData('activities', JSON.stringify(activities));
+            setUserData('activities', JSON.stringify(activities)); // Añadimos JSON.stringify aquí
 
             // Limpiar el formulario
             document.querySelector('.activity-form').reset();
@@ -846,15 +866,12 @@ function openGallery(startingImageId = null) {
     document.addEventListener('keydown', galleryKeyHandler);
 }
 
-// Función para guardar datos específicos del usuario
+// Función para guardar datos del usuario
 function setUserData(key, data) {
     try {
-        const user = auth.currentUser;
-        if (!user) return false;
-        
-        const userId = user.uid;
-        const storageKey = `${userId}_${key}`;
-        localStorage.setItem(storageKey, JSON.stringify(data));
+        // Si data ya es un string, no lo convertimos de nuevo
+        const dataToStore = typeof data === 'string' ? data : JSON.stringify(data);
+        localStorage.setItem(key, dataToStore);
         return true;
     } catch (error) {
         console.error('Error al guardar datos:', error);
@@ -862,52 +879,18 @@ function setUserData(key, data) {
     }
 }
 
-// Función para obtener datos específicos del usuario
+// Función para obtener datos del usuario
 function getUserData(key) {
     try {
-        const user = auth.currentUser;
-        if (!user) return null;
-        
-        const userId = user.uid;
-        const storageKey = `${userId}_${key}`;
-        return localStorage.getItem(storageKey);
+        const data = localStorage.getItem(key);
+        return data;
     } catch (error) {
         console.error('Error al obtener datos:', error);
         return null;
     }
 }
 
-// Funciones para manejar datos del usuario
-function getUserData(key) {
-    try {
-        const user = auth.currentUser;
-        if (!user) return null;
-        
-        const userId = user.uid;
-        const storageKey = `user_${userId}_${key}`;
-        return localStorage.getItem(storageKey);
-    } catch (error) {
-        console.error('Error al obtener datos:', error);
-        return null;
-    }
-}
 
-function setUserData(key, data) {
-    try {
-        const user = auth.currentUser;
-        if (!user) return false;
-        
-        const userId = user.uid;
-        const storageKey = `user_${userId}_${key}`;
-        
-        localStorage.setItem(storageKey, data);
-        
-        return true;
-    } catch (error) {
-        console.error('Error al guardar datos:', error);
-        return false;
-    }
-}
 
 // Exponer estas funciones globalmente
 window.setUserData = setUserData;
@@ -1036,15 +1019,12 @@ function openGallery(startingImageId = null) {
     document.addEventListener('keydown', galleryKeyHandler);
 }
 
-// Función para guardar datos específicos del usuario
+// Función para guardar datos del usuario
 function setUserData(key, data) {
     try {
-        const user = auth.currentUser;
-        if (!user) return false;
-        
-        const userId = user.uid;
-        const storageKey = `${userId}_${key}`;
-        localStorage.setItem(storageKey, JSON.stringify(data));
+        // Si data ya es un string, no lo convertimos de nuevo
+        const dataToStore = typeof data === 'string' ? data : JSON.stringify(data);
+        localStorage.setItem(key, dataToStore);
         return true;
     } catch (error) {
         console.error('Error al guardar datos:', error);
@@ -1052,52 +1032,18 @@ function setUserData(key, data) {
     }
 }
 
-// Función para obtener datos específicos del usuario
+// Función para obtener datos del usuario
 function getUserData(key) {
     try {
-        const user = auth.currentUser;
-        if (!user) return null;
-        
-        const userId = user.uid;
-        const storageKey = `${userId}_${key}`;
-        return localStorage.getItem(storageKey);
+        const data = localStorage.getItem(key);
+        return data;
     } catch (error) {
         console.error('Error al obtener datos:', error);
         return null;
     }
 }
 
-// Funciones para manejar datos del usuario
-function getUserData(key) {
-    try {
-        const user = auth.currentUser;
-        if (!user) return null;
-        
-        const userId = user.uid;
-        const storageKey = `user_${userId}_${key}`;
-        return localStorage.getItem(storageKey);
-    } catch (error) {
-        console.error('Error al obtener datos:', error);
-        return null;
-    }
-}
 
-function setUserData(key, data) {
-    try {
-        const user = auth.currentUser;
-        if (!user) return false;
-        
-        const userId = user.uid;
-        const storageKey = `user_${userId}_${key}`;
-        
-        localStorage.setItem(storageKey, data);
-        
-        return true;
-    } catch (error) {
-        console.error('Error al guardar datos:', error);
-        return false;
-    }
-}
 
 // Exponer estas funciones globalmente
 window.setUserData = setUserData;
@@ -1226,15 +1172,12 @@ function openGallery(startingImageId = null) {
     document.addEventListener('keydown', galleryKeyHandler);
 }
 
-// Función para guardar datos específicos del usuario
+// Función para guardar datos del usuario
 function setUserData(key, data) {
     try {
-        const user = auth.currentUser;
-        if (!user) return false;
-        
-        const userId = user.uid;
-        const storageKey = `${userId}_${key}`;
-        localStorage.setItem(storageKey, JSON.stringify(data));
+        // Si data ya es un string, no lo convertimos de nuevo
+        const dataToStore = typeof data === 'string' ? data : JSON.stringify(data);
+        localStorage.setItem(key, dataToStore);
         return true;
     } catch (error) {
         console.error('Error al guardar datos:', error);
@@ -1242,52 +1185,18 @@ function setUserData(key, data) {
     }
 }
 
-// Función para obtener datos específicos del usuario
+// Función para obtener datos del usuario
 function getUserData(key) {
     try {
-        const user = auth.currentUser;
-        if (!user) return null;
-        
-        const userId = user.uid;
-        const storageKey = `${userId}_${key}`;
-        return localStorage.getItem(storageKey);
+        const data = localStorage.getItem(key);
+        return data;
     } catch (error) {
         console.error('Error al obtener datos:', error);
         return null;
     }
 }
 
-// Funciones para manejar datos del usuario
-function getUserData(key) {
-    try {
-        const user = auth.currentUser;
-        if (!user) return null;
-        
-        const userId = user.uid;
-        const storageKey = `user_${userId}_${key}`;
-        return localStorage.getItem(storageKey);
-    } catch (error) {
-        console.error('Error al obtener datos:', error);
-        return null;
-    }
-}
 
-function setUserData(key, data) {
-    try {
-        const user = auth.currentUser;
-        if (!user) return false;
-        
-        const userId = user.uid;
-        const storageKey = `user_${userId}_${key}`;
-        
-        localStorage.setItem(storageKey, data);
-        
-        return true;
-    } catch (error) {
-        console.error('Error al guardar datos:', error);
-        return false;
-    }
-}
 
 // Exponer estas funciones globalmente
 window.setUserData = setUserData;
@@ -1416,15 +1325,12 @@ function openGallery(startingImageId = null) {
     document.addEventListener('keydown', galleryKeyHandler);
 }
 
-// Función para guardar datos específicos del usuario
+// Función para guardar datos del usuario
 function setUserData(key, data) {
     try {
-        const user = auth.currentUser;
-        if (!user) return false;
-        
-        const userId = user.uid;
-        const storageKey = `${userId}_${key}`;
-        localStorage.setItem(storageKey, JSON.stringify(data));
+        // Si data ya es un string, no lo convertimos de nuevo
+        const dataToStore = typeof data === 'string' ? data : JSON.stringify(data);
+        localStorage.setItem(key, dataToStore);
         return true;
     } catch (error) {
         console.error('Error al guardar datos:', error);
@@ -1432,52 +1338,18 @@ function setUserData(key, data) {
     }
 }
 
-// Función para obtener datos específicos del usuario
+// Función para obtener datos del usuario
 function getUserData(key) {
     try {
-        const user = auth.currentUser;
-        if (!user) return null;
-        
-        const userId = user.uid;
-        const storageKey = `${userId}_${key}`;
-        return localStorage.getItem(storageKey);
+        const data = localStorage.getItem(key);
+        return data;
     } catch (error) {
         console.error('Error al obtener datos:', error);
         return null;
     }
 }
 
-// Funciones para manejar datos del usuario
-function getUserData(key) {
-    try {
-        const user = auth.currentUser;
-        if (!user) return null;
-        
-        const userId = user.uid;
-        const storageKey = `user_${userId}_${key}`;
-        return localStorage.getItem(storageKey);
-    } catch (error) {
-        console.error('Error al obtener datos:', error);
-        return null;
-    }
-}
 
-function setUserData(key, data) {
-    try {
-        const user = auth.currentUser;
-        if (!user) return false;
-        
-        const userId = user.uid;
-        const storageKey = `user_${userId}_${key}`;
-        
-        localStorage.setItem(storageKey, data);
-        
-        return true;
-    } catch (error) {
-        console.error('Error al guardar datos:', error);
-        return false;
-    }
-}
 
 // Exponer estas funciones globalmente
 window.setUserData = setUserData;
@@ -1606,15 +1478,12 @@ function openGallery(startingImageId = null) {
     document.addEventListener('keydown', galleryKeyHandler);
 }
 
-// Función para guardar datos específicos del usuario
+// Función para guardar datos del usuario
 function setUserData(key, data) {
     try {
-        const user = auth.currentUser;
-        if (!user) return false;
-        
-        const userId = user.uid;
-        const storageKey = `${userId}_${key}`;
-        localStorage.setItem(storageKey, JSON.stringify(data));
+        // Si data ya es un string, no lo convertimos de nuevo
+        const dataToStore = typeof data === 'string' ? data : JSON.stringify(data);
+        localStorage.setItem(key, dataToStore);
         return true;
     } catch (error) {
         console.error('Error al guardar datos:', error);
@@ -1622,52 +1491,18 @@ function setUserData(key, data) {
     }
 }
 
-// Función para obtener datos específicos del usuario
+// Función para obtener datos del usuario
 function getUserData(key) {
     try {
-        const user = auth.currentUser;
-        if (!user) return null;
-        
-        const userId = user.uid;
-        const storageKey = `${userId}_${key}`;
-        return localStorage.getItem(storageKey);
+        const data = localStorage.getItem(key);
+        return data;
     } catch (error) {
         console.error('Error al obtener datos:', error);
         return null;
     }
 }
 
-// Funciones para manejar datos del usuario
-function getUserData(key) {
-    try {
-        const user = auth.currentUser;
-        if (!user) return null;
-        
-        const userId = user.uid;
-        const storageKey = `user_${userId}_${key}`;
-        return localStorage.getItem(storageKey);
-    } catch (error) {
-        console.error('Error al obtener datos:', error);
-        return null;
-    }
-}
 
-function setUserData(key, data) {
-    try {
-        const user = auth.currentUser;
-        if (!user) return false;
-        
-        const userId = user.uid;
-        const storageKey = `user_${userId}_${key}`;
-        
-        localStorage.setItem(storageKey, data);
-        
-        return true;
-    } catch (error) {
-        console.error('Error al guardar datos:', error);
-        return false;
-    }
-}
 
 // Exponer estas funciones globalmente
 window.setUserData = setUserData;
@@ -1796,15 +1631,12 @@ function openGallery(startingImageId = null) {
     document.addEventListener('keydown', galleryKeyHandler);
 }
 
-// Función para guardar datos específicos del usuario
+// Función para guardar datos del usuario
 function setUserData(key, data) {
     try {
-        const user = auth.currentUser;
-        if (!user) return false;
-        
-        const userId = user.uid;
-        const storageKey = `${userId}_${key}`;
-        localStorage.setItem(storageKey, JSON.stringify(data));
+        // Si data ya es un string, no lo convertimos de nuevo
+        const dataToStore = typeof data === 'string' ? data : JSON.stringify(data);
+        localStorage.setItem(key, dataToStore);
         return true;
     } catch (error) {
         console.error('Error al guardar datos:', error);
@@ -1812,52 +1644,18 @@ function setUserData(key, data) {
     }
 }
 
-// Función para obtener datos específicos del usuario
+// Función para obtener datos del usuario
 function getUserData(key) {
     try {
-        const user = auth.currentUser;
-        if (!user) return null;
-        
-        const userId = user.uid;
-        const storageKey = `${userId}_${key}`;
-        return localStorage.getItem(storageKey);
+        const data = localStorage.getItem(key);
+        return data;
     } catch (error) {
         console.error('Error al obtener datos:', error);
         return null;
     }
 }
 
-// Funciones para manejar datos del usuario
-function getUserData(key) {
-    try {
-        const user = auth.currentUser;
-        if (!user) return null;
-        
-        const userId = user.uid;
-        const storageKey = `user_${userId}_${key}`;
-        return localStorage.getItem(storageKey);
-    } catch (error) {
-        console.error('Error al obtener datos:', error);
-        return null;
-    }
-}
 
-function setUserData(key, data) {
-    try {
-        const user = auth.currentUser;
-        if (!user) return false;
-        
-        const userId = user.uid;
-        const storageKey = `user_${userId}_${key}`;
-        
-        localStorage.setItem(storageKey, data);
-        
-        return true;
-    } catch (error) {
-        console.error('Error al guardar datos:', error);
-        return false;
-    }
-}
 
 // Exponer estas funciones globalmente
 window.setUserData = setUserData;
