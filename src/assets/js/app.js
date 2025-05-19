@@ -10,6 +10,9 @@ function updateUserInfo(user) {
     });
 }
 
+// Variables para la instalación de la PWA
+let deferredPrompt;
+
 // Agregar al inicio del archivo o después de DOMContentLoaded
 function setupToggleMenu() {
     const profileButton = document.querySelector('.profile-button');
@@ -34,6 +37,72 @@ function setupToggleMenu() {
             e.stopPropagation();
         });
     }
+}
+
+// Función para manejar la instalación de la PWA
+function setupInstallApp() {
+    const installButton = document.getElementById('installApp');
+    
+    // Mostrar el botón inicialmente (cambiamos esto para que siempre sea visible)
+    if (installButton) {
+        installButton.style.display = 'flex';
+    }
+    
+    // Variable para controlar si la app puede ser instalada
+    let canInstall = false;
+    
+    // Capturar el evento beforeinstallprompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevenir que Chrome muestre automáticamente el diálogo
+        e.preventDefault();
+        // Guardar el evento para usarlo más tarde
+        deferredPrompt = e;
+        // Indicar que la app puede ser instalada
+        canInstall = true;
+    });
+    
+    // Agregar evento al botón
+    if (installButton) {
+        installButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            // Ocultar el menú desplegable
+            const menuDropdown = document.querySelector('.menu-dropdown');
+            if (menuDropdown) {
+                menuDropdown.classList.remove('active');
+            }
+            
+            // Si no hay evento guardado o no se puede instalar
+            if (!deferredPrompt || !canInstall) {
+                showNotification('La aplicación ya está instalada o no es compatible con este navegador', 'info');
+                return;
+            }
+            
+            // Mostrar el diálogo de instalación
+            deferredPrompt.prompt();
+            
+            // Esperar a que el usuario responda
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            // Mostrar mensaje según la respuesta
+            if (outcome === 'accepted') {
+                showNotification('¡Gracias por instalar nuestra aplicación!');
+            } else {
+                showNotification('Puedes instalar la aplicación más tarde desde el menú', 'info');
+            }
+            
+            // Limpiar el evento guardado
+            deferredPrompt = null;
+            canInstall = false;
+        });
+    }
+    
+    // Detectar cuando la app ya está instalada
+    window.addEventListener('appinstalled', () => {
+        // Limpiar el evento guardado
+        deferredPrompt = null;
+        canInstall = false;
+        showNotification('¡Aplicación instalada correctamente!');
+    });
 }
 
 // Agregar después de setupToggleMenu
@@ -218,22 +287,273 @@ function addActivity(event) {
     }
 }
 
-// Modificar el event listener DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
-    // Inicializar funcionalidades
-    initializeImagePreview();
-    loadActivities();
-    setupEventListeners();
-    setupToggleMenu();
-    setupAuthButtons();
-
-    const activityForm = document.querySelector('.activity-form');
-    if (activityForm) {
-        activityForm.addEventListener('submit', (e) => {
-            addActivity(e);
+// Función para manejar el botón de volver arriba
+function setupScrollToTop() {
+    const scrollButton = document.getElementById('scroll-to-top');
+    
+    if (scrollButton) {
+        // Mostrar/ocultar el botón según el scroll
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                scrollButton.classList.add('visible');
+            } else {
+                scrollButton.classList.remove('visible');
+            }
+        });
+        
+        // Acción al hacer clic en el botón
+        scrollButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         });
     }
+}
 
+// Función para manejar el modo oscuro
+function setupDarkMode() {
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    
+    // Verificar si hay una preferencia guardada
+    const isDarkMode = localStorage.getItem('darkMode') === 'true';
+    
+    // Aplicar el modo oscuro si está guardado
+    if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+        if (darkModeToggle) {
+            darkModeToggle.checked = true;
+        }
+    }
+    
+    // Escuchar cambios en el toggle
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('change', () => {
+            if (darkModeToggle.checked) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'true');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'false');
+            }
+        });
+    }
+}
+
+// Función para manejar la eliminación de cuenta
+function setupDeleteAccount() {
+    const deleteAccountBtn = document.getElementById('deleteAccount');
+    const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+    const cancelDeleteBtn = document.getElementById('cancelDelete');
+    const confirmDeleteBtn = document.getElementById('confirmDelete');
+    
+    if (deleteAccountBtn && deleteConfirmModal) {
+        // Mostrar el modal de confirmación
+        deleteAccountBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            deleteConfirmModal.classList.add('active');
+            
+            // Cerrar el menú desplegable
+            const menuDropdown = document.querySelector('.menu-dropdown');
+            if (menuDropdown) {
+                menuDropdown.classList.remove('active');
+            }
+        });
+        
+        // Cancelar la eliminación
+        if (cancelDeleteBtn) {
+            cancelDeleteBtn.addEventListener('click', () => {
+                deleteConfirmModal.classList.remove('active');
+            });
+        }
+        
+        // Confirmar la eliminación
+        if (confirmDeleteBtn) {
+            confirmDeleteBtn.addEventListener('click', async () => {
+                try {
+                    const user = auth.currentUser;
+                    if (user) {
+                        // Eliminar el usuario
+                        await user.delete();
+                        // Redirigir al login
+                        window.location.href = 'login.html';
+                        showNotification('Cuenta eliminada correctamente');
+                    }
+                } catch (error) {
+                    console.error('Error al eliminar la cuenta:', error);
+                    
+                    // Si el error es por autenticación reciente, mostrar mensaje específico
+                    if (error.code === 'auth/requires-recent-login') {
+                        showNotification('Por seguridad, debes volver a iniciar sesión antes de eliminar tu cuenta', 'error');
+                        // Cerrar sesión y redirigir al login
+                        await auth.signOut();
+                        window.location.href = 'login.html';
+                    } else {
+                        showNotification('Error al eliminar la cuenta: ' + error.message, 'error');
+                    }
+                } finally {
+                    deleteConfirmModal.classList.remove('active');
+                }
+            });
+        }
+        
+        // Cerrar el modal si se hace clic fuera
+        deleteConfirmModal.addEventListener('click', (e) => {
+            if (e.target === deleteConfirmModal) {
+                deleteConfirmModal.classList.remove('active');
+            }
+        });
+    }
+}
+
+// Función para manejar el botón de donación
+function setupDonationButton() {
+    const donationBtn = document.getElementById('donationBtn');
+    
+    if (donationBtn) {
+        donationBtn.addEventListener('click', () => {
+            // Por ahora solo mostramos una notificación
+            showNotification('¡Gracias por tu interés en donar! Esta función estará disponible próximamente.');
+            
+            // Cerrar el menú desplegable
+            const menuDropdown = document.querySelector('.menu-dropdown');
+            if (menuDropdown) {
+                menuDropdown.classList.remove('active');
+            }
+        });
+    }
+}
+
+// Función para mostrar notificaciones
+function showNotification(message, type = 'success') {
+    // Verificar si ya existe una notificación
+    let notification = document.querySelector('.notification');
+    
+    // Si no existe, crearla
+    if (!notification) {
+        notification = document.createElement('div');
+        notification.className = 'notification';
+        document.body.appendChild(notification);
+    }
+    
+    // Establecer el tipo y mensaje
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
+            <span>${message}</span>
+        </div>
+        <button class="close-notification">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    // Mostrar la notificación
+    notification.classList.add('show');
+    
+    // Configurar el botón de cierre
+    const closeBtn = notification.querySelector('.close-notification');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            notification.classList.remove('show');
+        });
+    }
+    
+    // Ocultar automáticamente después de 5 segundos
+    setTimeout(() => {
+        if (notification.classList.contains('show')) {
+            notification.classList.remove('show');
+        }
+    }, 5000);
+}
+
+// Función para agregar estilos CSS para las notificaciones
+function addNotificationStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 2000;
+            max-width: 350px;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        .notification i {
+            font-size: 1.5rem;
+        }
+        
+        .notification.success i {
+            color: #28a745;
+        }
+        
+        .notification.error i {
+            color: #dc3545;
+        }
+        
+        .notification.info i {
+            color: #17a2b8;
+        }
+        
+        .close-notification {
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        .close-notification:hover {
+            color: #333;
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Modificar el event listener DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+    // Inicializar componentes
+    setupToggleMenu();
+    setupAuthButtons();
+    setupInstallApp();
+    setupScrollToTop();
+    initializeImagePreview();
+    setupDarkMode();
+    setupDeleteAccount();
+    setupDonationButton();
+    addNotificationStyles();
+    
+    // Configurar formularios
+    const activityForm = document.querySelector('.activity-form');
+    if (activityForm) {
+        activityForm.addEventListener('submit', addActivity);
+    }
+    
+    // Cargar actividades
+    loadActivities();
+    
+    // Configurar eventos
+    setupEventListeners();
+    
     // Event listeners para filtros
     const searchInput = document.getElementById('activity-search');
     const dateFilter = document.getElementById('activity-date-filter');
@@ -766,14 +1086,45 @@ function setupActivityCardListeners(card) {
 
 // Función para mostrar notificaciones
 function showNotification(message, type = 'success') {
-    const notification = document.createElement('div');
+    // Verificar si ya existe una notificación
+    let notification = document.querySelector('.notification');
+    
+    // Si no existe, crearla
+    if (!notification) {
+        notification = document.createElement('div');
+        notification.className = 'notification';
+        document.body.appendChild(notification);
+    }
+    
+    // Establecer el tipo y mensaje
     notification.className = `notification ${type}`;
     notification.innerHTML = `
-        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-        ${message}
+        <div class="notification-content">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
+            <span>${message}</span>
+        </div>
+        <button class="close-notification">
+            <i class="fas fa-times"></i>
+        </button>
     `;
-    document.body.appendChild(notification);
-    setTimeout(() => notification.remove(), 3000);
+    
+    // Mostrar la notificación
+    notification.classList.add('show');
+    
+    // Configurar el botón de cierre
+    const closeBtn = notification.querySelector('.close-notification');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            notification.classList.remove('show');
+        });
+    }
+    
+    // Ocultar automáticamente después de 5 segundos
+    setTimeout(() => {
+        if (notification.classList.contains('show')) {
+            notification.classList.remove('show');
+        }
+    }, 5000);
 }
 
 // Hacer accesible la función deleteActivityImage globalmente
@@ -919,14 +1270,45 @@ function setupActivityCardListeners(card) {
 
 // Función para mostrar notificaciones
 function showNotification(message, type = 'success') {
-    const notification = document.createElement('div');
+    // Verificar si ya existe una notificación
+    let notification = document.querySelector('.notification');
+    
+    // Si no existe, crearla
+    if (!notification) {
+        notification = document.createElement('div');
+        notification.className = 'notification';
+        document.body.appendChild(notification);
+    }
+    
+    // Establecer el tipo y mensaje
     notification.className = `notification ${type}`;
     notification.innerHTML = `
-        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-        ${message}
+        <div class="notification-content">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
+            <span>${message}</span>
+        </div>
+        <button class="close-notification">
+            <i class="fas fa-times"></i>
+        </button>
     `;
-    document.body.appendChild(notification);
-    setTimeout(() => notification.remove(), 3000);
+    
+    // Mostrar la notificación
+    notification.classList.add('show');
+    
+    // Configurar el botón de cierre
+    const closeBtn = notification.querySelector('.close-notification');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            notification.classList.remove('show');
+        });
+    }
+    
+    // Ocultar automáticamente después de 5 segundos
+    setTimeout(() => {
+        if (notification.classList.contains('show')) {
+            notification.classList.remove('show');
+        }
+    }, 5000);
 }
 
 // Hacer accesible la función deleteActivityImage globalmente
@@ -1072,14 +1454,45 @@ function setupActivityCardListeners(card) {
 
 // Función para mostrar notificaciones
 function showNotification(message, type = 'success') {
-    const notification = document.createElement('div');
+    // Verificar si ya existe una notificación
+    let notification = document.querySelector('.notification');
+    
+    // Si no existe, crearla
+    if (!notification) {
+        notification = document.createElement('div');
+        notification.className = 'notification';
+        document.body.appendChild(notification);
+    }
+    
+    // Establecer el tipo y mensaje
     notification.className = `notification ${type}`;
     notification.innerHTML = `
-        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-        ${message}
+        <div class="notification-content">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
+            <span>${message}</span>
+        </div>
+        <button class="close-notification">
+            <i class="fas fa-times"></i>
+        </button>
     `;
-    document.body.appendChild(notification);
-    setTimeout(() => notification.remove(), 3000);
+    
+    // Mostrar la notificación
+    notification.classList.add('show');
+    
+    // Configurar el botón de cierre
+    const closeBtn = notification.querySelector('.close-notification');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            notification.classList.remove('show');
+        });
+    }
+    
+    // Ocultar automáticamente después de 5 segundos
+    setTimeout(() => {
+        if (notification.classList.contains('show')) {
+            notification.classList.remove('show');
+        }
+    }, 5000);
 }
 
 // Hacer accesible la función deleteActivityImage globalmente
@@ -1225,14 +1638,45 @@ function setupActivityCardListeners(card) {
 
 // Función para mostrar notificaciones
 function showNotification(message, type = 'success') {
-    const notification = document.createElement('div');
+    // Verificar si ya existe una notificación
+    let notification = document.querySelector('.notification');
+    
+    // Si no existe, crearla
+    if (!notification) {
+        notification = document.createElement('div');
+        notification.className = 'notification';
+        document.body.appendChild(notification);
+    }
+    
+    // Establecer el tipo y mensaje
     notification.className = `notification ${type}`;
     notification.innerHTML = `
-        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-        ${message}
+        <div class="notification-content">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
+            <span>${message}</span>
+        </div>
+        <button class="close-notification">
+            <i class="fas fa-times"></i>
+        </button>
     `;
-    document.body.appendChild(notification);
-    setTimeout(() => notification.remove(), 3000);
+    
+    // Mostrar la notificación
+    notification.classList.add('show');
+    
+    // Configurar el botón de cierre
+    const closeBtn = notification.querySelector('.close-notification');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            notification.classList.remove('show');
+        });
+    }
+    
+    // Ocultar automáticamente después de 5 segundos
+    setTimeout(() => {
+        if (notification.classList.contains('show')) {
+            notification.classList.remove('show');
+        }
+    }, 5000);
 }
 
 // Hacer accesible la función deleteActivityImage globalmente
@@ -1378,14 +1822,45 @@ function setupActivityCardListeners(card) {
 
 // Función para mostrar notificaciones
 function showNotification(message, type = 'success') {
-    const notification = document.createElement('div');
+    // Verificar si ya existe una notificación
+    let notification = document.querySelector('.notification');
+    
+    // Si no existe, crearla
+    if (!notification) {
+        notification = document.createElement('div');
+        notification.className = 'notification';
+        document.body.appendChild(notification);
+    }
+    
+    // Establecer el tipo y mensaje
     notification.className = `notification ${type}`;
     notification.innerHTML = `
-        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-        ${message}
+        <div class="notification-content">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
+            <span>${message}</span>
+        </div>
+        <button class="close-notification">
+            <i class="fas fa-times"></i>
+        </button>
     `;
-    document.body.appendChild(notification);
-    setTimeout(() => notification.remove(), 3000);
+    
+    // Mostrar la notificación
+    notification.classList.add('show');
+    
+    // Configurar el botón de cierre
+    const closeBtn = notification.querySelector('.close-notification');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            notification.classList.remove('show');
+        });
+    }
+    
+    // Ocultar automáticamente después de 5 segundos
+    setTimeout(() => {
+        if (notification.classList.contains('show')) {
+            notification.classList.remove('show');
+        }
+    }, 5000);
 }
 
 // Hacer accesible la función deleteActivityImage globalmente
@@ -1531,14 +2006,45 @@ function setupActivityCardListeners(card) {
 
 // Función para mostrar notificaciones
 function showNotification(message, type = 'success') {
-    const notification = document.createElement('div');
+    // Verificar si ya existe una notificación
+    let notification = document.querySelector('.notification');
+    
+    // Si no existe, crearla
+    if (!notification) {
+        notification = document.createElement('div');
+        notification.className = 'notification';
+        document.body.appendChild(notification);
+    }
+    
+    // Establecer el tipo y mensaje
     notification.className = `notification ${type}`;
     notification.innerHTML = `
-        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-        ${message}
+        <div class="notification-content">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
+            <span>${message}</span>
+        </div>
+        <button class="close-notification">
+            <i class="fas fa-times"></i>
+        </button>
     `;
-    document.body.appendChild(notification);
-    setTimeout(() => notification.remove(), 3000);
+    
+    // Mostrar la notificación
+    notification.classList.add('show');
+    
+    // Configurar el botón de cierre
+    const closeBtn = notification.querySelector('.close-notification');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            notification.classList.remove('show');
+        });
+    }
+    
+    // Ocultar automáticamente después de 5 segundos
+    setTimeout(() => {
+        if (notification.classList.contains('show')) {
+            notification.classList.remove('show');
+        }
+    }, 5000);
 }
 
 // Hacer accesible la función deleteActivityImage globalmente
@@ -1684,14 +2190,45 @@ function setupActivityCardListeners(card) {
 
 // Función para mostrar notificaciones
 function showNotification(message, type = 'success') {
-    const notification = document.createElement('div');
+    // Verificar si ya existe una notificación
+    let notification = document.querySelector('.notification');
+    
+    // Si no existe, crearla
+    if (!notification) {
+        notification = document.createElement('div');
+        notification.className = 'notification';
+        document.body.appendChild(notification);
+    }
+    
+    // Establecer el tipo y mensaje
     notification.className = `notification ${type}`;
     notification.innerHTML = `
-        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-        ${message}
+        <div class="notification-content">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
+            <span>${message}</span>
+        </div>
+        <button class="close-notification">
+            <i class="fas fa-times"></i>
+        </button>
     `;
-    document.body.appendChild(notification);
-    setTimeout(() => notification.remove(), 3000);
+    
+    // Mostrar la notificación
+    notification.classList.add('show');
+    
+    // Configurar el botón de cierre
+    const closeBtn = notification.querySelector('.close-notification');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            notification.classList.remove('show');
+        });
+    }
+    
+    // Ocultar automáticamente después de 5 segundos
+    setTimeout(() => {
+        if (notification.classList.contains('show')) {
+            notification.classList.remove('show');
+        }
+    }, 5000);
 }
 
 // Hacer accesible la función deleteActivityImage globalmente

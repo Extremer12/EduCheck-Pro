@@ -31,6 +31,16 @@
                         <h3>Nombre de la Docente</h3>
                         <p>Docente</p>
                     </div>
+                    
+                    <!-- Botón de modo oscuro -->
+                    <div class="dark-mode-toggle">
+                        <span>Modo Oscuro</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="darkModeToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
                     <div class="menu-divider"></div>
                     <a href="#" id="students-list" class="menu-item">
                         <i class="fas fa-users"></i>
@@ -55,6 +65,14 @@
                         </div>
                     </a>
                     <div class="menu-divider"></div>
+                    <a href="#" id="installApp" class="menu-item">
+                        <i class="fas fa-download"></i>
+                        <div class="menu-item-content">
+                            <span>Instalar App</span>
+                            <p>Instalar como aplicación</p>
+                        </div>
+                    </a>
+                    <div class="menu-divider"></div>
                     <a href="#" id="logout" class="menu-item">
                         <i class="fas fa-sign-out-alt"></i>
                         <div class="menu-item-content">
@@ -68,6 +86,11 @@
                             <p>Esta acción no se puede deshacer</p>
                         </div>
                     </a>
+                    
+                    <!-- Botón de donación -->
+                    <button id="donationBtn" class="donation-btn">
+                        <i class="fas fa-heart"></i> Realizar Donación
+                    </button>
                 </div>
             </div>
             <h1>Horita Feliz</h1>
@@ -372,5 +395,22 @@
     .catch(err => console.error("Error al registrar SW", err));
 }
 </script>
+</body>
+</html>
+
+<!-- Modal de confirmación para eliminar cuenta -->
+<div id="deleteConfirmModal" class="confirm-modal">
+    <div class="confirm-content">
+        <div class="confirm-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h3 class="confirm-title">¿Estás seguro?</h3>
+        <p class="confirm-text">Esta acción eliminará permanentemente tu cuenta y todos tus datos. Esta operación no se puede deshacer.</p>
+        <div class="confirm-buttons">
+            <button id="cancelDelete" class="confirm-cancel">Cancelar</button>
+            <button id="confirmDelete" class="confirm-delete">Eliminar Cuenta</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
