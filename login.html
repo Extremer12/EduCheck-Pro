@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Inicia sesión en Horita Feliz para acceder a todas las funcionalidades.">
+    <meta name="keywords" content="Horita Feliz, inicio de sesión, registro, recuperación de contraseña">
+    <meta name="author" content="Cristian Bordón">
+    <meta name="theme-color" content="#ffcc00">
+    <link rel="icon" href="icon-192.png" type="image/png">
+    <title>Horita Feliz - Iniciar Sesión</title>
+    <link rel="stylesheet" href="src/assets/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="login-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fas fa-heart auth-icon"></i>
+                <h1>Horita Feliz</h1>
+                <p id="authDescription">Inicia sesión para continuar</p>
+            </div>
+
+            <!-- Formulario de login -->
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Correo electrónico</label>
+                    <input type="email" id="email" placeholder="Ingresa tu correo electrónico" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Contraseña</label>
+                    <div class="password-input">
+                        <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
+                        <button type="button" class="toggle-password" aria-label="Mostrar contraseña" title="Mostrar/ocultar contraseña">
+                            <i class="fas fa-eye" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="auth-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Iniciar Sesión
+                </button>
+                <div class="auth-links">
+                    <a href="#" id="forgotPassword">¿Olvidaste tu contraseña?</a>
+                    <a href="#" id="createAccount">Crear cuenta nueva</a>
+                </div>
+            </form>
+
+            <!-- Formulario de registro (inicialmente oculto) -->
+            <form id="registerForm" class="auth-form" style="display: none;">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Nombre completo</label>
+                    <input type="text" id="registerName" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Correo electrónico</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Contraseña</label>
+                    <div class="password-input">
+                        <input type="password" id="registerPassword" required>
+                        <button type="button" class="toggle-password" aria-label="Mostrar contraseña">
+                            <i class="fas fa-eye" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="auth-btn">
+                    <i class="fas fa-user-plus"></i>
+                    Crear Cuenta
+                </button>
+                <div class="auth-links">
+                    <a href="#" id="backToLogin">Volver al inicio de sesión</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module">
+        // Importar funciones necesarias de Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword, 
+            updateProfile,
+            sendPasswordResetEmail,
+            sendEmailVerification
+        } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAC2DxR63utzR1tmnHCqzApYTraxMsH79M",
+            authDomain: "horita-feliz-system.firebaseapp.com",
+            projectId: "horita-feliz-system",
+            storageBucket: "horita-feliz-system.firebasestorage.app",
+            messagingSenderId: "469162449559",
+            appId: "1:469162449559:web:734e8756fd03b1388ce7d2",
+            measurementId: "G-6645JXJBD6"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Referencias a elementos del DOM
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const createAccountLink = document.getElementById('createAccount');
+        const backToLoginLink = document.getElementById('backToLogin');
+        const authDescription = document.getElementById('authDescription');
+
+        // Alternar entre formularios
+        createAccountLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+            authDescription.textContent = 'Crea tu cuenta';
+        });
+
+        backToLoginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerForm.style.display = 'none';
+            loginForm.style.display = 'block';
+            authDescription.textContent = 'Inicia sesión para continuar';
+        });
+
+        // Manejar registro
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await sendEmailVerification(userCredential.user);
+                alert('Se ha enviado un email de verificación. Por favor verifica tu cuenta.');
+                window.location.href = 'login.html';
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+
+        // Función para el registro
+        const handleRegister = async (email, password) => {
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await sendEmailVerification(userCredential.user);
+                alert('Se ha enviado un email de verificación');
+            } catch (error) {
+                alert('Error: ' + error.message); 
+            }
+        };
+
+        // Manejar form submission
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                window.location.href = 'index.html';
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+
+        // Función para manejar visibilidad de contraseña en ambos formularios
+        document.querySelectorAll('.toggle-password').forEach(button => {
+            button.addEventListener('click', function() {
+                const passwordInput = this.previousElementSibling;
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.querySelector('i').classList.toggle('fa-eye');
+                this.querySelector('i').classList.toggle('fa-eye-slash');
+            });
+        });
+
+        // Manejar recuperación de contraseña
+        document.getElementById('forgotPassword').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            if (!email) {
+                alert('Por favor ingresa tu email');
+                return;
+            }
+            
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert('Se ha enviado un enlace de recuperación a tu email');
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>

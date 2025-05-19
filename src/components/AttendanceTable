@@ -1,0 +1,33 @@
+// This file contains the AttendanceTable component for displaying student attendance status and points.
+
+const AttendanceTable = ({ students, attendanceData }) => {
+    return (
+        <table className="attendance-table">
+            <thead>
+                <tr>
+                    <th>Nombre del Estudiante</th>
+                    <th>Edad</th>
+                    <th>Asistencia</th>
+                    <th>Puntos</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {students.map(student => {
+                    const attendance = attendanceData.find(data => data.studentId === student.id) || {};
+                    return (
+                        <tr key={student.id}>
+                            <td>{student.name}</td>
+                            <td>{student.age}</td>
+                            <td>{attendance.present ? 'Presente' : 'Ausente'}</td>
+                            <td>{attendance.points || 0}</td>
+                            <td>{attendance.completed ? 'Completo' : 'Incompleto'}</td>
+                        </tr>
+                    );
+                })}
+            </tbody>
+        </table>
+    );
+};
+
+export default AttendanceTable;

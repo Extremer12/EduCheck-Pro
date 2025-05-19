@@ -1,0 +1,51 @@
+// This file contains the StudentForm component for adding student names and ages.
+
+const StudentForm = () => {
+    const form = document.createElement('form');
+    form.id = 'student-form';
+
+    const nameLabel = document.createElement('label');
+    nameLabel.setAttribute('for', 'student-name');
+    nameLabel.textContent = 'Nombre del Estudiante:';
+    form.appendChild(nameLabel);
+
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.id = 'student-name';
+    nameInput.required = true;
+    form.appendChild(nameInput);
+
+    const ageLabel = document.createElement('label');
+    ageLabel.setAttribute('for', 'student-age');
+    ageLabel.textContent = 'Edad del Estudiante:';
+    form.appendChild(ageLabel);
+
+    const ageInput = document.createElement('input');
+    ageInput.type = 'number';
+    ageInput.id = 'student-age';
+    ageInput.min = '1';
+    ageInput.required = true;
+    form.appendChild(ageInput);
+
+    const submitButton = document.createElement('button');
+    submitButton.type = 'submit';
+    submitButton.textContent = 'Agregar Estudiante';
+    form.appendChild(submitButton);
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const studentName = nameInput.value;
+        const studentAge = ageInput.value;
+
+        // Logic to handle adding the student goes here
+        console.log(`Estudiante agregado: ${studentName}, Edad: ${studentAge}`);
+
+        // Clear the form
+        nameInput.value = '';
+        ageInput.value = '';
+    });
+
+    return form;
+};
+
+export default StudentForm;

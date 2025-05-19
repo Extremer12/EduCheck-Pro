@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<link rel="apple-touch-icon" href="src/assets/icons/icon-192x192.png">
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema de asistencia para docentes de educación infantil.">
+    <meta name="keywords" content="asistencia, educación infantil, docentes, gestión de alumnos">
+    <meta name="author" content="Cristian Bordon">
+    <meta name="theme-color" content="#4CAF50">   
+    <meta name="theme-color" content="#f4a1c2">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="" type="image/png">
+    <title>Horita Feliz - Sistema de Asistencia</title>
+    <link rel="stylesheet" href="src/assets/css/styles.css">
+    <link rel="stylesheet" href="src/assets/css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div class="teacher-toggle">
+                <button class="profile-button" aria-label="Menú de perfil">
+                    <img src="https://img.freepik.com/vector-gratis/circulo-azul-usuario-blanco_78370-4707.jpg?semt=ais_hybrid&w=740" alt="Profile" class="profile-img">
+                    <span id="teacher-name">Nombre de la Docente</span>
+                    <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                </button>
+                <div class="menu-dropdown">
+                    <div class="menu-header">
+                        <img src="https://img.freepik.com/vector-gratis/circulo-azul-usuario-blanco_78370-4707.jpg?semt=ais_hybrid&w=740" alt="Profile" class="large-profile-img">
+                        <h3>Nombre de la Docente</h3>
+                        <p>Docente</p>
+                    </div>
+                    <div class="menu-divider"></div>
+                    <a href="#" id="students-list" class="menu-item">
+                        <i class="fas fa-users"></i>
+                        <div class="menu-item-content">
+                            <span>Mis Alumnos</span>
+                            <p>Gestionar lista de alumnos</p>
+                        </div>
+                    </a>
+                    <a href="#" id="profile" class="menu-item">
+                        <i class="fas fa-user-circle"></i>
+                        <div class="menu-item-content">
+                            <span>Perfil</span>
+                            <p>Ver y editar perfil</p>
+                        </div>
+                    </a>
+                    <div class="menu-divider"></div>
+                    <a href="#" id="gallery" class="menu-item">
+                        <i class="fas fa-images"></i>
+                        <div class="menu-item-content">
+                            <span>Galería</span>
+                            <p>Ver fotos de actividades</p>
+                        </div>
+                    </a>
+                    <div class="menu-divider"></div>
+                    <a href="#" id="logout" class="menu-item">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <div class="menu-item-content">
+                            <span>Cerrar Sesión</span>
+                        </div>
+                    </a>
+                    <a href="#" id="deleteAccount" class="menu-item">
+                        <i class="fas fa-user-times"></i>
+                        <div class="menu-item-content">
+                            <span>Eliminar Cuenta</span>
+                            <p>Esta acción no se puede deshacer</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <h1>Horita Feliz</h1>
+        </header>
+        <main>
+            <section id="student-management">
+                <form class="student-form">
+                    <div class="form-header">
+                        <i class="fas fa-child form-icon"></i>
+                        <h2>Agregar Alumnos</h2>
+                        <p class="form-description">
+                            Registra aquí a todos los niños que asisten a tu clase. 
+                            Esto te permitirá llevar un control de asistencia y seguimiento 
+                            de sus actividades.
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label for="studentName">
+                            <i class="fas fa-user"></i> Nombre del Alumno
+                        </label>
+                        <input type="text" id="studentName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="studentAge">
+                            <i class="fas fa-birthday-cake"></i> Edad
+                        </label>
+                        <input type="number" id="studentAge" min="1" max="15" required>
+                    </div>
+                    <button type="submit" class="add-student-btn">
+                        <i class="fas fa-plus"></i> Agregar Alumno
+                    </button>
+                </form>
+            </section>
+
+            <section id="activity-log">
+                <form class="activity-form">
+                    <div class="form-header">
+                        <i class="fas fa-book-open form-icon"></i>
+                        <h2>Registro de Actividades</h2>
+                        <p class="form-description">
+                            Registra las actividades que realizarás en clase. 
+                            Esto te ayudará a mantener un historial de las lecciones 
+                            y el progreso de tus alumnos.
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label for="activityName">
+                            <i class="fas fa-star"></i> Nombre de la Actividad
+                        </label>
+                        <input type="text" id="activityName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="activityDate">
+                            <i class="fas fa-calendar"></i> Fecha
+                        </label>
+                        <input type="date" id="activityDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-image"></i> Foto de la Actividad
+                        </label>
+                        <div class="image-upload-container">
+                            <input type="file" id="activityImage" accept="image/*" hidden aria-label="Imagen de actividad" title="Seleccionar imagen para la actividad" placeholder="Seleccionar imagen">
+                            <div class="image-preview">
+                                <img id="imagePreview" src="#" alt="Vista previa de imagen">
+                                <button type="button" class="remove-image" aria-label="Eliminar imagen" title="Eliminar imagen">
+                                    <i class="fas fa-times" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            <label for="activityImage" class="upload-placeholder" title="Subir imagen">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Click para subir imagen</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="add-activity-btn">
+                        <i class="fas fa-plus"></i>
+                        Agregar Actividad
+                    </button>
+                </form>
+            </section>
+
+            <section id="activities-list" class="activities-container">
+                <div class="form-header">
+                    <i class="fas fa-list-check form-icon"></i>
+                    <h2>Mis Actividades</h2>
+                    <p class="form-description">
+                        Aquí encontrarás todas las actividades registradas.
+                    </p>
+                </div>
+
+                <div class="activities-filters">
+                    <div class="filter-group">
+                        <label class="filter-label">
+                            <i class="fas fa-search"></i>
+                            Buscar actividad
+                        </label>
+                        <input type="text" id="activity-search" placeholder="Ej: Lección">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">
+                            <i class="fas fa-calendar"></i>
+                            Filtrar por fecha
+                        </label>
+                        <input type="date" id="activity-date-filter">
+                    </div>
+                </div>
+
+                <div id="activities-grid"></div>
+            </section>
+
+            <div id="attendance-modal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="modal-activity-title"></h3>
+                        <button class="close-modal"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="attendance-table">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-user"></i>Alumno</th>
+                                    <th><i class="fas fa-clipboard-check"></i>Asistencia</th>
+                                    <th><i class="fas fa-star"></i>Puntos</th>
+                                    <th><i class="fas fa-tasks"></i>Estado Tarea</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modal-attendance-list"></tbody>
+                        </table>
+                        <button class="save-attendance-btn">
+                            <i class="fas fa-save"></i> Guardar Asistencia
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para lista de alumnos -->
+            <div id="students-modal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-users"></i> Mis Alumnos</h3>
+                        <button class="close-modal" title="Cerrar ventana"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="students-list-container" class="students-list">
+                            <!-- Students will be added here dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para perfil -->
+            <div id="profile-modal" class="modal">
+                <div class="modal-content profile-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-user-circle"></i> Mi Perfil</h3>
+                        <button class="close-modal" title="Cerrar ventana"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="profile-header">
+                            <div class="profile-avatar-container">
+                                <span class="profile-avatar-label">Docente</span>
+                                <div class="profile-avatar">
+                                    <img id="profile-image" src="https://img.freepik.com/vector-gratis/circulo-azul-usuario-blanco_78370-4707.jpg?semt=ais_hybrid&w=740" alt="Profile">
+                                    <input type="file" id="profile-photo-input" accept="image/*" style="display: none;" title="Seleccionar foto de perfil" aria-label="Seleccionar foto de perfil">
+                                    <button class="change-avatar-btn" onclick="document.getElementById('profile-photo-input').click()" aria-label="Cambiar foto de perfil" title="Cambiar foto de perfil">
+                                        <i class="fas fa-camera" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="profile-info">
+                                <h2 class="teacher-name">Nombre de la Docente</h2>
+                                <p class="teacher-role">Educadora Infantil</p>
+                            </div>
+                        </div>
+                        <!-- Stats moved here -->
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="stat-details">
+                                    <span class="stat-value" id="profile-total-students">0</span>
+                                    <span class="stat-label">Alumnos Totales</span>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <div class="stat-details">
+                                    <span class="stat-value" id="profile-total-activities">0</span>
+                                    <span class="stat-label">Actividades Realizadas</span>
+                                </div>
+                            </div>
+
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div class="stat-details">
+                                    <span class="stat-value" id="profile-attendance-rate">0%</span>
+                                    <span class="stat-label">Asistencia Promedio</span>
+                                </div>
+                            </div>
+
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="stat-details">
+                                    <span class="stat-value" id="profile-completion-rate">0%</span>
+                                    <span class="stat-label">Tareas Completadas</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para galería -->
+            <div id="gallery-modal" class="modal">
+                <div class="modal-content gallery-modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-images"></i> Galería de Actividades</h3>
+                        <button class="close-modal" aria-label="Cerrar ventana" title="Cerrar ventana"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="gallery-search">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="gallery-search" placeholder="Buscar actividad...">
+                        </div>
+                    </div>
+                    <div class="modal-body gallery-carousel">
+                        <button class="carousel-btn prev-btn" aria-label="Imagen anterior">
+                            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                        </button>
+                        
+                        <div class="carousel-container">
+                            <div class="carousel-slide">
+                                <img src="" alt="Imagen de actividad">
+                                <div class="image-info">
+                                    <h4 class="activity-name"></h4>
+                                    <p class="activity-date"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="carousel-btn next-btn" aria-label="Siguiente imagen">
+                            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div class="carousel-indicators"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <button id="scroll-to-top" class="scroll-to-top" aria-label="Volver arriba">
+        <i class="fas fa-chevron-up" aria-hidden="true"></i>
+    </button>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { connectToDatabase } from "./src/utils/database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAC2DxR63utzR1tmnHCqzApYTraxMsH79M",
+            authDomain: "horita-feliz-system.firebaseapp.com",
+            projectId: "horita-feliz-system",
+            storageBucket: "horita-feliz-system.firebasestorage.app",
+            messagingSenderId: "469162449559",
+            appId: "1:469162449559:web:734e8756fd03b1388ce7d2",
+            measurementId: "G-6645JXJBD6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        window.auth = auth;
+        window.db = db;
+        
+        // Conectar a la base de datos cuando el usuario inicie sesión
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                await connectToDatabase();
+            }
+        });
+    </script>
+    <script src="src/assets/js/app.js"></script>
+    <script type="module" src="src/assets/js/students.js"></script>
+    <script type="module" src="src/assets/js/attendance.js"></script>
+    <script type="module" src="src/assets/js/profile.js"></script>
+    <script>
+    if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js")
+    .then(reg => console.log("SW registrado"))
+    .catch(err => console.error("Error al registrar SW", err));
+}
+</script>
+
+</body>
+</html>
+<!-- Busca el botón en la línea 189 y añade un texto o un atributo aria-label -->
+<button class="some-button" aria-label="Descripción de la acción del botón">
+    <i class="fas fa-icon" aria-hidden="true"></i>
+</button>
+</body>
+</html>

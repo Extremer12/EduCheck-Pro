@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    <title>Horita Feliz - Dashboard</title>
+</head>
+<body>
+    <header>
+        <div class="header-title">Horita Feliz</div>
+        <div class="teacher-toggle">
+            <span id="teacher-name">Nombre de la Docente</span>
+            <div class="dropdown-menu">
+                <button class="dropdown-toggle">▼</button>
+                <div class="dropdown-content">
+                    <a href="../pages/profile.html">Perfil</a>
+                    <a href="#">Cerrar Sección</a>
+                    <a href="#">Borrar Cuenta</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <main>
+        <section class="student-management">
+            <h2>Gestión de Estudiantes</h2>
+            <div id="student-form"></div>
+            <div id="student-list"></div>
+        </section>
+
+        <section class="activity-log">
+            <h2>Registro de Actividades</h2>
+            <div id="activity-log-form"></div>
+            <div id="activity-log-list"></div>
+        </section>
+
+        <section class="attendance-tracking">
+            <h2>Tabla de Asistencia</h2>
+            <div id="attendance-table"></div>
+        </section>
+    </main>
+
+    <script src="../assets/js/app.js"></script>
+    <script src="../assets/js/students.js"></script>
+    <script src="../assets/js/attendance.js"></script>
+</body>
+</html>
