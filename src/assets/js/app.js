@@ -572,11 +572,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Agregar el observer para el estado de autenticación
     auth.onAuthStateChanged(user => {
+        console.log('Estado de autenticación cambiado:', user ? user.uid : 'No autenticado');
+        
         if (user) {
+            // Usuario autenticado
             updateUserInfo(user);
+            migrateTemporaryData(); // Migrar datos temporales si existen
+            
+            // Recargar datos específicos del usuario
+            setTimeout(() => {
+                loadActivities();
+                // Recargar estudiantes si el modal está abierto
+                const studentsModal = document.getElementById('students-modal');
+                if (studentsModal && studentsModal.style.display === 'block') {
+                    loadStudentsList();
+                }
+            }, 100);
         } else {
-            // Redirigir al login si no hay usuario autenticado
-            window.location.href = 'login.html';
+            // Usuario no autenticado - limpiar datos o redirigir
+            if (!window.location.pathname.includes('login.html')) {
+                window.location.href = 'login.html';
+            }
         }
     });
 }); // Cierre del DOMContentLoaded que faltaba
@@ -882,7 +898,7 @@ function loadActivities() {
                     <div class="activity-image" onclick="openGallery('${activity.id}')">
                         <img src="${activity.imageData}" alt="${activity.name}">
                         <div class="image-actions">
-                            <button class="image-action-btn" onclick="event.stopPropagation(); handleImage('${activity.id}')" title="Opciones de imagen">
+                            <button class="image-action-btn" onclick="event.stopPropagation(); handleImage('${activity.id}', event)" title="Opciones de imagen">
                                 <i class="fas fa-times"></i>
                             </button>
                         </div>
@@ -1220,1103 +1236,87 @@ function openGallery(startingImageId = null) {
 // Función para guardar datos del usuario
 function setUserData(key, data) {
     try {
-        // Si data ya es un string, no lo convertimos de nuevo
-        const dataToStore = typeof data === 'string' ? data : JSON.stringify(data);
-        localStorage.setItem(key, dataToStore);
-        return true;
+        const user = window.auth?.currentUser;
+        if (!user) {
+            console.warn('Usuario no autenticado, guardando en localStorage temporal');
+            localStorage.setItem(`temp_${key}`, typeof data === 'string' ? data : JSON.stringify(data));
+            return;
+        }
+        
+        // Usar el UID del usuario para crear una clave única
+        const userKey = `${user.uid}_${key}`;
+        localStorage.setItem(userKey, typeof data === 'string' ? data : JSON.stringify(data));
+        console.log(`Datos guardados para usuario ${user.uid}:`, key);
     } catch (error) {
-        console.error('Error al guardar datos:', error);
-        return false;
+        console.error('Error al guardar datos del usuario:', error);
     }
 }
 
 // Función para obtener datos del usuario
 function getUserData(key) {
     try {
-        const data = localStorage.getItem(key);
+        const user = window.auth?.currentUser;
+        if (!user) {
+            console.warn('Usuario no autenticado, obteniendo datos temporales');
+            return localStorage.getItem(`temp_${key}`);
+        }
+        
+        // Usar el UID del usuario para obtener datos específicos
+        const userKey = `${user.uid}_${key}`;
+        const data = localStorage.getItem(userKey);
+        console.log(`Datos obtenidos para usuario ${user.uid}:`, key, data ? 'Encontrados' : 'No encontrados');
         return data;
     } catch (error) {
-        console.error('Error al obtener datos:', error);
+        console.error('Error al obtener datos del usuario:', error);
         return null;
     }
 }
 
-
-
-// Exponer estas funciones globalmente
-window.setUserData = setUserData;
-window.getUserData = getUserData;
-
-function setupActivityCardListeners(card) {
-    const attendanceBtn = card.querySelector('.attendance-btn');
-    const deleteBtn = card.querySelector('.delete-activity-btn');
-    const editTitleBtn = card.querySelector('.edit-title-btn');
-    const editDateBtn = card.querySelector('.edit-date-btn');
-
-    attendanceBtn?.addEventListener('click', () => {
-        const activity = attendanceBtn.dataset.activity;
-        const date = attendanceBtn.dataset.date;
-        openAttendanceModal(activity, date);
-    });
-
-    deleteBtn?.addEventListener('click', () => {
-        const activityId = deleteBtn.dataset.id;
-        deleteActivity(activityId);
-    });
-
-    editTitleBtn?.addEventListener('click', () => makeEditable(card, 'title', 'text'));
-    editDateBtn?.addEventListener('click', () => makeEditable(card, 'date', 'date'));
-}
-
-// Función para mostrar notificaciones
-function showNotification(message, type = 'success') {
-    // Verificar si ya existe una notificación
-    let notification = document.querySelector('.notification');
-    
-    // Si no existe, crearla
-    if (!notification) {
-        notification = document.createElement('div');
-        notification.className = 'notification';
-        document.body.appendChild(notification);
-    }
-    
-    // Establecer el tipo y mensaje
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
-            <span>${message}</span>
-        </div>
-        <button class="close-notification">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-    
-    // Mostrar la notificación
-    notification.classList.add('show');
-    
-    // Configurar el botón de cierre
-    const closeBtn = notification.querySelector('.close-notification');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            notification.classList.remove('show');
+// Función para migrar datos temporales cuando el usuario se autentica
+function migrateTemporaryData() {
+    try {
+        const user = window.auth?.currentUser;
+        if (!user) return;
+        
+        const keysToMigrate = ['students', 'activities', 'attendance'];
+        
+        keysToMigrate.forEach(key => {
+            const tempKey = `temp_${key}`;
+            const tempData = localStorage.getItem(tempKey);
+            
+            if (tempData) {
+                const userKey = `${user.uid}_${key}`;
+                // Solo migrar si no existen datos del usuario
+                if (!localStorage.getItem(userKey)) {
+                    localStorage.setItem(userKey, tempData);
+                    console.log(`Datos temporales migrados para ${key}`);
+                }
+                // Limpiar datos temporales
+                localStorage.removeItem(tempKey);
+            }
         });
-    }
-    
-    // Ocultar automáticamente después de 5 segundos
-    setTimeout(() => {
-        if (notification.classList.contains('show')) {
-            notification.classList.remove('show');
-        }
-    }, 5000);
-}
-
-// Hacer accesible la función deleteActivityImage globalmente
-window.editField = editField;
-window.saveEdit = saveEdit;
-window.deleteActivity = deleteActivity;
-window.handleImage = handleImage;
-window.addImage = addImage;
-window.openGallery = openGallery;
-window.openAttendanceModal = openAttendanceModal;
-
-function openGallery(startingImageId = null) {
-    const activities = JSON.parse(getUserData('activities') || '[]')
-        .filter(activity => activity.imageData);
-    
-    if (activities.length === 0) {
-        showNotification('No hay imágenes en la galería', 'info');
-        return;
-    }
-
-    let currentIndex = startingImageId ? 
-        activities.findIndex(a => a.id.toString() === startingImageId.toString()) : 0;
-    
-    if (currentIndex === -1) currentIndex = 0;
-
-    // Usar el modal existente
-    const modal = document.getElementById('gallery-modal');
-    const container = modal.querySelector('.carousel-slide');
-    const search = modal.querySelector('#gallery-search');
-    const prevBtn = modal.querySelector('.prev-btn');
-    const nextBtn = modal.querySelector('.next-btn');
-    const closeBtn = modal.querySelector('.close-modal');
-    let filteredActivities = [...activities];
-
-    function updateGalleryView() {
-        const activity = filteredActivities[currentIndex];
-        container.innerHTML = `
-            <img src="${activity.imageData}" alt="${activity.name}">
-            <div class="image-info">
-                <h4 class="activity-name">${activity.name}</h4>
-                <p class="activity-date">${formatDate(activity.date)}</p>
-            </div>
-        `;
-    }
-
-    // Inicializar la vista
-    updateGalleryView();
-    modal.style.display = 'block';
-
-    // Event listeners
-    search.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        filteredActivities = activities.filter(activity => 
-            activity.name.toLowerCase().includes(searchTerm)
-        );
-        if (filteredActivities.length > 0) {
-            currentIndex = 0;
-            updateGalleryView();
-        }
-    });
-
-    prevBtn.addEventListener('click', () => {
-        currentIndex = (currentIndex - 1 + filteredActivities.length) % filteredActivities.length;
-        updateGalleryView();
-    });
-
-    nextBtn.addEventListener('click', () => {
-        currentIndex = (currentIndex + 1) % filteredActivities.length;
-        updateGalleryView();
-    });
-
-    closeBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-        search.value = '';
-        filteredActivities = [...activities];
-    });
-
-    // Navegación con teclado
-    function galleryKeyHandler(e) {
-        if (e.key === 'Escape') {
-            modal.style.display = 'none';
-            document.removeEventListener('keydown', galleryKeyHandler);
-        } else if (e.key === 'ArrowLeft') {
-            prevBtn.click();
-        } else if (e.key === 'ArrowRight') {
-            nextBtn.click();
-        }
-    }
-
-    document.addEventListener('keydown', galleryKeyHandler);
-}
-
-// Función para guardar datos del usuario
-function setUserData(key, data) {
-    try {
-        // Si data ya es un string, no lo convertimos de nuevo
-        const dataToStore = typeof data === 'string' ? data : JSON.stringify(data);
-        localStorage.setItem(key, dataToStore);
-        return true;
     } catch (error) {
-        console.error('Error al guardar datos:', error);
-        return false;
+        console.error('Error al migrar datos temporales:', error);
     }
 }
 
-// Función para obtener datos del usuario
-function getUserData(key) {
-    try {
-        const data = localStorage.getItem(key);
-        return data;
-    } catch (error) {
-        console.error('Error al obtener datos:', error);
-        return null;
-    }
-}
+// Agregar esta función para limpiar datos mezclados (ejecutar una vez):
 
-
-
-// Exponer estas funciones globalmente
-window.setUserData = setUserData;
-window.getUserData = getUserData;
-
-function setupActivityCardListeners(card) {
-    const attendanceBtn = card.querySelector('.attendance-btn');
-    const deleteBtn = card.querySelector('.delete-activity-btn');
-    const editTitleBtn = card.querySelector('.edit-title-btn');
-    const editDateBtn = card.querySelector('.edit-date-btn');
-
-    attendanceBtn?.addEventListener('click', () => {
-        const activity = attendanceBtn.dataset.activity;
-        const date = attendanceBtn.dataset.date;
-        openAttendanceModal(activity, date);
-    });
-
-    deleteBtn?.addEventListener('click', () => {
-        const activityId = deleteBtn.dataset.id;
-        deleteActivity(activityId);
-    });
-
-    editTitleBtn?.addEventListener('click', () => makeEditable(card, 'title', 'text'));
-    editDateBtn?.addEventListener('click', () => makeEditable(card, 'date', 'date'));
-}
-
-// Función para mostrar notificaciones
-function showNotification(message, type = 'success') {
-    // Verificar si ya existe una notificación
-    let notification = document.querySelector('.notification');
+function cleanMixedUserData() {
+    const confirmed = confirm('¿Quieres limpiar todos los datos locales? Esta acción eliminará todos los estudiantes y actividades guardados localmente.');
     
-    // Si no existe, crearla
-    if (!notification) {
-        notification = document.createElement('div');
-        notification.className = 'notification';
-        document.body.appendChild(notification);
-    }
-    
-    // Establecer el tipo y mensaje
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
-            <span>${message}</span>
-        </div>
-        <button class="close-notification">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-    
-    // Mostrar la notificación
-    notification.classList.add('show');
-    
-    // Configurar el botón de cierre
-    const closeBtn = notification.querySelector('.close-notification');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            notification.classList.remove('show');
+    if (confirmed) {
+        // Limpiar todas las claves relacionadas con la app
+        Object.keys(localStorage).forEach(key => {
+            if (key.includes('students') || key.includes('activities') || key.includes('attendance')) {
+                localStorage.removeItem(key);
+            }
         });
-    }
-    
-    // Ocultar automáticamente después de 5 segundos
-    setTimeout(() => {
-        if (notification.classList.contains('show')) {
-            notification.classList.remove('show');
-        }
-    }, 5000);
-}
-
-// Hacer accesible la función deleteActivityImage globalmente
-window.editField = editField;
-window.saveEdit = saveEdit;
-window.deleteActivity = deleteActivity;
-window.handleImage = handleImage;
-window.addImage = addImage;
-window.openGallery = openGallery;
-window.openAttendanceModal = openAttendanceModal;
-
-function openGallery(startingImageId = null) {
-    const activities = JSON.parse(getUserData('activities') || '[]')
-        .filter(activity => activity.imageData);
-    
-    if (activities.length === 0) {
-        showNotification('No hay imágenes en la galería', 'info');
-        return;
-    }
-
-    let currentIndex = startingImageId ? 
-        activities.findIndex(a => a.id.toString() === startingImageId.toString()) : 0;
-    
-    if (currentIndex === -1) currentIndex = 0;
-
-    // Usar el modal existente
-    const modal = document.getElementById('gallery-modal');
-    const container = modal.querySelector('.carousel-slide');
-    const search = modal.querySelector('#gallery-search');
-    const prevBtn = modal.querySelector('.prev-btn');
-    const nextBtn = modal.querySelector('.next-btn');
-    const closeBtn = modal.querySelector('.close-modal');
-    let filteredActivities = [...activities];
-
-    function updateGalleryView() {
-        const activity = filteredActivities[currentIndex];
-        container.innerHTML = `
-            <img src="${activity.imageData}" alt="${activity.name}">
-            <div class="image-info">
-                <h4 class="activity-name">${activity.name}</h4>
-                <p class="activity-date">${formatDate(activity.date)}</p>
-            </div>
-        `;
-    }
-
-    // Inicializar la vista
-    updateGalleryView();
-    modal.style.display = 'block';
-
-    // Event listeners
-    search.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        filteredActivities = activities.filter(activity => 
-            activity.name.toLowerCase().includes(searchTerm)
-        );
-        if (filteredActivities.length > 0) {
-            currentIndex = 0;
-            updateGalleryView();
-        }
-    });
-
-    prevBtn.addEventListener('click', () => {
-        currentIndex = (currentIndex - 1 + filteredActivities.length) % filteredActivities.length;
-        updateGalleryView();
-    });
-
-    nextBtn.addEventListener('click', () => {
-        currentIndex = (currentIndex + 1) % filteredActivities.length;
-        updateGalleryView();
-    });
-
-    closeBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-        search.value = '';
-        filteredActivities = [...activities];
-    });
-
-    // Navegación con teclado
-    function galleryKeyHandler(e) {
-        if (e.key === 'Escape') {
-            modal.style.display = 'none';
-            document.removeEventListener('keydown', galleryKeyHandler);
-        } else if (e.key === 'ArrowLeft') {
-            prevBtn.click();
-        } else if (e.key === 'ArrowRight') {
-            nextBtn.click();
-        }
-    }
-
-    document.addEventListener('keydown', galleryKeyHandler);
-}
-
-// Función para guardar datos del usuario
-function setUserData(key, data) {
-    try {
-        // Si data ya es un string, no lo convertimos de nuevo
-        const dataToStore = typeof data === 'string' ? data : JSON.stringify(data);
-        localStorage.setItem(key, dataToStore);
-        return true;
-    } catch (error) {
-        console.error('Error al guardar datos:', error);
-        return false;
+        
+        showNotification('Datos locales limpiados. Recarga la página para empezar de nuevo.', 'success');
+        console.log('Datos locales limpiados');
     }
 }
 
-// Función para obtener datos del usuario
-function getUserData(key) {
-    try {
-        const data = localStorage.getItem(key);
-        return data;
-    } catch (error) {
-        console.error('Error al obtener datos:', error);
-        return null;
-    }
-}
-
-
-
-// Exponer estas funciones globalmente
-window.setUserData = setUserData;
-window.getUserData = getUserData;
-
-function setupActivityCardListeners(card) {
-    const attendanceBtn = card.querySelector('.attendance-btn');
-    const deleteBtn = card.querySelector('.delete-activity-btn');
-    const editTitleBtn = card.querySelector('.edit-title-btn');
-    const editDateBtn = card.querySelector('.edit-date-btn');
-
-    attendanceBtn?.addEventListener('click', () => {
-        const activity = attendanceBtn.dataset.activity;
-        const date = attendanceBtn.dataset.date;
-        openAttendanceModal(activity, date);
-    });
-
-    deleteBtn?.addEventListener('click', () => {
-        const activityId = deleteBtn.dataset.id;
-        deleteActivity(activityId);
-    });
-
-    editTitleBtn?.addEventListener('click', () => makeEditable(card, 'title', 'text'));
-    editDateBtn?.addEventListener('click', () => makeEditable(card, 'date', 'date'));
-}
-
-// Función para mostrar notificaciones
-function showNotification(message, type = 'success') {
-    // Verificar si ya existe una notificación
-    let notification = document.querySelector('.notification');
-    
-    // Si no existe, crearla
-    if (!notification) {
-        notification = document.createElement('div');
-        notification.className = 'notification';
-        document.body.appendChild(notification);
-    }
-    
-    // Establecer el tipo y mensaje
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
-            <span>${message}</span>
-        </div>
-        <button class="close-notification">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-    
-    // Mostrar la notificación
-    notification.classList.add('show');
-    
-    // Configurar el botón de cierre
-    const closeBtn = notification.querySelector('.close-notification');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            notification.classList.remove('show');
-        });
-    }
-    
-    // Ocultar automáticamente después de 5 segundos
-    setTimeout(() => {
-        if (notification.classList.contains('show')) {
-            notification.classList.remove('show');
-        }
-    }, 5000);
-}
-
-// Hacer accesible la función deleteActivityImage globalmente
-window.editField = editField;
-window.saveEdit = saveEdit;
-window.deleteActivity = deleteActivity;
-window.handleImage = handleImage;
-window.addImage = addImage;
-window.openGallery = openGallery;
-window.openAttendanceModal = openAttendanceModal;
-
-function openGallery(startingImageId = null) {
-    const activities = JSON.parse(getUserData('activities') || '[]')
-        .filter(activity => activity.imageData);
-    
-    if (activities.length === 0) {
-        showNotification('No hay imágenes en la galería', 'info');
-        return;
-    }
-
-    let currentIndex = startingImageId ? 
-        activities.findIndex(a => a.id.toString() === startingImageId.toString()) : 0;
-    
-    if (currentIndex === -1) currentIndex = 0;
-
-    // Usar el modal existente
-    const modal = document.getElementById('gallery-modal');
-    const container = modal.querySelector('.carousel-slide');
-    const search = modal.querySelector('#gallery-search');
-    const prevBtn = modal.querySelector('.prev-btn');
-    const nextBtn = modal.querySelector('.next-btn');
-    const closeBtn = modal.querySelector('.close-modal');
-    let filteredActivities = [...activities];
-
-    function updateGalleryView() {
-        const activity = filteredActivities[currentIndex];
-        container.innerHTML = `
-            <img src="${activity.imageData}" alt="${activity.name}">
-            <div class="image-info">
-                <h4 class="activity-name">${activity.name}</h4>
-                <p class="activity-date">${formatDate(activity.date)}</p>
-            </div>
-        `;
-    }
-
-    // Inicializar la vista
-    updateGalleryView();
-    modal.style.display = 'block';
-
-    // Event listeners
-    search.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        filteredActivities = activities.filter(activity => 
-            activity.name.toLowerCase().includes(searchTerm)
-        );
-        if (filteredActivities.length > 0) {
-            currentIndex = 0;
-            updateGalleryView();
-        }
-    });
-
-    prevBtn.addEventListener('click', () => {
-        currentIndex = (currentIndex - 1 + filteredActivities.length) % filteredActivities.length;
-        updateGalleryView();
-    });
-
-    nextBtn.addEventListener('click', () => {
-        currentIndex = (currentIndex + 1) % filteredActivities.length;
-        updateGalleryView();
-    });
-
-    closeBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-        search.value = '';
-        filteredActivities = [...activities];
-    });
-
-    // Navegación con teclado
-    function galleryKeyHandler(e) {
-        if (e.key === 'Escape') {
-            modal.style.display = 'none';
-            document.removeEventListener('keydown', galleryKeyHandler);
-        } else if (e.key === 'ArrowLeft') {
-            prevBtn.click();
-        } else if (e.key === 'ArrowRight') {
-            nextBtn.click();
-        }
-    }
-
-    document.addEventListener('keydown', galleryKeyHandler);
-}
-
-// Función para guardar datos del usuario
-function setUserData(key, data) {
-    try {
-        // Si data ya es un string, no lo convertimos de nuevo
-        const dataToStore = typeof data === 'string' ? data : JSON.stringify(data);
-        localStorage.setItem(key, dataToStore);
-        return true;
-    } catch (error) {
-        console.error('Error al guardar datos:', error);
-        return false;
-    }
-}
-
-// Función para obtener datos del usuario
-function getUserData(key) {
-    try {
-        const data = localStorage.getItem(key);
-        return data;
-    } catch (error) {
-        console.error('Error al obtener datos:', error);
-        return null;
-    }
-}
-
-
-
-// Exponer estas funciones globalmente
-window.setUserData = setUserData;
-window.getUserData = getUserData;
-
-function setupActivityCardListeners(card) {
-    const attendanceBtn = card.querySelector('.attendance-btn');
-    const deleteBtn = card.querySelector('.delete-activity-btn');
-    const editTitleBtn = card.querySelector('.edit-title-btn');
-    const editDateBtn = card.querySelector('.edit-date-btn');
-
-    attendanceBtn?.addEventListener('click', () => {
-        const activity = attendanceBtn.dataset.activity;
-        const date = attendanceBtn.dataset.date;
-        openAttendanceModal(activity, date);
-    });
-
-    deleteBtn?.addEventListener('click', () => {
-        const activityId = deleteBtn.dataset.id;
-        deleteActivity(activityId);
-    });
-
-    editTitleBtn?.addEventListener('click', () => makeEditable(card, 'title', 'text'));
-    editDateBtn?.addEventListener('click', () => makeEditable(card, 'date', 'date'));
-}
-
-// Función para mostrar notificaciones
-function showNotification(message, type = 'success') {
-    // Verificar si ya existe una notificación
-    let notification = document.querySelector('.notification');
-    
-    // Si no existe, crearla
-    if (!notification) {
-        notification = document.createElement('div');
-        notification.className = 'notification';
-        document.body.appendChild(notification);
-    }
-    
-    // Establecer el tipo y mensaje
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
-            <span>${message}</span>
-        </div>
-        <button class="close-notification">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-    
-    // Mostrar la notificación
-    notification.classList.add('show');
-    
-    // Configurar el botón de cierre
-    const closeBtn = notification.querySelector('.close-notification');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            notification.classList.remove('show');
-        });
-    }
-    
-    // Ocultar automáticamente después de 5 segundos
-    setTimeout(() => {
-        if (notification.classList.contains('show')) {
-            notification.classList.remove('show');
-        }
-    }, 5000);
-}
-
-// Hacer accesible la función deleteActivityImage globalmente
-window.editField = editField;
-window.saveEdit = saveEdit;
-window.deleteActivity = deleteActivity;
-window.handleImage = handleImage;
-window.addImage = addImage;
-window.openGallery = openGallery;
-window.openAttendanceModal = openAttendanceModal;
-
-function openGallery(startingImageId = null) {
-    const activities = JSON.parse(getUserData('activities') || '[]')
-        .filter(activity => activity.imageData);
-    
-    if (activities.length === 0) {
-        showNotification('No hay imágenes en la galería', 'info');
-        return;
-    }
-
-    let currentIndex = startingImageId ? 
-        activities.findIndex(a => a.id.toString() === startingImageId.toString()) : 0;
-    
-    if (currentIndex === -1) currentIndex = 0;
-
-    // Usar el modal existente
-    const modal = document.getElementById('gallery-modal');
-    const container = modal.querySelector('.carousel-slide');
-    const search = modal.querySelector('#gallery-search');
-    const prevBtn = modal.querySelector('.prev-btn');
-    const nextBtn = modal.querySelector('.next-btn');
-    const closeBtn = modal.querySelector('.close-modal');
-    let filteredActivities = [...activities];
-
-    function updateGalleryView() {
-        const activity = filteredActivities[currentIndex];
-        container.innerHTML = `
-            <img src="${activity.imageData}" alt="${activity.name}">
-            <div class="image-info">
-                <h4 class="activity-name">${activity.name}</h4>
-                <p class="activity-date">${formatDate(activity.date)}</p>
-            </div>
-        `;
-    }
-
-    // Inicializar la vista
-    updateGalleryView();
-    modal.style.display = 'block';
-
-    // Event listeners
-    search.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        filteredActivities = activities.filter(activity => 
-            activity.name.toLowerCase().includes(searchTerm)
-        );
-        if (filteredActivities.length > 0) {
-            currentIndex = 0;
-            updateGalleryView();
-        }
-    });
-
-    prevBtn.addEventListener('click', () => {
-        currentIndex = (currentIndex - 1 + filteredActivities.length) % filteredActivities.length;
-        updateGalleryView();
-    });
-
-    nextBtn.addEventListener('click', () => {
-        currentIndex = (currentIndex + 1) % filteredActivities.length;
-        updateGalleryView();
-    });
-
-    closeBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-        search.value = '';
-        filteredActivities = [...activities];
-    });
-
-    // Navegación con teclado
-    function galleryKeyHandler(e) {
-        if (e.key === 'Escape') {
-            modal.style.display = 'none';
-            document.removeEventListener('keydown', galleryKeyHandler);
-        } else if (e.key === 'ArrowLeft') {
-            prevBtn.click();
-        } else if (e.key === 'ArrowRight') {
-            nextBtn.click();
-        }
-    }
-
-    document.addEventListener('keydown', galleryKeyHandler);
-}
-
-// Función para guardar datos del usuario
-function setUserData(key, data) {
-    try {
-        // Si data ya es un string, no lo convertimos de nuevo
-        const dataToStore = typeof data === 'string' ? data : JSON.stringify(data);
-        localStorage.setItem(key, dataToStore);
-        return true;
-    } catch (error) {
-        console.error('Error al guardar datos:', error);
-        return false;
-    }
-}
-
-// Función para obtener datos del usuario
-function getUserData(key) {
-    try {
-        const data = localStorage.getItem(key);
-        return data;
-    } catch (error) {
-        console.error('Error al obtener datos:', error);
-        return null;
-    }
-}
-
-
-
-// Exponer estas funciones globalmente
-window.setUserData = setUserData;
-window.getUserData = getUserData;
-
-function setupActivityCardListeners(card) {
-    const attendanceBtn = card.querySelector('.attendance-btn');
-    const deleteBtn = card.querySelector('.delete-activity-btn');
-    const editTitleBtn = card.querySelector('.edit-title-btn');
-    const editDateBtn = card.querySelector('.edit-date-btn');
-
-    attendanceBtn?.addEventListener('click', () => {
-        const activity = attendanceBtn.dataset.activity;
-        const date = attendanceBtn.dataset.date;
-        openAttendanceModal(activity, date);
-    });
-
-    deleteBtn?.addEventListener('click', () => {
-        const activityId = deleteBtn.dataset.id;
-        deleteActivity(activityId);
-    });
-
-    editTitleBtn?.addEventListener('click', () => makeEditable(card, 'title', 'text'));
-    editDateBtn?.addEventListener('click', () => makeEditable(card, 'date', 'date'));
-}
-
-// Función para mostrar notificaciones
-function showNotification(message, type = 'success') {
-    // Verificar si ya existe una notificación
-    let notification = document.querySelector('.notification');
-    
-    // Si no existe, crearla
-    if (!notification) {
-        notification = document.createElement('div');
-        notification.className = 'notification';
-        document.body.appendChild(notification);
-    }
-    
-    // Establecer el tipo y mensaje
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
-            <span>${message}</span>
-        </div>
-        <button class="close-notification">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-    
-    // Mostrar la notificación
-    notification.classList.add('show');
-    
-    // Configurar el botón de cierre
-    const closeBtn = notification.querySelector('.close-notification');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            notification.classList.remove('show');
-        });
-    }
-    
-    // Ocultar automáticamente después de 5 segundos
-    setTimeout(() => {
-        if (notification.classList.contains('show')) {
-            notification.classList.remove('show');
-        }
-    }, 5000);
-}
-
-// Hacer accesible la función deleteActivityImage globalmente
-window.editField = editField;
-window.saveEdit = saveEdit;
-window.deleteActivity = deleteActivity;
-window.handleImage = handleImage;
-window.addImage = addImage;
-window.openGallery = openGallery;
-window.openAttendanceModal = openAttendanceModal;
-
-function openGallery(startingImageId = null) {
-    const activities = JSON.parse(getUserData('activities') || '[]')
-        .filter(activity => activity.imageData);
-    
-    if (activities.length === 0) {
-        showNotification('No hay imágenes en la galería', 'info');
-        return;
-    }
-
-    let currentIndex = startingImageId ? 
-        activities.findIndex(a => a.id.toString() === startingImageId.toString()) : 0;
-    
-    if (currentIndex === -1) currentIndex = 0;
-
-    // Usar el modal existente
-    const modal = document.getElementById('gallery-modal');
-    const container = modal.querySelector('.carousel-slide');
-    const search = modal.querySelector('#gallery-search');
-    const prevBtn = modal.querySelector('.prev-btn');
-    const nextBtn = modal.querySelector('.next-btn');
-    const closeBtn = modal.querySelector('.close-modal');
-    let filteredActivities = [...activities];
-
-    function updateGalleryView() {
-        const activity = filteredActivities[currentIndex];
-        container.innerHTML = `
-            <img src="${activity.imageData}" alt="${activity.name}">
-            <div class="image-info">
-                <h4 class="activity-name">${activity.name}</h4>
-                <p class="activity-date">${formatDate(activity.date)}</p>
-            </div>
-        `;
-    }
-
-    // Inicializar la vista
-    updateGalleryView();
-    modal.style.display = 'block';
-
-    // Event listeners
-    search.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        filteredActivities = activities.filter(activity => 
-            activity.name.toLowerCase().includes(searchTerm)
-        );
-        if (filteredActivities.length > 0) {
-            currentIndex = 0;
-            updateGalleryView();
-        }
-    });
-
-    prevBtn.addEventListener('click', () => {
-        currentIndex = (currentIndex - 1 + filteredActivities.length) % filteredActivities.length;
-        updateGalleryView();
-    });
-
-    nextBtn.addEventListener('click', () => {
-        currentIndex = (currentIndex + 1) % filteredActivities.length;
-        updateGalleryView();
-    });
-
-    closeBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-        search.value = '';
-        filteredActivities = [...activities];
-    });
-
-    // Navegación con teclado
-    function galleryKeyHandler(e) {
-        if (e.key === 'Escape') {
-            modal.style.display = 'none';
-            document.removeEventListener('keydown', galleryKeyHandler);
-        } else if (e.key === 'ArrowLeft') {
-            prevBtn.click();
-        } else if (e.key === 'ArrowRight') {
-            nextBtn.click();
-        }
-    }
-
-    document.addEventListener('keydown', galleryKeyHandler);
-}
-
-// Función para guardar datos del usuario
-function setUserData(key, data) {
-    try {
-        // Si data ya es un string, no lo convertimos de nuevo
-        const dataToStore = typeof data === 'string' ? data : JSON.stringify(data);
-        localStorage.setItem(key, dataToStore);
-        return true;
-    } catch (error) {
-        console.error('Error al guardar datos:', error);
-        return false;
-    }
-}
-
-// Función para obtener datos del usuario
-function getUserData(key) {
-    try {
-        const data = localStorage.getItem(key);
-        return data;
-    } catch (error) {
-        console.error('Error al obtener datos:', error);
-        return null;
-    }
-}
-
-
-
-// Exponer estas funciones globalmente
-window.setUserData = setUserData;
-window.getUserData = getUserData;
-
-function setupActivityCardListeners(card) {
-    const attendanceBtn = card.querySelector('.attendance-btn');
-    const deleteBtn = card.querySelector('.delete-activity-btn');
-    const editTitleBtn = card.querySelector('.edit-title-btn');
-    const editDateBtn = card.querySelector('.edit-date-btn');
-
-    attendanceBtn?.addEventListener('click', () => {
-        const activity = attendanceBtn.dataset.activity;
-        const date = attendanceBtn.dataset.date;
-        openAttendanceModal(activity, date);
-    });
-
-    deleteBtn?.addEventListener('click', () => {
-        const activityId = deleteBtn.dataset.id;
-        deleteActivity(activityId);
-    });
-
-    editTitleBtn?.addEventListener('click', () => makeEditable(card, 'title', 'text'));
-    editDateBtn?.addEventListener('click', () => makeEditable(card, 'date', 'date'));
-}
-
-// Función para mostrar notificaciones
-function showNotification(message, type = 'success') {
-    // Verificar si ya existe una notificación
-    let notification = document.querySelector('.notification');
-    
-    // Si no existe, crearla
-    if (!notification) {
-        notification = document.createElement('div');
-        notification.className = 'notification';
-        document.body.appendChild(notification);
-    }
-    
-    // Establecer el tipo y mensaje
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
-            <span>${message}</span>
-        </div>
-        <button class="close-notification">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-    
-    // Mostrar la notificación
-    notification.classList.add('show');
-    
-    // Configurar el botón de cierre
-    const closeBtn = notification.querySelector('.close-notification');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            notification.classList.remove('show');
-        });
-    }
-    
-    // Ocultar automáticamente después de 5 segundos
-    setTimeout(() => {
-        if (notification.classList.contains('show')) {
-            notification.classList.remove('show');
-        }
-    }, 5000);
-}
-
-// Hacer accesible la función deleteActivityImage globalmente
-window.editField = editField;
-window.saveEdit = saveEdit;
-window.deleteActivity = deleteActivity;
-window.handleImage = handleImage;
-window.addImage = addImage;
-window.openGallery = openGallery;
-window.openAttendanceModal = openAttendanceModal;
-
-function openGallery(startingImageId = null) {
-    const activities = JSON.parse(getUserData('activities') || '[]')
-        .filter(activity => activity.imageData);
-    
-    if (activities.length === 0) {
-        showNotification('No hay imágenes en la galería', 'info');
-        return;
-    }
-
-    let currentIndex = startingImageId ? 
-        activities.findIndex(a => a.id.toString() === startingImageId.toString()) : 0;
-    
-    if (currentIndex === -1) currentIndex = 0;
-
-    // Usar el modal existente
-    const modal = document.getElementById('gallery-modal');
-    const container = modal.querySelector('.carousel-slide');
-    const search = modal.querySelector('#gallery-search');
-    const prevBtn = modal.querySelector('.prev-btn');
-    const nextBtn = modal.querySelector('.next-btn');
-    const closeBtn = modal.querySelector('.close-modal');
-    let filteredActivities = [...activities];
-
-    function updateGalleryView() {
-        const activity = filteredActivities[currentIndex];
-        container.innerHTML = `
-            <img src="${activity.imageData}" alt="${activity.name}">
-            <div class="image-info">
-                <h4 class="activity-name">${activity.name}</h4>
-                <p class="activity-date">${formatDate(activity.date)}</p>
-            </div>
-        `;
-    }
-
-    // Inicializar la vista
-    updateGalleryView();
-    modal.style.display = 'block';
-
-    // Event listeners
-    search.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        filteredActivities = activities.filter(activity => 
-            activity.name.toLowerCase().includes(searchTerm)
-        );
-        if (filteredActivities.length > 0) {
-            currentIndex = 0;
-            updateGalleryView();
-        }
-    });
-
-    prevBtn.addEventListener('click', () => {
-        currentIndex = (currentIndex - 1 + filteredActivities.length) % filteredActivities.length;
-        updateGalleryView();
-    });
-
-    nextBtn.addEventListener('click', () => {
-        currentIndex = (currentIndex + 1) % filteredActivities.length;
-        updateGalleryView();
-    });
-
-    closeBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-        search.value = '';
-        filteredActivities = [...activities];
-    });
-
-    // Navegación con teclado
-    function galleryKeyHandler(e) {
-        if (e.key === 'Escape') {
-            modal.style.display = 'none';
-            document.removeEventListener('keydown', galleryKeyHandler);
-        } else if (e.key === 'ArrowLeft') {
-            prevBtn.click();
-        } else if (e.key === 'ArrowRight') {
-            nextBtn.click();
-        }
-    }
-
-    document.addEventListener('keydown', galleryKeyHandler);
-}
+// Hacer disponible globalmente para debugging
+window.cleanMixedUserData = cleanMixedUserData;

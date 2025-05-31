@@ -1,0 +1,1669 @@
+[1mdiff --git a/index.html b/index.html[m
+[1mindex dc36c75..43624c4 100644[m
+[1m--- a/index.html[m
+[1m+++ b/index.html[m
+[36m@@ -35,8 +35,8 @@[m
+                     <!-- Botón de modo oscuro -->[m
+                     <div class="dark-mode-toggle">[m
+                         <span>Modo Oscuro</span>[m
+[31m-                        <label class="toggle-switch">[m
+[31m-                            <input type="checkbox" id="darkModeToggle">[m
+[32m+[m[32m                        <label class="toggle-switch" for="darkModeToggle">[m
+[32m+[m[32m                            <input type="checkbox" id="darkModeToggle" aria-label="Activar modo oscuro" title="Activar/desactivar modo oscuro">[m
+                             <span class="toggle-slider"></span>[m
+                         </label>[m
+                     </div>[m
+[36m@@ -385,7 +385,7 @@[m
+         });[m
+     </script>[m
+     <script src="src/assets/js/app.js"></script>[m
+[31m-    <script type="module" src="src/assets/js/students.js"></script>[m
+[32m+[m[32m    <script src="src/assets/js/students.js"></script>[m
+     <script type="module" src="src/assets/js/attendance.js"></script>[m
+     <script type="module" src="src/assets/js/profile.js"></script>[m
+     <script>[m
+[1mdiff --git a/service-worker.js b/service-worker.js[m
+[1mindex 1fb4e1f..e3b1d71 100644[m
+[1m--- a/service-worker.js[m
+[1m+++ b/service-worker.js[m
+[36m@@ -1,24 +1,53 @@[m
+[31m-self.addEventListener("install", event => {[m
+[31m-  console.log("Service Worker instalado");[m
+[31m-  event.waitUntil([m
+[31m-    caches.open("horita-cache").then(cache => {[m
+[31m-      return cache.addAll([[m
+[31m-        "/",[m
+[31m-        "/index.html",[m
+[31m-        "/manifest.json",[m
+[31m-        "/icon-192.png",[m
+[31m-        "/icon-512.png",[m
+[31m-        "/src/assets/css/styles.css",[m
+[31m-        "/src/assets/js/app.js"[m
+[31m-      ]);[m
+[31m-    })[m
+[31m-  );[m
+[32m+[m[32mconst CACHE_NAME = 'horita-feliz-v1';[m
+[32m+[m[32mconst urlsToCache = [[m
+[32m+[m[32m    './',[m
+[32m+[m[32m    './index.html',[m
+[32m+[m[32m    './login.html',[m
+[32m+[m[32m    './manifest.json',[m
+[32m+[m[32m    './src/assets/css/styles.css',[m
+[32m+[m[32m    './src/assets/css/responsive.css',[m
+[32m+[m[32m    './src/assets/js/app.js',[m
+[32m+[m[32m    './src/assets/js/auth.js',[m
+[32m+[m[32m    './src/assets/js/students.js',[m
+[32m+[m[32m    './src/assets/js/attendance.js',[m
+[32m+[m[32m    './src/assets/js/profile.js',[m
+[32m+[m[32m    './src/utils/database.js',[m
+[32m+[m[32m    './src/utils/helpers.js',[m
+[32m+[m[32m    './icon-192.png',[m
+[32m+[m[32m    './icon-512.png'[m
+[32m+[m[32m];[m
+[32m+[m
+[32m+[m[32mself.addEventListener('install', event => {[m
+[32m+[m[32m    event.waitUntil([m
+[32m+[m[32m        caches.open(CACHE_NAME)[m
+[32m+[m[32m            .then(cache => {[m
+[32m+[m[32m                console.log('Cache abierto');[m
+[32m+[m[32m                // Cachear archivos uno por uno para evitar errores[m
+[32m+[m[32m                return Promise.allSettled([m
+[32m+[m[32m                    urlsToCache.map(url => {[m
+[32m+[m[32m                        return cache.add(url).catch(error => {[m
+[32m+[m[32m                            console.warn(`No se pudo cachear ${url}:`, error);[m
+[32m+[m[32m                        });[m
+[32m+[m[32m                    })[m
+[32m+[m[32m                );[m
+[32m+[m[32m            })[m
+[32m+[m[32m            .catch(error => {[m
+[32m+[m[32m                console.error('Error al abrir cache:', error);[m
+[32m+[m[32m            })[m
+[32m+[m[32m    );[m
+ });[m
+ [m
+[31m-self.addEventListener("fetch", event => {[m
+[31m-  event.respondWith([m
+[31m-    caches.match(event.request).then(resp => {[m
+[31m-      return resp || fetch(event.request);[m
+[31m-    })[m
+[31m-  );[m
+[32m+[m[32mself.addEventListener('fetch', event => {[m
+[32m+[m[32m    event.respondWith([m
+[32m+[m[32m        caches.match(event.request)[m
+[32m+[m[32m            .then(response => {[m
+[32m+[m[32m                // Si está en cache, devolverlo[m
+[32m+[m[32m                if (response) {[m
+[32m+[m[32m                    return response;[m
+[32m+[m[32m                }[m
+[32m+[m[32m                // Si no, hacer fetch normal[m
+[32m+[m[32m                return fetch(event.request);[m
+[32m+[m[32m            }[m
+[32m+[m[32m        )[m
+[32m+[m[32m    );[m
+ });[m
+[1mdiff --git a/src/assets/js/app.js b/src/assets/js/app.js[m
+[1mindex 5be13f5..2c21241 100644[m
+[1m--- a/src/assets/js/app.js[m
+[1m+++ b/src/assets/js/app.js[m
+[36m@@ -572,11 +572,27 @@[m [mdocument.addEventListener('DOMContentLoaded', () => {[m
+ [m
+     // Agregar el observer para el estado de autenticación[m
+     auth.onAuthStateChanged(user => {[m
+[32m+[m[32m        console.log('Estado de autenticación cambiado:', user ? user.uid : 'No autenticado');[m
+[32m+[m[41m        [m
+         if (user) {[m
+[32m+[m[32m            // Usuario autenticado[m
+             updateUserInfo(user);[m
+[32m+[m[32m            migrateTemporaryData(); // Migrar datos temporales si existen[m
+[32m+[m[41m            [m
+[32m+[m[32m            // Recargar datos específicos del usuario[m
+[32m+[m[32m            setTimeout(() => {[m
+[32m+[m[32m                loadActivities();[m
+[32m+[m[32m                // Recargar estudiantes si el modal está abierto[m
+[32m+[m[32m                const studentsModal = document.getElementById('students-modal');[m
+[32m+[m[32m                if (studentsModal && studentsModal.style.display === 'block') {[m
+[32m+[m[32m                    loadStudentsList();[m
+[32m+[m[32m                }[m
+[32m+[m[32m            }, 100);[m
+         } else {[m
+[31m-            // Redirigir al login si no hay usuario autenticado[m
+[31m-            window.location.href = 'login.html';[m
+[32m+[m[32m            // Usuario no autenticado - limpiar datos o redirigir[m
+[32m+[m[32m            if (!window.location.pathname.includes('login.html')) {[m
+[32m+[m[32m                window.location.href = 'login.html';[m
+[32m+[m[32m            }[m
+         }[m
+     });[m
+ }); // Cierre del DOMContentLoaded que faltaba[m
+[36m@@ -882,7 +898,7 @@[m [mfunction loadActivities() {[m
+                     <div class="activity-image" onclick="openGallery('${activity.id}')">[m
+                         <img src="${activity.imageData}" alt="${activity.name}">[m
+                         <div class="image-actions">[m
+[31m-                            <button class="image-action-btn" onclick="event.stopPropagation(); handleImage('${activity.id}')" title="Opciones de imagen">[m
+[32m+[m[32m                            <button class="image-action-btn" onclick="event.stopPropagation(); handleImage('${activity.id}', event)" title="Opciones de imagen">[m
+                                 <i class="fas fa-times"></i>[m
+                             </button>[m
+                         </div>[m
+[36m@@ -1220,1103 +1236,87 @@[m [mfunction openGallery(startingImageId = null) {[m
+ // Función para guardar datos del usuario[m
+ function setUserData(key, data) {[m
+     try {[m
+[31m-        // Si data ya es un string, no lo convertimos de nuevo[m
+[31m-        const dataToStore = typeof data === 'string' ? data : JSON.stringify(data);[m
+[31m-        localStorage.setItem(key, dataToStore);[m
+[31m-        return true;[m
+[32m+[m[32m        const user = window.auth?.currentUser;[m
+[32m+[m[32m        if (!user) {[m
+[32m+[m[32m            console.warn('Usuario no autenticado, guardando en localStorage temporal');[m
+[32m+[m[32m            localStorage.setItem(`temp_${key}`, typeof data === 'string' ? data : JSON.stringify(data));[m
+[32m+[m[32m            return;[m
+[32m+[m[32m        }[m
+[32m+[m[41m        [m
+[32m+[m[32m        // Usar el UID del usuario para crear una clave única[m
+[32m+[m[32m        const userKey = `${user.uid}_${key}`;[m
+[32m+[m[32m        localStorage.setItem(userKey, typeof data === 'string' ? data : JSON.stringify(data));[m
+[32m+[m[32m        console.log(`Datos guardados para usuario ${user.uid}:`, key);[m
+     } catch (error) {[m
+[31m-        console.error('Error al guardar datos:', error);[m
+[31m-        return false;[m
+[32m+[m[32m        console.error('Error al guardar datos del usuario:', error);[m
+     }[m
+ }[m
+ [m
+ // Función para obtener datos del usuario[m
+ function getUserData(key) {[m
+     try {[m
+[31m-        const data = localStorage.getItem(key);[m
+[32m+[m[32m        const user = window.auth?.currentUser;[m
+[32m+[m[32m        if (!user) {[m
+[32m+[m[32m            console.warn('Usuario no autenticado, obteniendo datos temporales');[m
+[32m+[m[32m            return localStorage.getItem(`temp_${key}`);[m
+[32m+[m[32m        }[m
+[32m+[m[41m        [m
+[32m+[m[32m        // Usar el UID del usuario para obtener datos específicos[m
+[32m+[m[32m        const userKey = `${user.uid}_${key}`;[m
+[32m+[m[32m        const data = localStorage.getItem(userKey);[m
+[32m+[m[32m        console.log(`Datos obtenidos para usuario ${user.uid}:`, key, data ? 'Encontrados' : 'No encontrados');[m
+         return data;[m
+     } catch (error) {[m
+[31m-        console.error('Error al obtener datos:', error);[m
+[32m+[m[32m        console.error('Error al obtener datos del usuario:', error);[m
+         return null;[m
+     }[m
+ }[m
+ [m
+[31m-[m
+[31m-[m
+[31m-// Exponer estas funciones globalmente[m
+[31m-window.setUserData = setUserData;[m
+[31m-window.getUserData = getUserData;[m
+[31m-[m
+[31m-function setupActivityCardListeners(card) {[m
+[31m-    const attendanceBtn = card.querySelector('.attendance-btn');[m
+[31m-    const deleteBtn = card.querySelector('.delete-activity-btn');[m
+[31m-    const editTitleBtn = card.querySelector('.edit-title-btn');[m
+[31m-    const editDateBtn = card.querySelector('.edit-date-btn');[m
+[31m-[m
+[31m-    attendanceBtn?.addEventListener('click', () => {[m
+[31m-        const activity = attendanceBtn.dataset.activity;[m
+[31m-        const date = attendanceBtn.dataset.date;[m
+[31m-        openAttendanceModal(activity, date);[m
+[31m-    });[m
+[31m-[m
+[31m-    deleteBtn?.addEventListener('click', () => {[m
+[31m-        const activityId = deleteBtn.dataset.id;[m
+[31m-        deleteActivity(activityId);[m
+[31m-    });[m
+[31m-[m
+[31m-    editTitleBtn?.addEventListener('click', () => makeEditable(card, 'title', 'text'));[m
+[31m-    editDateBtn?.addEventListener('click', () => makeEditable(card, 'date', 'date'));[m
+[31m-}[m
+[31m-[m
+[31m-// Función para mostrar notificaciones[m
+[31m-function showNotification(message, type = 'success') {[m
+[31m-    // Verificar si ya existe una notificación[m
+[31m-    let notification = document.querySelector('.notification');[m
+[31m-    [m
+[31m-    // Si no existe, crearla[m
+[31m-    if (!notification) {[m
+[31m-        notification = document.createElement('div');[m
+[31m-        notification.className = 'notification';[m
+[31m-        document.body.appendChild(notification);[m
+[31m-    }[m
+[31m-    [m
+[31m-    // Establecer el tipo y mensaje[m
+[31m-    notification.className = `notification ${type}`;[m
+[31m-    notification.innerHTML = `[m
+[31m-        <div class="notification-content">[m
+[31m-            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>[m
+[31m-            <span>${message}</span>[m
+[31m-        </div>[m
+[31m-        <button class="close-notification">[m
+[31m-            <i class="fas fa-times"></i>[m
+[31m-        </button>[m
+[31m-    `;[m
+[31m-    [m
+[31m-    // Mostrar la notificación[m
+[31m-    notification.classList.add('show');[m
+[31m-    [m
+[31m-    // Configurar el botón de cierre[m
+[31m-    const closeBtn = notification.querySelector('.close-notification');[m
+[31m-    if (closeBtn) {[m
+[31m-        closeBtn.addEventListener('click', () => {[m
+[31m-            notification.classList.remove('show');[m
+[31m-        });[m
+[31m-    }[m
+[31m-    [m
+[31m-    // Ocultar automáticamente después de 5 segundos[m
+[31m-    setTimeout(() => {[m
+[31m-        if (notification.classList.contains('show')) {[m
+[31m-            notification.classList.remove('show');[m
+[31m-        }[m
+[31m-    }, 5000);[m
+[31m-}[m
+[31m-[m
+[31m-// Hacer accesible la función deleteActivityImage globalmente[m
+[31m-window.editField = editField;[m
+[31m-window.saveEdit = saveEdit;[m
+[31m-window.deleteActivity = deleteActivity;[m
+[31m-window.handleImage = handleImage;[m
+[31m-window.addImage = addImage;[m
+[31m-window.openGallery = openGallery;[m
+[31m-window.openAttendanceModal = openAttendanceModal;[m
+[31m-[m
+[31m-function openGallery(startingImageId = null) {[m
+[31m-    const activities = JSON.parse(getUserData('activities') || '[]')[m
+[31m-        .filter(activity => activity.imageData);[m
+[31m-    [m
+[31m-    if (activities.length === 0) {[m
+[31m-        showNotification('No hay imágenes en la galería', 'info');[m
+[31m-        return;[m
+[31m-    }[m
+[31m-[m
+[31m-    let currentIndex = startingImageId ? [m
+[31m-        activities.findIndex(a => a.id.toString() === startingImageId.toString()) : 0;[m
+[31m-    [m
+[31m-    if (currentIndex === -1) currentIndex = 0;[m
+[31m-[m
+[31m-    // Usar el modal existente[m
+[31m-    const modal = document.getElementById('gallery-modal');[m
+[31m-    const container = modal.querySelector('.carousel-slide');[m
+[31m-    const search = modal.querySelector('#gallery-search');[m
+[31m-    const prevBtn = modal.querySelector('.prev-btn');[m
+[31m-    const nextBtn = modal.querySelector('.next-btn');[m
+[31m-    const closeBtn = modal.querySelector('.close-modal');[m
+[31m-    let filteredActivities = [...activities];[m
+[31m-[m
+[31m-    function updateGalleryView() {[m
+[31m-        const activity = filteredActivities[currentIndex];[m
+[31m-        container.innerHTML = `[m
+[31m-            <img src="${activity.imageData}" alt="${activity.name}">[m
+[31m-            <div class="image-info">[m
+[31m-                <h4 class="activity-name">${activity.name}</h4>[m
+[31m-                <p class="activity-date">${formatDate(activity.date)}</p>[m
+[31m-            </div>[m
+[31m-        `;[m
+[31m-    }[m
+[31m-[m
+[31m-    // Inicializar la vista[m
+[31m-    updateGalleryView();[m
+[31m-    modal.style.display = 'block';[m
+[31m-[m
+[31m-    // Event listeners[m
+[31m-    search.addEventListener('input', (e) => {[m
+[31m-        const searchTerm = e.target.value.toLowerCase();[m
+[31m-        filteredActivities = activities.filter(activity => [m
+[31m-            activity.name.toLowerCase().includes(searchTerm)[m
+[31m-        );[m
+[31m-        if (filteredActivities.length > 0) {[m
+[31m-            currentIndex = 0;[m
+[31m-            updateGalleryView();[m
+[31m-        }[m
+[31m-    });[m
+[31m-[m
+[31m-    prevBtn.addEventListener('click', () => {[m
+[31m-        currentIndex = (currentIndex - 1 + filteredActivities.length) % filteredActivities.length;[m
+[31m-        updateGalleryView();[m
+[31m-    });[m
+[31m-[m
+[31m-    nextBtn.addEventListener('click', () => {[m
+[31m-        currentIndex = (currentIndex + 1) % filteredActivities.length;[m
+[31m-        updateGalleryView();[m
+[31m-    });[m
+[31m-[m
+[31m-    closeBtn.addEventListener('click', () => {[m
+[31m-        modal.style.display = 'none';[m
+[31m-        search.value = '';[m
+[31m-        filteredActivities = [...activities];[m
+[31m-    });[m
+[31m-[m
+[31m-    // Navegación con teclado[m
+[31m-    function galleryKeyHandler(e) {[m
+[31m-        if (e.key === 'Escape') {[m
+[31m-            modal.style.display = 'none';[m
+[31m-            document.removeEventListener('keydown', galleryKeyHandler);[m
+[31m-        } else if (e.key === 'ArrowLeft') {[m
+[31m-            prevBtn.click();[m
+[31m-        } else if (e.key === 'ArrowRight') {[m
+[31m-            nextBtn.click();[m
+[31m-        }[m
+[31m-    }[m
+[31m-[m
+[31m-    document.addEventListener('keydown', galleryKeyHandler);[m
+[31m-}[m
+[31m-[m
+[31m-// Función para guardar datos del usuario[m
+[31m-function setUserData(key, data) {[m
+[31m-    try {[m
+[31m-        // Si data ya es un string, no lo convertimos de nuevo[m
+[31m-        const dataToStore = typeof data === 'string' ? data : JSON.stringify(data);[m
+[31m-        localStorage.setItem(key, dataToStore);[m
+[31m-        return true;[m
+[31m-    } catch (error) {[m
+[31m-        console.error('Error al guardar datos:', error);[m
+[31m-        return false;[m
+[31m-    }[m
+[31m-}[m
+[31m-[m
+[31m-// Función para obtener datos del usuario[m
+[31m-function getUserData(key) {[m
+[32m+[m[32m// Función para migrar datos temporales cuando el usuario se autentica[m
+[32m+[m[32mfunction migrateTemporaryData() {[m
+     try {[m
+[31m-        const data = localStorage.getItem(key);[m
+[31m-        return data;[m
+[32m+[m[32m        const user = window.auth?.currentUser;[m
+[32m+[m[32m        if (!user) return;[m
+[32m+[m[41m        [m
+[32m+[m[32m        const keysToMigrate = ['students', 'activities', 'attendance'];[m
+[32m+[m[41m        [m
+[32m+[m[32m        keysToMigrate.forEach(key => {[m
+[32m+[m[32m            const tempKey = `temp_${key}`;[m
+[32m+[m[32m            const tempData = localStorage.getItem(tempKey);[m
+[32m+[m[41m            [m
+[32m+[m[32m            if (tempData) {[m
+[32m+[m[32m                const userKey = `${user.uid}_${key}`;[m
+[32m+[m[32m                // Solo migrar si no existen datos del usuario[m
+[32m+[m[32m                if (!localStorage.getItem(userKey)) {[m
+[32m+[m[32m                    localStorage.setItem(userKey, tempData);[m
+[32m+[m[32m                    console.log(`Datos temporales migrados para ${key}`);[m
+[32m+[m[32m                }[m
+[32m+[m[32m                // Limpiar datos temporales[m
+[32m+[m[32m                localStorage.removeItem(tempKey);[m
+[32m+[m[32m            }[m
+[32m+[m[32m        });[m
+     } catch (error) {[m
+[31m-        console.error('Error al obtener datos:', error);[m
+[31m-        return null;[m
+[32m+[m[32m        console.error('Error al migrar datos temporales:', error);[m
+     }[m
+ }[m
+ [m
+[32m+[m[32m// Agregar esta función para limpiar datos mezclados (ejecutar una vez):[m
+ [m
+[31m-[m
+[31m-// Exponer estas funciones globalmente[m
+[31m-window.setUserData = setUserData;[m
+[31m-window.getUserData = getUserData;[m
+[31m-[m
+[31m-function setupActivityCardListeners(card) {[m
+[31m-    const attendanceBtn = card.querySelector('.attendance-btn');[m
+[31m-    const deleteBtn = card.querySelector('.delete-activity-btn');[m
+[31m-    const editTitleBtn = card.querySelector('.edit-title-btn');[m
+[31m-    const editDateBtn = card.querySelector('.edit-date-btn');[m
+[31m-[m
+[31m-    attendanceBtn?.addEventListener('click', () => {[m
+[31m-        const activity = attendanceBtn.dataset.activity;[m
+[31m-        const date = attendanceBtn.dataset.date;[m
+[31m-        openAttendanceModal(activity, date);[m
+[31m-    });[m
+[31m-[m
+[31m-    deleteBtn?.addEventListener('click', () => {[m
+[31m-        const activityId = deleteBtn.dataset.id;[m
+[31m-        deleteActivity(activityId);[m
+[31m-    });[m
+[31m-[m
+[31m-    editTitleBtn?.addEventListener('click', () => makeEditable(card, 'title', 'text'));[m
+[31m-    editDateBtn?.addEventListener('click', () => makeEditable(card, 'date', 'date'));[m
+[31m-}[m
+[31m-[m
+[31m-// Función para mostrar notificaciones[m
+[31m-function showNotification(message, type = 'success') {[m
+[31m-    // Verificar si ya existe una notificación[m
+[31m-    let notification = document.querySelector('.notification');[m
+[31m-    [m
+[31m-    // Si no existe, crearla[m
+[31m-    if (!notification) {[m
+[31m-        notification = document.createElement('div');[m
+[31m-        notification.className = 'notification';[m
+[31m-        document.body.appendChild(notification);[m
+[31m-    }[m
+[31m-    [m
+[31m-    // Establecer el tipo y mensaje[m
+[31m-    notification.className = `notification ${type}`;[m
+[31m-    notification.innerHTML = `[m
+[31m-        <div class="notification-content">[m
+[31m-            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>[m
+[31m-            <span>${message}</span>[m
+[31m-        </div>[m
+[31m-        <button class="close-notification">[m
+[31m-            <i class="fas fa-times"></i>[m
+[31m-        </button>[m
+[31m-    `;[m
+[31m-    [m
+[31m-    // Mostrar la notificación[m
+[31m-    notification.classList.add('show');[m
+[32m+[m[32mfunction cleanMixedUserData() {[m
+[32m+[m[32m    const confirmed = confirm('¿Quieres limpiar todos los datos locales? Esta acción eliminará todos los estudiantes y actividades guardados localmente.');[m
+     [m
+[31m-    // Configurar el botón de cierre[m
+[31m-    const closeBtn = notification.querySelector('.close-notification');[m
+[31m-    if (closeBtn) {[m
+[31m-        closeBtn.addEventListener('click', () => {[m
+[31m-            notification.classList.remove('show');[m
+[32m+[m[32m    if (confirmed) {[m
+[32m+[m[32m        // Limpiar todas las claves relacionadas con la app[m
+[32m+[m[32m        Object.keys(localStorage).forEach(key => {[m
+[32m+[m[32m            if (key.includes('students') || key.includes('activities') || key.includes('attendance')) {[m
+[32m+[m[32m                localStorage.removeItem(key);[m
+[32m+[m[32m            }[m
+         });[m
+[32m+[m[41m        [m
+[32m+[m[32m        showNotification('Datos locales limpiados. Recarga la página para empezar de nuevo.', 'success');[m
+[32m+[m[32m        console.log('Datos locales limpiados');[m
+     }[m
+[31m-    [m
+[31m-    // Ocultar automáticamente después de 5 segundos[m
+[31m-    setTimeout(() => {[m
+[31m-        if (notification.classList.contains('show')) {[m
+[31m-            notification.classList.remove('show');[m
+[31m-        }[m
+[31m-    }, 5000);[m
+ }[m
+ [m
+[31m-// Hacer accesible la función deleteActivityImage globalmente[m
+[31m-window.editField = editField;[m
+[31m-window.saveEdit = saveEdit;[m
+[31m-window.deleteActivity = deleteActivity;[m
+[31m-window.handleImage = handleImage;[m
+[31m-window.addImage = addImage;[m
+[31m-window.openGallery = openGallery;[m
+[31m-window.openAttendanceModal = openAttendanceModal;[m
+[31m-[m
+[31m-function openGallery(startingImageId = null) {[m
+[31m-    const activities = JSON.parse(getUserData('activities') || '[]')[m
+[31m-        .filter(activity => activity.imageData);[m
+[31m-    [m
+[31m-    if (activities.length === 0) {[m
+[31m-        showNotification('No hay imágenes en la galería', 'info');[m
+[31m-        return;[m
+[31m-    }[m
+[31m-[m
+[31m-    let currentIndex = startingImageId ? [m
+[31m-        activities.findIndex(a => a.id.toString() === startingImageId.toString()) : 0;[m
+[31m-    [m
+[31m-    if (currentIndex === -1) currentIndex = 0;[m
+[31m-[m
+[31m-    // Usar el modal existente[m
+[31m-    const modal = document.getElementById('gallery-modal');[m
+[31m-    const container = modal.querySelector('.carousel-slide');[m
+[31m-    const search = modal.querySelector('#gallery-search');[m
+[31m-    const prevBtn = modal.querySelector('.prev-btn');[m
+[31m-    const nextBtn = modal.querySelector('.next-btn');[m
+[31m-    const closeBtn = modal.querySelector('.close-modal');[m
+[31m-    let filteredActivities = [...activities];[m
+[31m-[m
+[31m-    function updateGalleryView() {[m
+[31m-        const activity = filteredActivities[currentIndex];[m
+[31m-        container.innerHTML = `[m
+[31m-            <img src="${activity.imageData}" alt="${activity.name}">[m
+[31m-            <div class="image-info">[m
+[31m-                <h4 class="activity-name">${activity.name}</h4>[m
+[31m-                <p class="activity-date">${formatDate(activity.date)}</p>[m
+[31m-            </div>[m
+[31m-        `;[m
+[31m-    }[m
+[31m-[m
+[31m-    // Inicializar la vista[m
+[31m-    updateGalleryView();[m
+[31m-    modal.style.display = 'block';[m
+[31m-[m
+[31m-    // Event listeners[m
+[31m-    search.addEventListener('input', (e) => {[m
+[31m-        const searchTerm = e.target.value.toLowerCase();[m
+[31m-        filteredActivities = activities.filter(activity => [m
+[31m-            activity.name.toLowerCase().includes(searchTerm)[m
+[31m-        );[m
+[31m-        if (filteredActivities.length > 0) {[m
+[31m-            currentIndex = 0;[m
+[31m-            updateGalleryView();[m
+[31m-        }[m
+[31m-    });[m
+[31m-[m
+[31m-    prevBtn.addEventListener('click', () => {[m
+[31m-        currentIndex = (currentIndex - 1 + filteredActivities.length) % filteredActivities.length;[m
+[31m-        updateGalleryView();[m
+[31m-    });[m
+[31m-[m
+[31m-    nextBtn.addEventListener('click', () => {[m
+[31m-        currentIndex = (currentIndex + 1) % filteredActivities.length;[m
+[31m-        updateGalleryView();[m
+[31m-    });[m
+[31m-[m
+[31m-    closeBtn.addEventListener('click', () => {[m
+[31m-        modal.style.display = 'none';[m
+[31m-        search.value = '';[m
+[31m-        filteredActivities = [...activities];[m
+[31m-    });[m
+[31m-[m
+[31m-    // Navegación con teclado[m
+[31m-    function galleryKeyHandler(e) {[m
+[31m-        if (e.key === 'Escape') {[m
+[31m-            modal.style.display = 'none';[m
+[31m-            document.removeEventListener('keydown', galleryKeyHandler);[m
+[31m-        } else if (e.key === 'ArrowLeft') {[m
+[31m-            prevBtn.click();[m
+[31m-        } else if (e.key === 'ArrowRight') {[m
+[31m-            nextBtn.click();[m
+[31m-        }[m
+[31m-    }[m
+[31m-[m
+[31m-    document.addEventListener('keydown', galleryKeyHandler);[m
+[31m-}[m
+[31m-[m
+[31m-// Función para guardar datos del usuario[m
+[31m-function setUserData(key, data) {[m
+[31m-    try {[m
+[31m-        // Si data ya es un string, no lo convertimos de nuevo[m
+[31m-        const dataToStore = typeof data === 'string' ? data : JSON.stringify(data);[m
+[31m-        localStorage.setItem(key, dataToStore);[m
+[31m-        return true;[m
+[31m-    } catch (error) {[m
+[31m-        console.error('Error al guardar datos:', error);[m
+[31m-        return false;[m
+[31m-    }[m
+[31m-}[m
+[31m-[m
+[31m-// Función para obtener datos del usuario[m
+[31m-function getUserData(key) {[m
+[31m-    try {[m
+[31m-        const data = localStorage.getItem(key);[m
+[31m-        return data;[m
+[31m-    } catch (error) {[m
+[31m-        console.error('Error al obtener datos:', error);[m
+[31m-        return null;[m
+[31m-    }[m
+[31m-}[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-// Exponer estas funciones globalmente[m
+[31m-window.setUserData = setUserData;[m
+[31m-window.getUserData = getUserData;[m
+[31m-[m
+[31m-function setupActivityCardListeners(card) {[m
+[31m-    const attendanceBtn = card.querySelector('.attendance-btn');[m
+[31m-    const deleteBtn = card.querySelector('.delete-activity-btn');[m
+[31m-    const editTitleBtn = card.querySelector('.edit-title-btn');[m
+[31m-    const editDateBtn = card.querySelector('.edit-date-btn');[m
+[31m-[m
+[31m-    attendanceBtn?.addEventListener('click', () => {[m
+[31m-        const activity = attendanceBtn.dataset.activity;[m
+[31m-        const date = attendanceBtn.dataset.date;[m
+[31m-        openAttendanceModal(activity, date);[m
+[31m-    });[m
+[31m-[m
+[31m-    deleteBtn?.addEventListener('click', () => {[m
+[31m-        const activityId = deleteBtn.dataset.id;[m
+[31m-        deleteActivity(activityId);[m
+[31m-    });[m
+[31m-[m
+[31m-    editTitleBtn?.addEventListener('click', () => makeEditable(card, 'title', 'text'));[m
+[31m-    editDateBtn?.addEventListener('click', () => makeEditable(card, 'date', 'date'));[m
+[31m-}[m
+[31m-[m
+[31m-// Función para mostrar notificaciones[m
+[31m-function showNotification(message, type = 'success') {[m
+[31m-    // Verificar si ya existe una notificación[m
+[31m-    let notification = document.querySelector('.notification');[m
+[31m-    [m
+[31m-    // Si no existe, crearla[m
+[31m-    if (!notification) {[m
+[31m-        notification = document.createElement('div');[m
+[31m-        notification.className = 'notification';[m
+[31m-        document.body.appendChild(notification);[m
+[31m-    }[m
+[31m-    [m
+[31m-    // Establecer el tipo y mensaje[m
+[31m-    notification.className = `notification ${type}`;[m
+[31m-    notification.innerHTML = `[m
+[31m-        <div class="notification-content">[m
+[31m-            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>[m
+[31m-            <span>${message}</span>[m
+[31m-        </div>[m
+[31m-        <button class="close-notification">[m
+[31m-            <i class="fas fa-times"></i>[m
+[31m-        </button>[m
+[31m-    `;[m
+[31m-    [m
+[31m-    // Mostrar la notificación[m
+[31m-    notification.classList.add('show');[m
+[31m-    [m
+[31m-    // Configurar el botón de cierre[m
+[31m-    const closeBtn = notification.querySelector('.close-notification');[m
+[31m-    if (closeBtn) {[m
+[31m-        closeBtn.addEventListener('click', () => {[m
+[31m-            notification.classList.remove('show');[m
+[31m-        });[m
+[31m-    }[m
+[31m-    [m
+[31m-    // Ocultar automáticamente después de 5 segundos[m
+[31m-    setTimeout(() => {[m
+[31m-        if (notification.classList.contains('show')) {[m
+[31m-            notification.classList.remove('show');[m
+[31m-        }[m
+[31m-    }, 5000);[m
+[31m-}[m
+[31m-[m
+[31m-// Hacer accesible la función deleteActivityImage globalmente[m
+[31m-window.editField = editField;[m
+[31m-window.saveEdit = saveEdit;[m
+[31m-window.deleteActivity = deleteActivity;[m
+[31m-window.handleImage = handleImage;[m
+[31m-window.addImage = addImage;[m
+[31m-window.openGallery = openGallery;[m
+[31m-window.openAttendanceModal = openAttendanceModal;[m
+[31m-[m
+[31m-function openGallery(startingImageId = null) {[m
+[31m-    const activities = JSON.parse(getUserData('activities') || '[]')[m
+[31m-        .filter(activity => activity.imageData);[m
+[31m-    [m
+[31m-    if (activities.length === 0) {[m
+[31m-        showNotification('No hay imágenes en la galería', 'info');[m
+[31m-        return;[m
+[31m-    }[m
+[31m-[m
+[31m-    let currentIndex = startingImageId ? [m
+[31m-        activities.findIndex(a => a.id.toString() === startingImageId.toString()) : 0;[m
+[31m-    [m
+[31m-    if (currentIndex === -1) currentIndex = 0;[m
+[31m-[m
+[31m-    // Usar el modal existente[m
+[31m-    const modal = document.getElementById('gallery-modal');[m
+[31m-    const container = modal.querySelector('.carousel-slide');[m
+[31m-    const search = modal.querySelector('#gallery-search');[m
+[31m-    const prevBtn = modal.querySelector('.prev-btn');[m
+[31m-    const nextBtn = modal.querySelector('.next-btn');[m
+[31m-    const closeBtn = modal.querySelector('.close-modal');[m
+[31m-    let filteredActivities = [...activities];[m
+[31m-[m
+[31m-    function updateGalleryView() {[m
+[31m-        const activity = filteredActivities[currentIndex];[m
+[31m-        container.innerHTML = `[m
+[31m-            <img src="${activity.imageData}" alt="${activity.name}">[m
+[31m-            <div class="image-info">[m
+[31m-                <h4 class="activity-name">${activity.name}</h4>[m
+[31m-                <p class="activity-date">${formatDate(activity.date)}</p>[m
+[31m-            </div>[m
+[31m-        `;[m
+[31m-    }[m
+[31m-[m
+[31m-    // Inicializar la vista[m
+[31m-    updateGalleryView();[m
+[31m-    modal.style.display = 'block';[m
+[31m-[m
+[31m-    // Event listeners[m
+[31m-    search.addEventListener('input', (e) => {[m
+[31m-        const searchTerm = e.target.value.toLowerCase();[m
+[31m-        filteredActivities = activities.filter(activity => [m
+[31m-            activity.name.toLowerCase().includes(searchTerm)[m
+[31m-        );[m
+[31m-        if (filteredActivities.length > 0) {[m
+[31m-            currentIndex = 0;[m
+[31m-            updateGalleryView();[m
+[31m-        }[m
+[31m-    });[m
+[31m-[m
+[31m-    prevBtn.addEventListener('click', () => {[m
+[31m-        currentIndex = (currentIndex - 1 + filteredActivities.length) % filteredActivities.length;[m
+[31m-        updateGalleryView();[m
+[31m-    });[m
+[31m-[m
+[31m-    nextBtn.addEventListener('click', () => {[m
+[31m-        currentIndex = (currentIndex + 1) % filteredActivities.length;[m
+[31m-        updateGalleryView();[m
+[31m-    });[m
+[31m-[m
+[31m-    closeBtn.addEventListener('click', () => {[m
+[31m-        modal.style.display = 'none';[m
+[31m-        search.value = '';[m
+[31m-        filteredActivities = [...activities];[m
+[31m-    });[m
+[31m-[m
+[31m-    // Navegación con teclado[m
+[31m-    function galleryKeyHandler(e) {[m
+[31m-        if (e.key === 'Escape') {[m
+[31m-            modal.style.display = 'none';[m
+[31m-            document.removeEventListener('keydown', galleryKeyHandler);[m
+[31m-        } else if (e.key === 'ArrowLeft') {[m
+[31m-            prevBtn.click();[m
+[31m-        } else if (e.key === 'ArrowRight') {[m
+[31m-            nextBtn.click();[m
+[31m-        }[m
+[31m-    }[m
+[31m-[m
+[31m-    document.addEventListener('keydown', galleryKeyHandler);[m
+[31m-}[m
+[31m-[m
+[31m-// Función para guardar datos del usuario[m
+[31m-function setUserData(key, data) {[m
+[31m-    try {[m
+[31m-        // Si data ya es un string, no lo convertimos de nuevo[m
+[31m-        const dataToStore = typeof data === 'string' ? data : JSON.stringify(data);[m
+[31m-        localStorage.setItem(key, dataToStore);[m
+[31m-        return true;[m
+[31m-    } catch (error) {[m
+[31m-        console.error('Error al guardar datos:', error);[m
+[31m-        return false;[m
+[31m-    }[m
+[31m-}[m
+[31m-[m
+[31m-// Función para obtener datos del usuario[m
+[31m-function getUserData(key) {[m
+[31m-    try {[m
+[31m-        const data = localStorage.getItem(key);[m
+[31m-        return data;[m
+[31m-    } catch (error) {[m
+[31m-        console.error('Error al obtener datos:', error);[m
+[31m-        return null;[m
+[31m-    }[m
+[31m-}[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-// Exponer estas funciones globalmente[m
+[31m-window.setUserData = setUserData;[m
+[31m-window.getUserData = getUserData;[m
+[31m-[m
+[31m-function setupActivityCardListeners(card) {[m
+[31m-    const attendanceBtn = card.querySelector('.attendance-btn');[m
+[31m-    const deleteBtn = card.querySelector('.delete-activity-btn');[m
+[31m-    const editTitleBtn = card.querySelector('.edit-title-btn');[m
+[31m-    const editDateBtn = card.querySelector('.edit-date-btn');[m
+[31m-[m
+[31m-    attendanceBtn?.addEventListener('click', () => {[m
+[31m-        const activity = attendanceBtn.dataset.activity;[m
+[31m-        const date = attendanceBtn.dataset.date;[m
+[31m-        openAttendanceModal(activity, date);[m
+[31m-    });[m
+[31m-[m
+[31m-    deleteBtn?.addEventListener('click', () => {[m
+[31m-        const activityId = deleteBtn.dataset.id;[m
+[31m-        deleteActivity(activityId);[m
+[31m-    });[m
+[31m-[m
+[31m-    editTitleBtn?.addEventListener('click', () => makeEditable(card, 'title', 'text'));[m
+[31m-    editDateBtn?.addEventListener('click', () => makeEditable(card, 'date', 'date'));[m
+[31m-}[m
+[31m-[m
+[31m-// Función para mostrar notificaciones[m
+[31m-function showNotification(message, type = 'success') {[m
+[31m-    // Verificar si ya existe una notificación[m
+[31m-    let notification = document.querySelector('.notification');[m
+[31m-    [m
+[31m-    // Si no existe, crearla[m
+[31m-    if (!notification) {[m
+[31m-        notification = document.createElement('div');[m
+[31m-        notification.className = 'notification';[m
+[31m-        document.body.appendChild(notification);[m
+[31m-    }[m
+[31m-    [m
+[31m-    // Establecer el tipo y mensaje[m
+[31m-    notification.className = `notification ${type}`;[m
+[31m-    notification.innerHTML = `[m
+[31m-        <div class="notification-content">[m
+[31m-            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>[m
+[31m-            <span>${message}</span>[m
+[31m-        </div>[m
+[31m-        <button class="close-notification">[m
+[31m-            <i class="fas fa-times"></i>[m
+[31m-        </button>[m
+[31m-    `;[m
+[31m-    [m
+[31m-    // Mostrar la notificación[m
+[31m-    notification.classList.add('show');[m
+[31m-    [m
+[31m-    // Configurar el botón de cierre[m
+[31m-    const closeBtn = notification.querySelector('.close-notification');[m
+[31m-    if (closeBtn) {[m
+[31m-        closeBtn.addEventListener('click', () => {[m
+[31m-            notification.classList.remove('show');[m
+[31m-        });[m
+[31m-    }[m
+[31m-    [m
+[31m-    // Ocultar automáticamente después de 5 segundos[m
+[31m-    setTimeout(() => {[m
+[31m-        if (notification.classList.contains('show')) {[m
+[31m-            notification.classList.remove('show');[m
+[31m-        }[m
+[31m-    }, 5000);[m
+[31m-}[m
+[31m-[m
+[31m-// Hacer accesible la función deleteActivityImage globalmente[m
+[31m-window.editField = editField;[m
+[31m-window.saveEdit = saveEdit;[m
+[31m-window.deleteActivity = deleteActivity;[m
+[31m-window.handleImage = handleImage;[m
+[31m-window.addImage = addImage;[m
+[31m-window.openGallery = openGallery;[m
+[31m-window.openAttendanceModal = openAttendanceModal;[m
+[31m-[m
+[31m-function openGallery(startingImageId = null) {[m
+[31m-    const activities = JSON.parse(getUserData('activities') || '[]')[m
+[31m-        .filter(activity => activity.imageData);[m
+[31m-    [m
+[31m-    if (activities.length === 0) {[m
+[31m-        showNotification('No hay imágenes en la galería', 'info');[m
+[31m-        return;[m
+[31m-    }[m
+[31m-[m
+[31m-    let currentIndex = startingImageId ? [m
+[31m-        activities.findIndex(a => a.id.toString() === startingImageId.toString()) : 0;[m
+[31m-    [m
+[31m-    if (currentIndex === -1) currentIndex = 0;[m
+[31m-[m
+[31m-    // Usar el modal existente[m
+[31m-    const modal = document.getElementById('gallery-modal');[m
+[31m-    const container = modal.querySelector('.carousel-slide');[m
+[31m-    const search = modal.querySelector('#gallery-search');[m
+[31m-    const prevBtn = modal.querySelector('.prev-btn');[m
+[31m-    const nextBtn = modal.querySelector('.next-btn');[m
+[31m-    const closeBtn = modal.querySelector('.close-modal');[m
+[31m-    let filteredActivities = [...activities];[m
+[31m-[m
+[31m-    function updateGalleryView() {[m
+[31m-        const activity = filteredActivities[currentIndex];[m
+[31m-        container.innerHTML = `[m
+[31m-            <img src="${activity.imageData}" alt="${activity.name}">[m
+[31m-            <div class="image-info">[m
+[31m-                <h4 class="activity-name">${activity.name}</h4>[m
+[31m-                <p class="activity-date">${formatDate(activity.date)}</p>[m
+[31m-            </div>[m
+[31m-        `;[m
+[31m-    }[m
+[31m-[m
+[31m-    // Inicializar la vista[m
+[31m-    updateGalleryView();[m
+[31m-    modal.style.display = 'block';[m
+[31m-[m
+[31m-    // Event listeners[m
+[31m-    search.addEventListener('input', (e) => {[m
+[31m-        const searchTerm = e.target.value.toLowerCase();[m
+[31m-        filteredActivities = activities.filter(activity => [m
+[31m-            activity.name.toLowerCase().includes(searchTerm)[m
+[31m-        );[m
+[31m-        if (filteredActivities.length > 0) {[m
+[31m-            currentIndex = 0;[m
+[31m-            updateGalleryView();[m
+[31m-        }[m
+[31m-    });[m
+[31m-[m
+[31m-    prevBtn.addEventListener('click', () => {[m
+[31m-        currentIndex = (currentIndex - 1 + filteredActivities.length) % filteredActivities.length;[m
+[31m-        updateGalleryView();[m
+[31m-    });[m
+[31m-[m
+[31m-    nextBtn.addEventListener('click', () => {[m
+[31m-        currentIndex = (currentIndex + 1) % filteredActivities.length;[m
+[31m-        updateGalleryView();[m
+[31m-    });[m
+[31m-[m
+[31m-    closeBtn.addEventListener('click', () => {[m
+[31m-        modal.style.display = 'none';[m
+[31m-        search.value = '';[m
+[31m-        filteredActivities = [...activities];[m
+[31m-    });[m
+[31m-[m
+[31m-    // Navegación con teclado[m
+[31m-    function galleryKeyHandler(e) {[m
+[31m-        if (e.key === 'Escape') {[m
+[31m-            modal.style.display = 'none';[m
+[31m-            document.removeEventListener('keydown', galleryKeyHandler);[m
+[31m-        } else if (e.key === 'ArrowLeft') {[m
+[31m-            prevBtn.click();[m
+[31m-        } else if (e.key === 'ArrowRight') {[m
+[31m-            nextBtn.click();[m
+[31m-        }[m
+[31m-    }[m
+[31m-[m
+[31m-    document.addEventListener('keydown', galleryKeyHandler);[m
+[31m-}[m
+[31m-[m
+[31m-// Función para guardar datos del usuario[m
+[31m-function setUserData(key, data) {[m
+[31m-    try {[m
+[31m-        // Si data ya es un string, no lo convertimos de nuevo[m
+[31m-        const dataToStore = typeof data === 'string' ? data : JSON.stringify(data);[m
+[31m-        localStorage.setItem(key, dataToStore);[m
+[31m-        return true;[m
+[31m-    } catch (error) {[m
+[31m-        console.error('Error al guardar datos:', error);[m
+[31m-        return false;[m
+[31m-    }[m
+[31m-}[m
+[31m-[m
+[31m-// Función para obtener datos del usuario[m
+[31m-function getUserData(key) {[m
+[31m-    try {[m
+[31m-        const data = localStorage.getItem(key);[m
+[31m-        return data;[m
+[31m-    } catch (error) {[m
+[31m-        console.error('Error al obtener datos:', error);[m
+[31m-        return null;[m
+[31m-    }[m
+[31m-}[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-// Exponer estas funciones globalmente[m
+[31m-window.setUserData = setUserData;[m
+[31m-window.getUserData = getUserData;[m
+[31m-[m
+[31m-function setupActivityCardListeners(card) {[m
+[31m-    const attendanceBtn = card.querySelector('.attendance-btn');[m
+[31m-    const deleteBtn = card.querySelector('.delete-activity-btn');[m
+[31m-    const editTitleBtn = card.querySelector('.edit-title-btn');[m
+[31m-    const editDateBtn = card.querySelector('.edit-date-btn');[m
+[31m-[m
+[31m-    attendanceBtn?.addEventListener('click', () => {[m
+[31m-        const activity = attendanceBtn.dataset.activity;[m
+[31m-        const date = attendanceBtn.dataset.date;[m
+[31m-        openAttendanceModal(activity, date);[m
+[31m-    });[m
+[31m-[m
+[31m-    deleteBtn?.addEventListener('click', () => {[m
+[31m-        const activityId = deleteBtn.dataset.id;[m
+[31m-        deleteActivity(activityId);[m
+[31m-    });[m
+[31m-[m
+[31m-    editTitleBtn?.addEventListener('click', () => makeEditable(card, 'title', 'text'));[m
+[31m-    editDateBtn?.addEventListener('click', () => makeEditable(card, 'date', 'date'));[m
+[31m-}[m
+[31m-[m
+[31m-// Función para mostrar notificaciones[m
+[31m-function showNotification(message, type = 'success') {[m
+[31m-    // Verificar si ya existe una notificación[m
+[31m-    let notification = document.querySelector('.notification');[m
+[31m-    [m
+[31m-    // Si no existe, crearla[m
+[31m-    if (!notification) {[m
+[31m-        notification = document.createElement('div');[m
+[31m-        notification.className = 'notification';[m
+[31m-        document.body.appendChild(notification);[m
+[31m-    }[m
+[31m-    [m
+[31m-    // Establecer el tipo y mensaje[m
+[31m-    notification.className = `notification ${type}`;[m
+[31m-    notification.innerHTML = `[m
+[31m-        <div class="notification-content">[m
+[31m-            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>[m
+[31m-            <span>${message}</span>[m
+[31m-        </div>[m
+[31m-        <button class="close-notification">[m
+[31m-            <i class="fas fa-times"></i>[m
+[31m-        </button>[m
+[31m-    `;[m
+[31m-    [m
+[31m-    // Mostrar la notificación[m
+[31m-    notification.classList.add('show');[m
+[31m-    [m
+[31m-    // Configurar el botón de cierre[m
+[31m-    const closeBtn = notification.querySelector('.close-notification');[m
+[31m-    if (closeBtn) {[m
+[31m-        closeBtn.addEventListener('click', () => {[m
+[31m-            notification.classList.remove('show');[m
+[31m-        });[m
+[31m-    }[m
+[31m-    [m
+[31m-    // Ocultar automáticamente después de 5 segundos[m
+[31m-    setTimeout(() => {[m
+[31m-        if (notification.classList.contains('show')) {[m
+[31m-            notification.classList.remove('show');[m
+[31m-        }[m
+[31m-    }, 5000);[m
+[31m-}[m
+[31m-[m
+[31m-// Hacer accesible la función deleteActivityImage globalmente[m
+[31m-window.editField = editField;[m
+[31m-window.saveEdit = saveEdit;[m
+[31m-window.deleteActivity = deleteActivity;[m
+[31m-window.handleImage = handleImage;[m
+[31m-window.addImage = addImage;[m
+[31m-window.openGallery = openGallery;[m
+[31m-window.openAttendanceModal = openAttendanceModal;[m
+[31m-[m
+[31m-function openGallery(startingImageId = null) {[m
+[31m-    const activities = JSON.parse(getUserData('activities') || '[]')[m
+[31m-        .filter(activity => activity.imageData);[m
+[31m-    [m
+[31m-    if (activities.length === 0) {[m
+[31m-        showNotification('No hay imágenes en la galería', 'info');[m
+[31m-        return;[m
+[31m-    }[m
+[31m-[m
+[31m-    let currentIndex = startingImageId ? [m
+[31m-        activities.findIndex(a => a.id.toString() === startingImageId.toString()) : 0;[m
+[31m-    [m
+[31m-    if (currentIndex === -1) currentIndex = 0;[m
+[31m-[m
+[31m-    // Usar el modal existente[m
+[31m-    const modal = document.getElementById('gallery-modal');[m
+[31m-    const container = modal.querySelector('.carousel-slide');[m
+[31m-    const search = modal.querySelector('#gallery-search');[m
+[31m-    const prevBtn = modal.querySelector('.prev-btn');[m
+[31m-    const nextBtn = modal.querySelector('.next-btn');[m
+[31m-    const closeBtn = modal.querySelector('.close-modal');[m
+[31m-    let filteredActivities = [...activities];[m
+[31m-[m
+[31m-    function updateGalleryView() {[m
+[31m-        const activity = filteredActivities[currentIndex];[m
+[31m-        container.innerHTML = `[m
+[31m-            <img src="${activity.imageData}" alt="${activity.name}">[m
+[31m-            <div class="image-info">[m
+[31m-                <h4 class="activity-name">${activity.name}</h4>[m
+[31m-                <p class="activity-date">${formatDate(activity.date)}</p>[m
+[31m-            </div>[m
+[31m-        `;[m
+[31m-    }[m
+[31m-[m
+[31m-    // Inicializar la vista[m
+[31m-    updateGalleryView();[m
+[31m-    modal.style.display = 'block';[m
+[31m-[m
+[31m-    // Event listeners[m
+[31m-    search.addEventListener('input', (e) => {[m
+[31m-        const searchTerm = e.target.value.toLowerCase();[m
+[31m-        filteredActivities = activities.filter(activity => [m
+[31m-            activity.name.toLowerCase().includes(searchTerm)[m
+[31m-        );[m
+[31m-        if (filteredActivities.length > 0) {[m
+[31m-            currentIndex = 0;[m
+[31m-            updateGalleryView();[m
+[31m-        }[m
+[31m-    });[m
+[31m-[m
+[31m-    prevBtn.addEventListener('click', () => {[m
+[31m-        currentIndex = (currentIndex - 1 + filteredActivities.length) % filteredActivities.length;[m
+[31m-        updateGalleryView();[m
+[31m-    });[m
+[31m-[m
+[31m-    nextBtn.addEventListener('click', () => {[m
+[31m-        currentIndex = (currentIndex + 1) % filteredActivities.length;[m
+[31m-        updateGalleryView();[m
+[31m-    });[m
+[31m-[m
+[31m-    closeBtn.addEventListener('click', () => {[m
+[31m-        modal.style.display = 'none';[m
+[31m-        search.value = '';[m
+[31m-        filteredActivities = [...activities];[m
+[31m-    });[m
+[31m-[m
+[31m-    // Navegación con teclado[m
+[31m-    function galleryKeyHandler(e) {[m
+[31m-        if (e.key === 'Escape') {[m
+[31m-            modal.style.display = 'none';[m
+[31m-            document.removeEventListener('keydown', galleryKeyHandler);[m
+[31m-        } else if (e.key === 'ArrowLeft') {[m
+[31m-            prevBtn.click();[m
+[31m-        } else if (e.key === 'ArrowRight') {[m
+[31m-            nextBtn.click();[m
+[31m-        }[m
+[31m-    }[m
+[31m-[m
+[31m-    document.addEventListener('keydown', galleryKeyHandler);[m
+[31m-}[m
+[31m-[m
+[31m-// Función para guardar datos del usuario[m
+[31m-function setUserData(key, data) {[m
+[31m-    try {[m
+[31m-        // Si data ya es un string, no lo convertimos de nuevo[m
+[31m-        const dataToStore = typeof data === 'string' ? data : JSON.stringify(data);[m
+[31m-        localStorage.setItem(key, dataToStore);[m
+[31m-        return true;[m
+[31m-    } catch (error) {[m
+[31m-        console.error('Error al guardar datos:', error);[m
+[31m-        return false;[m
+[31m-    }[m
+[31m-}[m
+[31m-[m
+[31m-// Función para obtener datos del usuario[m
+[31m-function getUserData(key) {[m
+[31m-    try {[m
+[31m-        const data = localStorage.getItem(key);[m
+[31m-        return data;[m
+[31m-    } catch (error) {[m
+[31m-        console.error('Error al obtener datos:', error);[m
+[31m-        return null;[m
+[31m-    }[m
+[31m-}[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-// Exponer estas funciones globalmente[m
+[31m-window.setUserData = setUserData;[m
+[31m-window.getUserData = getUserData;[m
+[31m-[m
+[31m-function setupActivityCardListeners(card) {[m
+[31m-    const attendanceBtn = card.querySelector('.attendance-btn');[m
+[31m-    const deleteBtn = card.querySelector('.delete-activity-btn');[m
+[31m-    const editTitleBtn = card.querySelector('.edit-title-btn');[m
+[31m-    const editDateBtn = card.querySelector('.edit-date-btn');[m
+[31m-[m
+[31m-    attendanceBtn?.addEventListener('click', () => {[m
+[31m-        const activity = attendanceBtn.dataset.activity;[m
+[31m-        const date = attendanceBtn.dataset.date;[m
+[31m-        openAttendanceModal(activity, date);[m
+[31m-    });[m
+[31m-[m
+[31m-    deleteBtn?.addEventListener('click', () => {[m
+[31m-        const activityId = deleteBtn.dataset.id;[m
+[31m-        deleteActivity(activityId);[m
+[31m-    });[m
+[31m-[m
+[31m-    editTitleBtn?.addEventListener('click', () => makeEditable(card, 'title', 'text'));[m
+[31m-    editDateBtn?.addEventListener('click', () => makeEditable(card, 'date', 'date'));[m
+[31m-}[m
+[31m-[m
+[31m-// Función para mostrar notificaciones[m
+[31m-function showNotification(message, type = 'success') {[m
+[31m-    // Verificar si ya existe una notificación[m
+[31m-    let notification = document.querySelector('.notification');[m
+[31m-    [m
+[31m-    // Si no existe, crearla[m
+[31m-    if (!notification) {[m
+[31m-        notification = document.createElement('div');[m
+[31m-        notification.className = 'notification';[m
+[31m-        document.body.appendChild(notification);[m
+[31m-    }[m
+[31m-    [m
+[31m-    // Establecer el tipo y mensaje[m
+[31m-    notification.className = `notification ${type}`;[m
+[31m-    notification.innerHTML = `[m
+[31m-        <div class="notification-content">[m
+[31m-            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>[m
+[31m-            <span>${message}</span>[m
+[31m-        </div>[m
+[31m-        <button class="close-notification">[m
+[31m-            <i class="fas fa-times"></i>[m
+[31m-        </button>[m
+[31m-    `;[m
+[31m-    [m
+[31m-    // Mostrar la notificación[m
+[31m-    notification.classList.add('show');[m
+[31m-    [m
+[31m-    // Configurar el botón de cierre[m
+[31m-    const closeBtn = notification.querySelector('.close-notification');[m
+[31m-    if (closeBtn) {[m
+[31m-        closeBtn.addEventListener('click', () => {[m
+[31m-            notification.classList.remove('show');[m
+[31m-        });[m
+[31m-    }[m
+[31m-    [m
+[31m-    // Ocultar automáticamente después de 5 segundos[m
+[31m-    setTimeout(() => {[m
+[31m-        if (notification.classList.contains('show')) {[m
+[31m-            notification.classList.remove('show');[m
+[31m-        }[m
+[31m-    }, 5000);[m
+[31m-}[m
+[31m-[m
+[31m-// Hacer accesible la función deleteActivityImage globalmente[m
+[31m-window.editField = editField;[m
+[31m-window.saveEdit = saveEdit;[m
+[31m-window.deleteActivity = deleteActivity;[m
+[31m-window.handleImage = handleImage;[m
+[31m-window.addImage = addImage;[m
+[31m-window.openGallery = openGallery;[m
+[31m-window.openAttendanceModal = openAttendanceModal;[m
+[31m-[m
+[31m-function openGallery(startingImageId = null) {[m
+[31m-    const activities = JSON.parse(getUserData('activities') || '[]')[m
+[31m-        .filter(activity => activity.imageData);[m
+[31m-    [m
+[31m-    if (activities.length === 0) {[m
+[31m-        showNotification('No hay imágenes en la galería', 'info');[m
+[31m-        return;[m
+[31m-    }[m
+[31m-[m
+[31m-    let currentIndex = startingImageId ? [m
+[31m-        activities.findIndex(a => a.id.toString() === startingImageId.toString()) : 0;[m
+[31m-    [m
+[31m-    if (currentIndex === -1) currentIndex = 0;[m
+[31m-[m
+[31m-    // Usar el modal existente[m
+[31m-    const modal = document.getElementById('gallery-modal');[m
+[31m-    const container = modal.querySelector('.carousel-slide');[m
+[31m-    const search = modal.querySelector('#gallery-search');[m
+[31m-    const prevBtn = modal.querySelector('.prev-btn');[m
+[31m-    const nextBtn = modal.querySelector('.next-btn');[m
+[31m-    const closeBtn = modal.querySelector('.close-modal');[m
+[31m-    let filteredActivities = [...activities];[m
+[31m-[m
+[31m-    function updateGalleryView() {[m
+[31m-        const activity = filteredActivities[currentIndex];[m
+[31m-        container.innerHTML = `[m
+[31m-            <img src="${activity.imageData}" alt="${activity.name}">[m
+[31m-            <div class="image-info">[m
+[31m-                <h4 class="activity-name">${activity.name}</h4>[m
+[31m-                <p class="activity-date">${formatDate(activity.date)}</p>[m
+[31m-            </div>[m
+[31m-        `;[m
+[31m-    }[m
+[31m-[m
+[31m-    // Inicializar la vista[m
+[31m-    updateGalleryView();[m
+[31m-    modal.style.display = 'block';[m
+[31m-[m
+[31m-    // Event listeners[m
+[31m-    search.addEventListener('input', (e) => {[m
+[31m-        const searchTerm = e.target.value.toLowerCase();[m
+[31m-        filteredActivities = activities.filter(activity => [m
+[31m-            activity.name.toLowerCase().includes(searchTerm)[m
+[31m-        );[m
+[31m-        if (filteredActivities.length > 0) {[m
+[31m-            currentIndex = 0;[m
+[31m-            updateGalleryView();[m
+[31m-        }[m
+[31m-    });[m
+[31m-[m
+[31m-    prevBtn.addEventListener('click', () => {[m
+[31m-        currentIndex = (currentIndex - 1 + filteredActivities.length) % filteredActivities.length;[m
+[31m-        updateGalleryView();[m
+[31m-    });[m
+[31m-[m
+[31m-    nextBtn.addEventListener('click', () => {[m
+[31m-        currentIndex = (currentIndex + 1) % filteredActivities.length;[m
+[31m-        updateGalleryView();[m
+[31m-    });[m
+[31m-[m
+[31m-    closeBtn.addEventListener('click', () => {[m
+[31m-        modal.style.display = 'none';[m
+[31m-        search.value = '';[m
+[31m-        filteredActivities = [...activities];[m
+[31m-    });[m
+[31m-[m
+[31m-    // Navegación con teclado[m
+[31m-    function galleryKeyHandler(e) {[m
+[31m-        if (e.key === 'Escape') {[m
+[31m-            modal.style.display = 'none';[m
+[31m-            document.removeEventListener('keydown', galleryKeyHandler);[m
+[31m-        } else if (e.key === 'ArrowLeft') {[m
+[31m-            prevBtn.click();[m
+[31m-        } else if (e.key === 'ArrowRight') {[m
+[31m-            nextBtn.click();[m
+[31m-        }[m
+[31m-    }[m
+[31m-[m
+[31m-    document.addEventListener('keydown', galleryKeyHandler);[m
+[31m-}[m
+[32m+[m[32m// Hacer disponible globalmente para debugging[m
+[32m+[m[32mwindow.cleanMixedUserData = cleanMixedUserData;[m
+[1mdiff --git a/src/assets/js/students.js b/src/assets/js/students.js[m
+[1mindex df1046b..4c8e36c 100644[m
+[1m--- a/src/assets/js/students.js[m
+[1m+++ b/src/assets/js/students.js[m
+[36m@@ -1,149 +1,237 @@[m
+[31m-// This file manages the functionality related to adding and managing student information, including names and ages.[m
+[32m+[m[32m// Remover la línea de import problemática y usar solo funciones locales[m
+ [m
+[31m-document.addEventListener('DOMContentLoaded', () => {[m
+[31m-    const studentForm = document.querySelector('.student-form');[m
+[31m-    const studentsList = document.getElementById('students-list-container');[m
+[31m-[m
+[31m-    // Función para mostrar notificaciones[m
+[31m-    function showNotification(message, type = 'success') {[m
+[31m-        const notification = document.createElement('div');[m
+[31m-        notification.className = `notification ${type}`;[m
+[31m-        notification.innerHTML = `[m
+[31m-            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>[m
+[31m-            ${message}[m
+[31m-        `;[m
+[31m-        document.body.appendChild(notification);[m
+[31m-        setTimeout(() => notification.remove(), 3000);[m
+[32m+[m[32m// Función para agregar estudiante[m
+[32m+[m[32mfunction addStudent(name, age) {[m
+[32m+[m[32m    const user = window.auth?.currentUser;[m
+[32m+[m[32m    if (!user) {[m
+[32m+[m[32m        showNotification('Debes estar autenticado para agregar estudiantes', 'error');[m
+[32m+[m[32m        return;[m
+     }[m
+ [m
+[31m-    // Manejar agregar estudiante[m
+[31m-    studentForm?.addEventListener('submit', async (e) => {[m
+[31m-        e.preventDefault();[m
+[31m-        const name = document.getElementById('studentName').value;[m
+[31m-        const age = document.getElementById('studentAge').value;[m
+[31m-        [m
+[31m-        const newStudent = {[m
+[31m-            id: Date.now(),[m
+[31m-            name,[m
+[31m-            age[m
+[31m-        };[m
+[31m-        [m
+[31m-        // Importar la función desde database.js[m
+[31m-const { saveStudentData } = await import('../../utils/database.js');[m
+[31m-        [m
+[31m-        // Guardar estudiante[m
+[31m-        const success = await saveStudentData(newStudent);[m
+[32m+[m[32m    const student = {[m
+[32m+[m[32m        id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 9),[m
+[32m+[m[32m        name: name.trim(),[m
+[32m+[m[32m        age: parseInt(age),[m
+[32m+[m[32m        dateAdded: new Date().toISOString(),[m
+[32m+[m[32m        userId: user.uid[m
+[32m+[m[32m    };[m
+[32m+[m
+[32m+[m[32m    try {[m
+[32m+[m[32m        // Obtener estudiantes existentes del usuario actual[m
+[32m+[m[32m        let students = [];[m
+[32m+[m[32m        const storedStudents = getUserData('students');[m
+         [m
+[31m-        if (success) {[m
+[31m-            // Mostrar notificación[m
+[31m-            showNotification('Alumno agregado exitosamente');[m
+[31m-            [m
+[31m-            // Limpiar formulario[m
+[31m-            studentForm.reset();[m
+[31m-            [m
+[31m-            // Actualizar lista[m
+[31m-            loadStudentsList();[m
+[31m-        } else {[m
+[31m-            showNotification('Error al agregar alumno', 'error');[m
+[32m+[m[32m        if (storedStudents) {[m
+[32m+[m[32m            students = typeof storedStudents === 'string'[m[41m [m
+[32m+[m[32m                ? JSON.parse(storedStudents)[m[41m [m
+[32m+[m[32m                : storedStudents;[m
+         }[m
+[31m-    });[m
+ [m
+[31m-    // Función para cargar lista de estudiantes[m
+[31m-    async function loadStudentsList() {[m
+[31m-        if (!studentsList) return;[m
+[31m-        [m
+[31m-        // Importar la función desde database.js[m
+[31m-const { getStudentData } = await import('../../utils/database.js');[m
+[31m-        [m
+[31m-        // Obtener estudiantes[m
+[31m-        const students = await getStudentData();[m
+[31m-        [m
+[32m+[m[32m        // Verificar si ya existe un estudiante con el mismo nombre[m
+[32m+[m[32m        const existingStudent = students.find(s =>[m[41m [m
+[32m+[m[32m            s.name.toLowerCase() === name.toLowerCase().trim()[m
+[32m+[m[32m        );[m
+[32m+[m
+[32m+[m[32m        if (existingStudent) {[m
+[32m+[m[32m            showNotification('Ya existe un estudiante con ese nombre', 'error');[m
+[32m+[m[32m            return;[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        // Agregar el nuevo estudiante[m
+[32m+[m[32m        students.push(student);[m
+[32m+[m
+[32m+[m[32m        // Guardar en localStorage con clave específica del usuario[m
+[32m+[m[32m        setUserData('students', JSON.stringify(students));[m
+[32m+[m
+[32m+[m[32m        console.log(`Estudiante agregado para usuario ${user.uid}:`, student);[m
+[32m+[m[32m        showNotification('Estudiante agregado exitosamente', 'success');[m
+[32m+[m
+[32m+[m[32m        // Actualizar la lista si está visible[m
+[32m+[m[32m        loadStudentsList();[m
+[32m+[m
+[32m+[m[32m        return student;[m
+[32m+[m[32m    } catch (error) {[m
+[32m+[m[32m        console.error('Error al agregar estudiante:', error);[m
+[32m+[m[32m        showNotification('Error al agregar estudiante', 'error');[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m// Función para cargar lista de estudiantes[m
+[32m+[m[32mfunction loadStudentsList() {[m
+[32m+[m[32m    const container = document.getElementById('students-list-container');[m
+[32m+[m[32m    if (!container) {[m
+[32m+[m[32m        console.warn('Container students-list-container no encontrado');[m
+[32m+[m[32m        return;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    const user = window.auth?.currentUser;[m
+[32m+[m[32m    if (!user) {[m
+[32m+[m[32m        container.innerHTML = '<div class="empty-state"><i class="fas fa-user-slash"></i><p>Debes estar autenticado para ver los estudiantes</p></div>';[m
+[32m+[m[32m        return;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    try {[m
+[32m+[m[32m        const storedStudents = getUserData('students');[m
+[32m+[m[32m        let students = [];[m
+[32m+[m
+[32m+[m[32m        if (storedStudents) {[m
+[32m+[m[32m            students = typeof storedStudents === 'string'[m[41m [m
+[32m+[m[32m                ? JSON.parse(storedStudents)[m[41m [m
+[32m+[m[32m                : storedStudents;[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        console.log(`Cargando estudiantes para usuario ${user.uid}:`, students);[m
+[32m+[m
+         if (students.length === 0) {[m
+[31m-            studentsList.innerHTML = `[m
+[32m+[m[32m            container.innerHTML = `[m
+                 <div class="empty-state">[m
+                     <i class="fas fa-user-plus"></i>[m
+[31m-                    <p>No hay alumnos registrados</p>[m
+[32m+[m[32m                    <p>No tienes estudiantes registrados</p>[m
+[32m+[m[32m                    <p>Agrega estudiantes usando el formulario de la página principal</p>[m
+                 </div>[m
+             `;[m
+             return;[m
+         }[m
+ [m
+[31m-        studentsList.innerHTML = students.map(student => `[m
+[31m-            <div class="student-card">[m
+[32m+[m[32m        container.innerHTML = students.map(student => `[m
+[32m+[m[32m            <div class="student-card" data-id="${student.id}">[m
+                 <div class="student-info">[m
+                     <div class="student-avatar">[m
+[31m-                        ${student.name.charAt(0).toUpperCase()}[m
+[32m+[m[32m                        <i class="fas fa-child"></i>[m
+                     </div>[m
+                     <div class="student-details">[m
+                         <h4>${student.name}</h4>[m
+                         <p>${student.age} años</p>[m
+[32m+[m[32m                        <small>Agregado: ${new Date(student.dateAdded).toLocaleDateString()}</small>[m
+                     </div>[m
+                 </div>[m
+[31m-                <button class="delete-student" onclick="deleteStudent(${student.id})">[m
+[31m-                    <i class="fas fa-trash-alt"></i>[m
+[32m+[m[32m                <button class="delete-student" onclick="deleteStudent('${student.id}')" title="Eliminar estudiante">[m
+[32m+[m[32m                    <i class="fas fa-trash"></i>[m
+                 </button>[m
+             </div>[m
+         `).join('');[m
+[32m+[m
+[32m+[m[32m    } catch (error) {[m
+[32m+[m[32m        console.error('Error al cargar estudiantes:', error);[m
+[32m+[m[32m        container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error al cargar estudiantes</p></div>';[m
+     }[m
+[32m+[m[32m}[m
+ [m
+[31m-    // Función para eliminar estudiante[m
+[31m-    window.deleteStudent = async function(id) {[m
+[31m-        if (confirm('¿Estás seguro de que deseas eliminar este alumno?')) {[m
+[31m-            try {[m
+[31m-                const user = auth.currentUser;[m
+[31m-                if (!user) return;[m
+[31m-                [m
+[31m-                // Importar la función doc de Firestore y la instancia db[m
+[31m-                const { doc, deleteDoc, getFirestore } = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js");[m
+[31m-                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js");[m
+[31m-                [m
+[31m-                // Configuración de Firebase[m
+[31m-                const firebaseConfig = {[m
+[31m-                    apiKey: "AIzaSyAC2DxR63utzR1tmnHCqzApYTraxMsH79M",[m
+[31m-                    authDomain: "horita-feliz-system.firebaseapp.com",[m
+[31m-                    projectId: "horita-feliz-system",[m
+[31m-                    storageBucket: "horita-feliz-system.firebasestorage.app",[m
+[31m-                    messagingSenderId: "469162449559",[m
+[31m-                    appId: "1:469162449559:web:734e8756fd03b1388ce7d2",[m
+[31m-                    measurementId: "G-6645JXJBD6"[m
+[31m-                };[m
+[31m-                [m
+[31m-                // Inicializar Firebase y obtener db[m
+[31m-                const app = initializeApp(firebaseConfig);[m
+[31m-                const db = getFirestore(app);[m
+[31m-                [m
+[31m-                // Eliminar de Firestore[m
+[31m-                const studentRef = doc(db, `users/${user.uid}/students/${id}`);[m
+[31m-                await deleteDoc(studentRef);[m
+[31m-                [m
+[31m-                // Actualizar localStorage[m
+[31m-                let students = JSON.parse(localStorage.getItem('students') || '[]');[m
+[31m-                students = students.filter(student => student.id !== id);[m
+[31m-                localStorage.setItem('students', JSON.stringify(students));[m
+[32m+[m[32m// Función para eliminar estudiante[m
+[32m+[m[32mfunction deleteStudent(studentId) {[m
+[32m+[m[32m    const user = window.auth?.currentUser;[m
+[32m+[m[32m    if (!user) {[m
+[32m+[m[32m        showNotification('Debes estar autenticado para eliminar estudiantes', 'error');[m
+[32m+[m[32m        return;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    if (!confirm('¿Estás seguro de que quieres eliminar este estudiante?')) {[m
+[32m+[m[32m        return;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    try {[m
+[32m+[m[32m        let students = [];[m
+[32m+[m[32m        const storedStudents = getUserData('students');[m
+[32m+[m[41m        [m
+[32m+[m[32m        if (storedStudents) {[m
+[32m+[m[32m            students = typeof storedStudents === 'string'[m[41m [m
+[32m+[m[32m                ? JSON.parse(storedStudents)[m[41m [m
+[32m+[m[32m                : storedStudents;[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        // Filtrar para eliminar el estudiante[m
+[32m+[m[32m        students = students.filter(student => student.id !== studentId);[m
+[32m+[m
+[32m+[m[32m        // Guardar la lista actualizada[m
+[32m+[m[32m        setUserData('students', JSON.stringify(students));[m
+[32m+[m
+[32m+[m[32m        console.log(`Estudiante eliminado para usuario ${user.uid}. Estudiantes restantes:`, students.length);[m
+[32m+[m[41m        [m
+[32m+[m[32m        showNotification('Estudiante eliminado exitosamente', 'success');[m
+[32m+[m[32m        loadStudentsList();[m
+[32m+[m
+[32m+[m[32m    } catch (error) {[m
+[32m+[m[32m        console.error('Error al eliminar estudiante:', error);[m
+[32m+[m[32m        showNotification('Error al eliminar estudiante', 'error');[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m// Event listeners[m
+[32m+[m[32mdocument.addEventListener('DOMContentLoaded', () => {[m
+[32m+[m[32m    console.log('🎓 Students.js cargado');[m
+[32m+[m
+[32m+[m[32m    // Formulario para agregar estudiantes[m
+[32m+[m[32m    const studentForm = document.querySelector('.student-form');[m
+[32m+[m[32m    if (studentForm) {[m
+[32m+[m[32m        studentForm.addEventListener('submit', (e) => {[m
+[32m+[m[32m            e.preventDefault();[m
+[32m+[m[41m            [m
+[32m+[m[32m            const nameInput = document.getElementById('studentName');[m
+[32m+[m[32m            const ageInput = document.getElementById('studentAge');[m
+[32m+[m[41m            [m
+[32m+[m[32m            if (nameInput && ageInput) {[m
+[32m+[m[32m                const name = nameInput.value.trim();[m
+[32m+[m[32m                const age = parseInt(ageInput.value);[m
+                 [m
+[32m+[m[32m                if (name && age > 0 && age <= 15) {[m
+[32m+[m[32m                    addStudent(name, age);[m
+[32m+[m[32m                    nameInput.value = '';[m
+[32m+[m[32m                    ageInput.value = '';[m
+[32m+[m[32m                } else {[m
+[32m+[m[32m                    showNotification('Por favor, completa todos los campos correctamente', 'error');[m
+[32m+[m[32m                }[m
+[32m+[m[32m            }[m
+[32m+[m[32m        });[m
+[32m+[m[32m        console.log('✅ Formulario de estudiantes configurado');[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    // Botón para mostrar lista de estudiantes[m
+[32m+[m[32m    const studentsListBtn = document.getElementById('students-list');[m
+[32m+[m[32m    if (studentsListBtn) {[m
+[32m+[m[32m        studentsListBtn.addEventListener('click', (e) => {[m
+[32m+[m[32m            e.preventDefault();[m
+[32m+[m[32m            console.log('📋 Abriendo modal de estudiantes...');[m
+[32m+[m[32m            const modal = document.getElementById('students-modal');[m
+[32m+[m[32m            if (modal) {[m
+[32m+[m[32m                modal.style.display = 'block';[m
+                 loadStudentsList();[m
+[31m-                showNotification('Alumno eliminado exitosamente');[m
+[31m-            } catch (error) {[m
+[31m-                console.error('Error al eliminar alumno:', error);[m
+[31m-                showNotification('Error al eliminar alumno: ' + error.message, 'error');[m
+[32m+[m[32m                console.log('✅ Modal de estudiantes abierto');[m
+[32m+[m[32m            } else {[m
+[32m+[m[32m                console.error('❌ Modal students-modal no encontrado');[m
+             }[m
+[31m-        }[m
+[31m-    };[m
+[32m+[m[32m        });[m
+[32m+[m[32m        console.log('✅ Botón "Mis alumnos" configurado');[m
+[32m+[m[32m    } else {[m
+[32m+[m[32m        console.error('❌ Botón students-list no encontrado');[m
+[32m+[m[32m    }[m
+ [m
+[31m-    // Cargar estudiantes al iniciar[m
+[31m-    loadStudentsList();[m
+[31m-});[m
+[32m+[m[32m    // Cerrar modal de estudiantes[m
+[32m+[m[32m    const closeModalBtns = document.querySelectorAll('#students-modal .close-modal');[m
+[32m+[m[32m    closeModalBtns.forEach(btn => {[m
+[32m+[m[32m        btn.addEventListener('click', () => {[m
+[32m+[m[32m            const modal = document.getElementById('students-modal');[m
+[32m+[m[32m            if (modal) {[m
+[32m+[m[32m                modal.style.display = 'none';[m
+[32m+[m[32m                console.log('🔒 Modal de estudiantes cerrado');[m
+[32m+[m[32m            }[m
+[32m+[m[32m        });[m
+[32m+[m[32m    });[m
+ [m
+[31m-// Mostrar modal de estudiantes[m
+[31m-document.getElementById('students-list')?.addEventListener('click', (e) => {[m
+[31m-    e.preventDefault();[m
+[31m-    const modal = document.getElementById('students-modal');[m
+[31m-    modal.style.display = 'block';[m
+[32m+[m[32m    // Cerrar modal al hacer clic fuera[m
+[32m+[m[32m    const studentsModal = document.getElementById('students-modal');[m
+[32m+[m[32m    if (studentsModal) {[m
+[32m+[m[32m        studentsModal.addEventListener('click', (e) => {[m
+[32m+[m[32m            if (e.target === studentsModal) {[m
+[32m+[m[32m                studentsModal.style.display = 'none';[m
+[32m+[m[32m                console.log('🔒 Modal cerrado por click fuera');[m
+[32m+[m[32m            }[m
+[32m+[m[32m        });[m
+[32m+[m[32m    }[m
+ });[m
+ [m
+[31m-// Cerrar modales[m
+[31m-document.querySelectorAll('.close-modal').forEach(btn => {[m
+[31m-    btn.addEventListener('click', () => {[m
+[31m-        btn.closest('.modal').style.display = 'none';[m
+[31m-    });[m
+[31m-});[m
+\ No newline at end of file[m
+[32m+[m[32m// Exportar funciones para uso global[m
+[32m+[m[32mwindow.addStudent = addStudent;[m
+[32m+[m[32mwindow.loadStudentsList = loadStudentsList;[m
+[32m+[m[32mwindow.deleteStudent = deleteStudent;[m
+[32m+[m
+[32m+[m[32mconsole.log('📚 Students.js completamente cargado');[m
+\ No newline at end of file[m

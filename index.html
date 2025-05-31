@@ -35,8 +35,8 @@
                     <!-- Botón de modo oscuro -->
                     <div class="dark-mode-toggle">
                         <span>Modo Oscuro</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="darkModeToggle">
+                        <label class="toggle-switch" for="darkModeToggle">
+                            <input type="checkbox" id="darkModeToggle" aria-label="Activar modo oscuro" title="Activar/desactivar modo oscuro">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
@@ -385,7 +385,7 @@
         });
     </script>
     <script src="src/assets/js/app.js"></script>
-    <script type="module" src="src/assets/js/students.js"></script>
+    <script src="src/assets/js/students.js"></script>
     <script type="module" src="src/assets/js/attendance.js"></script>
     <script type="module" src="src/assets/js/profile.js"></script>
     <script>
