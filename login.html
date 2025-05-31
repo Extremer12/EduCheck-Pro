@@ -6,13 +6,26 @@
     <meta name="description" content="Inicia sesión en Horita Feliz para acceder a todas las funcionalidades.">
     <meta name="keywords" content="Horita Feliz, inicio de sesión, registro, recuperación de contraseña">
     <meta name="author" content="Cristian Bordón">
-    <meta name="theme-color" content="#ffcc00">
+    <meta name="theme-color" content="#FFB6C1">
     <link rel="icon" href="icon-192.png" type="image/png">
     <title>Horita Feliz - Iniciar Sesión</title>
-    <link rel="stylesheet" href="src/assets/css/styles.css">
+    
+    <!-- CSS específico para login -->
+    <link rel="stylesheet" href="src/assets/css/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="login-page">
+    <!-- Corazones flotantes decorativos -->
+    <div class="floating-heart" style="left: 10%; animation-delay: 0s;">💖</div>
+    <div class="floating-heart" style="left: 20%; animation-delay: 3s;">💕</div>
+    <div class="floating-heart" style="left: 30%; animation-delay: 6s;">💝</div>
+    <div class="floating-heart" style="left: 40%; animation-delay: 9s;">💗</div>
+    <div class="floating-heart" style="left: 50%; animation-delay: 12s;">💖</div>
+    <div class="floating-heart" style="left: 60%; animation-delay: 2s;">💕</div>
+    <div class="floating-heart" style="left: 70%; animation-delay: 5s;">💝</div>
+    <div class="floating-heart" style="left: 80%; animation-delay: 8s;">💗</div>
+    <div class="floating-heart" style="left: 90%; animation-delay: 11s;">💖</div>
+
     <div class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
@@ -24,53 +37,117 @@
             <!-- Formulario de login -->
             <form id="loginForm" class="auth-form">
                 <div class="form-group">
-                    <label><i class="fas fa-envelope"></i> Correo electrónico</label>
-                    <input type="email" id="email" placeholder="Ingresa tu correo electrónico" required>
+                    <label>
+                        <i class="fas fa-envelope"></i> 
+                        Correo electrónico
+                    </label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        placeholder="tu@ejemplo.com" 
+                        required
+                        autocomplete="email"
+                    >
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-lock"></i> Contraseña</label>
+                    <label>
+                        <i class="fas fa-lock"></i> 
+                        Contraseña
+                    </label>
                     <div class="password-input">
-                        <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
-                        <button type="button" class="toggle-password" aria-label="Mostrar contraseña" title="Mostrar/ocultar contraseña">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            placeholder="Ingresa tu contraseña" 
+                            required
+                            autocomplete="current-password"
+                        >
+                        <button 
+                            type="button" 
+                            class="toggle-password" 
+                            aria-label="Mostrar contraseña" 
+                            title="Mostrar/ocultar contraseña"
+                        >
                             <i class="fas fa-eye" aria-hidden="true"></i>
                         </button>
                     </div>
                 </div>
-                <button type="submit" class="auth-btn">
+                <button type="submit" class="auth-btn" id="loginBtn">
                     <i class="fas fa-sign-in-alt"></i>
                     Iniciar Sesión
                 </button>
                 <div class="auth-links">
-                    <a href="#" id="forgotPassword">¿Olvidaste tu contraseña?</a>
-                    <a href="#" id="createAccount">Crear cuenta nueva</a>
+                    <a href="#" id="forgotPassword">
+                        <i class="fas fa-key"></i>
+                        ¿Olvidaste tu contraseña?
+                    </a>
+                    <a href="#" id="createAccount">
+                        <i class="fas fa-user-plus"></i>
+                        Crear cuenta nueva
+                    </a>
                 </div>
             </form>
 
             <!-- Formulario de registro (inicialmente oculto) -->
             <form id="registerForm" class="auth-form" style="display: none;">
                 <div class="form-group">
-                    <label><i class="fas fa-user"></i> Nombre completo</label>
-                    <input type="text" id="registerName" required>
+                    <label>
+                        <i class="fas fa-user"></i> 
+                        Nombre completo
+                    </label>
+                    <input 
+                        type="text" 
+                        id="registerName" 
+                        placeholder="Tu nombre completo"
+                        required
+                        autocomplete="name"
+                    >
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-envelope"></i> Correo electrónico</label>
-                    <input type="email" id="registerEmail" required>
+                    <label>
+                        <i class="fas fa-envelope"></i> 
+                        Correo electrónico
+                    </label>
+                    <input 
+                        type="email" 
+                        id="registerEmail" 
+                        placeholder="tu@ejemplo.com"
+                        required
+                        autocomplete="email"
+                    >
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-lock"></i> Contraseña</label>
+                    <label>
+                        <i class="fas fa-lock"></i> 
+                        Contraseña
+                    </label>
                     <div class="password-input">
-                        <input type="password" id="registerPassword" required>
-                        <button type="button" class="toggle-password" aria-label="Mostrar contraseña">
+                        <input 
+                            type="password" 
+                            id="registerPassword" 
+                            placeholder="Mínimo 6 caracteres"
+                            required
+                            autocomplete="new-password"
+                            minlength="6"
+                        >
+                        <button 
+                            type="button" 
+                            class="toggle-password" 
+                            aria-label="Mostrar contraseña"
+                        >
                             <i class="fas fa-eye" aria-hidden="true"></i>
                         </button>
                     </div>
                 </div>
-                <button type="submit" class="auth-btn">
+                <button type="submit" class="auth-btn" id="registerBtn">
                     <i class="fas fa-user-plus"></i>
                     Crear Cuenta
                 </button>
                 <div class="auth-links">
-                    <a href="#" id="backToLogin">Volver al inicio de sesión</a>
+                    <a href="#" id="backToLogin">
+                        <i class="fas fa-arrow-left"></i>
+                        Volver al inicio de sesión
+                    </a>
                 </div>
             </form>
         </div>
@@ -194,6 +271,40 @@
                 alert('Error: ' + error.message);
             }
         });
+    </script>
+
+    <!-- Script para mejorar la experiencia visual -->
+    <script>
+        // Crear efectos de sparkle al hacer hover
+        document.querySelector('.auth-card').addEventListener('mouseenter', function() {
+            createSparkles(this);
+        });
+
+        function createSparkles(element) {
+            for (let i = 0; i < 6; i++) {
+                setTimeout(() => {
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'sparkle';
+                    sparkle.style.left = Math.random() * 100 + '%';
+                    sparkle.style.top = Math.random() * 100 + '%';
+                    sparkle.style.animationDelay = Math.random() * 2 + 's';
+                    element.appendChild(sparkle);
+                    
+                    setTimeout(() => sparkle.remove(), 2000);
+                }, i * 100);
+            }
+        }
+
+        // Mejorar estados de carga
+        function setLoadingState(button, isLoading) {
+            if (isLoading) {
+                button.classList.add('loading');
+                button.disabled = true;
+            } else {
+                button.classList.remove('loading');
+                button.disabled = false;
+            }
+        }
     </script>
 </body>
 </html>

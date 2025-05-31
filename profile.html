@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Perfil profesional de docente - Horita Feliz">
+    <meta name="keywords" content="perfil, docente, estadísticas, progreso">
+    <meta name="author" content="Cristian Bordón">
+    <meta name="theme-color" content="#FFB6C1">
+    <link rel="icon" href="icon-192.png" type="image/png">
+    <title>Mi Perfil - Horita Feliz</title>
+    
+    <!-- CSS específico para perfil -->
+    <link rel="stylesheet" href="src/assets/css/profile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="profile-page">
+    <!-- Header profesional -->
+    <header class="profile-header">
+        <div class="header-content">
+            <button class="back-btn" onclick="window.location.href='index.html'" title="Volver a la aplicación">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="header-title">
+                <h1><i class="fas fa-user-circle"></i> Mi Perfil Profesional</h1>
+                <p>Panel de control y estadísticas personales</p>
+            </div>
+            <div class="header-actions">
+                <button class="export-btn" id="exportData" title="Exportar datos">
+                    <i class="fas fa-download"></i>
+                    <span>Exportar</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="profile-main">
+        <!-- Sección de información personal -->
+        <section class="personal-info-section">
+            <div class="profile-card">
+                <div class="profile-avatar-section">
+                    <div class="avatar-container">
+                        <img id="profileAvatar" src="https://img.freepik.com/vector-gratis/circulo-azul-usuario-blanco_78370-4707.jpg" alt="Foto de perfil">
+                        <button class="change-photo-btn" id="changePhotoBtn" title="Cambiar foto">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                        <input type="file" id="photoInput" accept="image/*" hidden>
+                    </div>
+                    <div class="profile-status">
+                        <span class="status-indicator active"></span>
+                        <span class="status-text">Activo</span>
+                    </div>
+                </div>
+                
+                <div class="profile-details">
+                    <div class="name-section">
+                        <h2 id="teacherName">Nombre de la Docente</h2>
+                        <button class="edit-name-btn" id="editNameBtn" title="Editar nombre">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                    </div>
+                    <p class="role">Educadora Infantil Cristiana</p>
+                    <p class="join-date">
+                        <i class="fas fa-calendar-alt"></i>
+                        Miembro desde <span id="joinDate">Enero 2024</span>
+                    </p>
+                    
+                    <div class="quick-info">
+                        <div class="info-item">
+                            <i class="fas fa-heart"></i>
+                            <span>Horita Feliz</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-users"></i>
+                            <span id="totalStudentsQuick">0 Alumnos</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-star"></i>
+                            <span id="totalActivitiesQuick">0 Actividades</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard de estadísticas -->
+        <section class="stats-dashboard">
+            <div class="section-header">
+                <h3><i class="fas fa-chart-line"></i> Panel de Estadísticas</h3>
+                <div class="time-filter">
+                    <select id="statsTimeFilter" title="Filtrar estadísticas por período de tiempo">
+                        <option value="all">Todo el tiempo</option>
+                        <option value="month">Este mes</option>
+                        <option value="week">Esta semana</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h4>Alumnos Registrados</h4>
+                        <span class="stat-number" id="totalStudents">0</span>
+                        <p class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span id="studentsChange">+0 este mes</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="stat-card success">
+                    <div class="stat-icon">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h4>Actividades Realizadas</h4>
+                        <span class="stat-number" id="totalActivities">0</span>
+                        <p class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span id="activitiesChange">+0 este mes</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="stat-card warning">
+                    <div class="stat-icon">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h4>Asistencia Promedio</h4>
+                        <span class="stat-number" id="attendanceRate">0%</span>
+                        <p class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span id="attendanceChange">+0% este mes</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="stat-card info">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h4>Tareas Completadas</h4>
+                        <span class="stat-number" id="completionRate">0%</span>
+                        <p class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span id="completionChange">+0% este mes</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gráficos y tendencias -->
+        <section class="charts-section">
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4><i class="fas fa-chart-area"></i> Progreso Mensual</h4>
+                        <button class="chart-toggle" title="Cambiar vista">
+                            <i class="fas fa-expand-arrows-alt"></i>
+                        </button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4><i class="fas fa-chart-pie"></i> Distribución de Actividades</h4>
+                        <button class="chart-toggle" title="Cambiar vista">
+                            <i class="fas fa-expand-arrows-alt"></i>
+                        </button>
+                    </div>
+                    <div class="chart-container">
+                        <div class="pie-chart" id="activitiesDistribution">
+                            <!-- Simulación de gráfico circular -->
+                            <div class="pie-segment" style="--percentage: 60%; --color: var(--primary-color);">
+                                <span class="pie-label">Biblicas 60%</span>
+                            </div>
+                            <div class="pie-segment" style="--percentage: 25%; --color: var(--secondary-color);">
+                                <span class="pie-label">Creatividad 25%</span>
+                            </div>
+                            <div class="pie-segment" style="--percentage: 15%; --color: var(--accent-color);">
+                                <span class="pie-label">Juegos 15%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Actividades recientes -->
+        <section class="recent-activities">
+            <div class="section-header">
+                <h3><i class="fas fa-clock"></i> Actividades Recientes</h3>
+                <a href="index.html" class="view-all-btn">Ver todas</a>
+            </div>
+            
+            <div class="activities-timeline" id="recentActivitiesTimeline">
+                <!-- Se llenará dinámicamente -->
+            </div>
+        </section>
+
+        <!-- Logros y insignias -->
+        <section class="achievements-section">
+            <div class="section-header">
+                <h3><i class="fas fa-trophy"></i> Logros y Reconocimientos</h3>
+            </div>
+            
+            <div class="achievements-grid">
+                <div class="achievement-card earned">
+                    <div class="achievement-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h4>Primera Actividad</h4>
+                    <p>Registraste tu primera actividad</p>
+                    <span class="achievement-date">Enero 2024</span>
+                </div>
+
+                <div class="achievement-card earned">
+                    <div class="achievement-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h4>5 Alumnos</h4>
+                    <p>Tienes 5 alumnos registrados</p>
+                    <span class="achievement-date">Febrero 2024</span>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h4>Mes Completo</h4>
+                    <p>Actividad diaria durante un mes</p>
+                    <span class="achievement-date">Próximamente</span>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h4>Dedicación Total</h4>
+                    <p>100 actividades registradas</p>
+                    <span class="achievement-date">Próximamente</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Scripts -->
+    <script type="module">
+        // Firebase imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAC2DxR63utzR1tmnHCqzApYTraxMsH79M",
+            authDomain: "horita-feliz-system.firebaseapp.com",
+            projectId: "horita-feliz-system",
+            storageBucket: "horita-feliz-system.firebasestorage.app",
+            messagingSenderId: "469162449559",
+            appId: "1:469162449559:web:734e8756fd03b1388ce7d2",
+            measurementId: "G-6645JXJBD6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        window.auth = auth;
+        window.db = db;
+
+        // Verificar autenticación
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+            } else {
+                loadProfileData();
+            }
+        });
+    </script>
+    <script src="src/assets/js/profile.js"></script>
+</body>
+</html>

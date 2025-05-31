@@ -631,6 +631,12 @@ function setupEventListeners() {
             }
         });
     }
+
+    // Buscar la línea del event listener para el perfil y cambiarla:
+    document.getElementById('profile').addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = 'profile.html';
+    });
 }
 
 function makeEditable(element, type) {
