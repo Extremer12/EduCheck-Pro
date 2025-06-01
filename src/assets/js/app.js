@@ -1,4 +1,8 @@
-// Añadir esta función al inicio del archivo
+// ===== VARIABLES GLOBALES =====
+let deferredPrompt = null;
+let currentAttendanceActivity = null;
+
+// ===== FUNCIÓN PARA ACTUALIZAR INFO DEL USUARIO =====
 function updateUserInfo(user) {
     const teacherNameElements = document.querySelectorAll('#teacher-name, .menu-header h3');
     const displayName = user.displayName || user.email.split('@')[0];
@@ -10,16 +14,13 @@ function updateUserInfo(user) {
     });
 }
 
-// Variables para la instalación de la PWA
-let deferredPrompt;
-
-// Agregar al inicio del archivo o después de DOMContentLoaded
+// ===== MENÚ TOGGLE =====
 function setupToggleMenu() {
     const profileButton = document.querySelector('.profile-button');
     const menuDropdown = document.querySelector('.menu-dropdown');
     
     if (profileButton && menuDropdown) {
-        // Toggle del menú solo con el botón
+        // Toggle del menú
         profileButton.addEventListener('click', (e) => {
             e.stopPropagation();
             menuDropdown.classList.toggle('active');
@@ -32,80 +33,67 @@ function setupToggleMenu() {
             }
         });
 
-        // Evitar que el menú se cierre al hacer clic dentro de él
+        // Evitar que el menú se cierre al hacer clic dentro
         menuDropdown.addEventListener('click', (e) => {
             e.stopPropagation();
         });
     }
 }
 
-// Función para manejar la instalación de la PWA
+// ===== PWA INSTALLATION =====
 function setupInstallApp() {
     const installButton = document.getElementById('installApp');
+    let canInstall = false;
     
-    // Mostrar el botón inicialmente (cambiamos esto para que siempre sea visible)
     if (installButton) {
         installButton.style.display = 'flex';
     }
     
-    // Variable para controlar si la app puede ser instalada
-    let canInstall = false;
-    
-    // Capturar el evento beforeinstallprompt
+    // Capturar evento beforeinstallprompt
     window.addEventListener('beforeinstallprompt', (e) => {
-        // Prevenir que Chrome muestre automáticamente el diálogo
         e.preventDefault();
-        // Guardar el evento para usarlo más tarde
         deferredPrompt = e;
-        // Indicar que la app puede ser instalada
         canInstall = true;
     });
     
-    // Agregar evento al botón
+    // Event listener del botón
     if (installButton) {
         installButton.addEventListener('click', async (e) => {
             e.preventDefault();
-            // Ocultar el menú desplegable
+            
             const menuDropdown = document.querySelector('.menu-dropdown');
             if (menuDropdown) {
                 menuDropdown.classList.remove('active');
             }
             
-            // Si no hay evento guardado o no se puede instalar
             if (!deferredPrompt || !canInstall) {
-                showNotification('La aplicación ya está instalada o no es compatible con este navegador', 'info');
+                showNotification('Esta aplicación ya está instalada o no se puede instalar desde este navegador', 'info');
                 return;
             }
             
-            // Mostrar el diálogo de instalación
             deferredPrompt.prompt();
-            
-            // Esperar a que el usuario responda
             const { outcome } = await deferredPrompt.userChoice;
             
-            // Mostrar mensaje según la respuesta
             if (outcome === 'accepted') {
-                showNotification('¡Gracias por instalar nuestra aplicación!');
+                showNotification('¡Aplicación instalándose!', 'success');
             } else {
-                showNotification('Puedes instalar la aplicación más tarde desde el menú', 'info');
+                showNotification('Instalación cancelada', 'info');
             }
             
-            // Limpiar el evento guardado
             deferredPrompt = null;
             canInstall = false;
         });
     }
     
-    // Detectar cuando la app ya está instalada
+    // Detectar cuando la app está instalada
     window.addEventListener('appinstalled', () => {
-        // Limpiar el evento guardado
         deferredPrompt = null;
         canInstall = false;
-        showNotification('¡Aplicación instalada correctamente!');
+        showNotification('¡Aplicación instalada correctamente!', 'success');
     });
 }
 
-// Agregar después de setupToggleMenu
+// ===== AUTENTICACIÓN =====
 function setupAuthButtons() {
     const logoutButton = document.getElementById('logout');
     
@@ -113,8 +101,11 @@ function setupAuthButtons() {
         logoutButton.addEventListener('click', async (e) => {
             e.preventDefault();
             try {
-                await auth.signOut();
-                window.location.href = 'login.html';
+                await window.auth.signOut();
+                showNotification('Sesión cerrada correctamente', 'success');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1000);
             } catch (error) {
                 console.error('Error al cerrar sesión:', error);
                 showNotification('Error al cerrar sesión', 'error');
@@ -122,24 +113,21 @@ function setupAuthButtons() {
         });
     }
 
-    // Verificar estado de autenticación
-    auth.onAuthStateChanged((user) => {
+    // Observer de autenticación
+    window.auth.onAuthStateChanged((user) => {
         if (!user && !window.location.pathname.includes('login.html')) {
-            // Si no hay usuario y no estamos en login.html, redirigir al login
             window.location.href = 'login.html';
         } else if (user && window.location.pathname.includes('login.html')) {
-            // Si hay usuario y estamos en login.html, redirigir al index
             window.location.href = 'index.html';
         }
 
         if (user) {
-            // Actualizar la interfaz con la información del usuario
             updateUserInfo(user);
         }
     });
 }
 
-// Función para manejar la previsualización de imágenes
+// ===== PREVISUALIZACIÓN DE IMÁGENES =====
 function initializeImagePreview() {
     const imageInput = document.getElementById('activityImage');
     const imagePreview = document.querySelector('.image-preview');
@@ -155,9 +143,8 @@ function initializeImagePreview() {
                 reader.onload = function(e) {
                     previewImg.src = e.target.result;
                     imagePreview.style.display = 'block';
-                    previewImg.style.display = 'block';
-                    if (removeButton) removeButton.style.display = 'flex';
-                    if (placeholder) placeholder.style.display = 'none';
+                    placeholder.style.display = 'none';
+                    removeButton.style.display = 'block';
                 };
                 reader.readAsDataURL(file);
             }
@@ -168,140 +155,26 @@ function initializeImagePreview() {
                 imageInput.value = '';
                 previewImg.src = '#';
                 imagePreview.style.display = 'none';
-                previewImg.style.display = 'none';
+                placeholder.style.display = 'flex';
                 removeButton.style.display = 'none';
-                if (placeholder) placeholder.style.display = 'flex';
             });
         }
     }
 }
 
-// Función para guardar actividades con imágenes
-function addActivity(event) {
-    event.preventDefault();
-    
-    // Obtener los valores del formulario
-    const activityName = document.getElementById('activityName').value;
-    const activityDate = document.getElementById('activityDate').value;
-    
-    try {
-        const imageInput = document.getElementById('activityImage');
-        let imageData = null;
-        
-        if (imageInput && imageInput.files && imageInput.files[0]) {
-            // Leer la imagen como promesa
-            readFileAsDataURL(imageInput.files[0]).then(data => {
-                imageData = data;
-                
-                const activityId = Date.now();
-                const activity = {
-                    id: activityId,
-                    name: activityName,
-                    date: activityDate,
-                    imageData: imageData
-                };
-
-                // Guardar en localStorage
-            let activities = [];
-            const savedActivities = getUserData('activities');
-            
-            if (savedActivities) {
-                // Verificar si savedActivities es un string o un objeto
-                if (typeof savedActivities === 'string') {
-                    try {
-                        activities = JSON.parse(savedActivities);
-                    } catch (e) {
-                        console.error('Error al parsear actividades:', e);
-                        activities = [];
-                    }
-                } else if (Array.isArray(savedActivities)) {
-                    activities = savedActivities;
-                }
-            }
-                
-                activities.unshift(activity);
-                setUserData('activities', JSON.stringify(activities)); // Añadimos JSON.stringify aquí
-
-                // Limpiar el formulario
-                document.querySelector('.activity-form').reset();
-                const preview = document.getElementById('imagePreview');
-                if (preview) {
-                    preview.src = '#';
-                    preview.style.display = 'none';
-                }
-                document.querySelector('.remove-image').style.display = 'none';
-                document.querySelector('.upload-placeholder').style.display = 'flex';
-
-                // Actualizar la vista
-                loadActivities();
-                showNotification('Actividad agregada correctamente');
-            });
-        } else {
-            // Si no hay imagen, crear la actividad sin imagen
-            const activityId = Date.now();
-            const activity = {
-                id: activityId,
-                name: activityName,
-                date: activityDate,
-                imageData: null
-            };
-
-            // Guardar en localStorage
-            let activities = [];
-            const savedActivities = getUserData('activities');
-            
-            if (savedActivities) {
-                // Verificar si savedActivities es un string o un objeto
-                if (typeof savedActivities === 'string') {
-                    try {
-                        activities = JSON.parse(savedActivities);
-                    } catch (e) {
-                        console.error('Error al parsear actividades:', e);
-                        activities = [];
-                    }
-                } else if (Array.isArray(savedActivities)) {
-                    activities = savedActivities;
-                }
-            }
-            
-            activities.unshift(activity);
-            setUserData('activities', JSON.stringify(activities)); // Añadimos JSON.stringify aquí
-
-            // Limpiar el formulario
-            document.querySelector('.activity-form').reset();
-            const preview = document.getElementById('imagePreview');
-            if (preview) {
-                preview.src = '#';
-                preview.style.display = 'none';
-            }
-            document.querySelector('.remove-image').style.display = 'none';
-            document.querySelector('.upload-placeholder').style.display = 'flex';
-
-            // Actualizar la vista
-            loadActivities();
-            showNotification('Actividad agregada correctamente');
-        }
-    } catch (error) {
-        console.error('Error al agregar actividad:', error);
-        showNotification('Error al agregar la actividad: ' + error.message, 'error');
-    }
-}
-
-// Función para manejar el botón de volver arriba
+// ===== SCROLL TO TOP =====
 function setupScrollToTop() {
     const scrollButton = document.getElementById('scroll-to-top');
     
     if (scrollButton) {
-        // Mostrar/ocultar el botón según el scroll
         window.addEventListener('scroll', () => {
             if (window.scrollY > 300) {
-                scrollButton.classList.add('visible');
+                scrollButton.classList.add('show');
             } else {
-                scrollButton.classList.remove('visible');
+                scrollButton.classList.remove('show');
             }
         });
         
-        // Acción al hacer clic en el botón
         scrollButton.addEventListener('click', () => {
             window.scrollTo({
                 top: 0,
@@ -311,14 +184,11 @@ function setupScrollToTop() {
     }
 }
 
-// Función para manejar el modo oscuro
+// ===== MODO OSCURO =====
 function setupDarkMode() {
     const darkModeToggle = document.getElementById('darkModeToggle');
-    
-    // Verificar si hay una preferencia guardada
     const isDarkMode = localStorage.getItem('darkMode') === 'true';
     
-    // Aplicar el modo oscuro si está guardado
     if (isDarkMode) {
         document.body.classList.add('dark-mode');
         if (darkModeToggle) {
@@ -326,7 +196,6 @@ function setupDarkMode() {
         }
     }
     
-    // Escuchar cambios en el toggle
     if (darkModeToggle) {
         darkModeToggle.addEventListener('change', () => {
             if (darkModeToggle.checked) {
@@ -340,61 +209,51 @@ function setupDarkMode() {
     }
 }
 
-// Función para manejar la eliminación de cuenta
+// ===== ELIMINAR CUENTA =====
 function setupDeleteAccount() {
     const deleteAccountBtn = document.getElementById('deleteAccount');
     const deleteConfirmModal = document.getElementById('deleteConfirmModal');
     const cancelDeleteBtn = document.getElementById('cancelDelete');
     const confirmDeleteBtn = document.getElementById('confirmDelete');
-    const closeConfirmBtn = document.getElementById('closeConfirmModal'); // NUEVO
+    const closeConfirmBtn = document.getElementById('closeConfirmModal');
     
     if (deleteAccountBtn && deleteConfirmModal) {
-        // Mostrar el modal de confirmación
         deleteAccountBtn.addEventListener('click', (e) => {
             e.preventDefault();
             deleteConfirmModal.classList.add('active');
             
-            // Cerrar el menú desplegable
             const menuDropdown = document.querySelector('.menu-dropdown');
             if (menuDropdown) {
                 menuDropdown.classList.remove('active');
             }
         });
         
-        // Función para cerrar el modal
         function closeModal() {
             deleteConfirmModal.classList.remove('active');
         }
         
-        // Cancelar la eliminación
         if (cancelDeleteBtn) {
             cancelDeleteBtn.addEventListener('click', closeModal);
         }
         
-        // NUEVO - Botón de cierre (X)
         if (closeConfirmBtn) {
             closeConfirmBtn.addEventListener('click', closeModal);
         }
         
-        // Confirmar la eliminación
         if (confirmDeleteBtn) {
             confirmDeleteBtn.addEventListener('click', async () => {
                 try {
-                    const user = auth.currentUser;
+                    const user = window.auth.currentUser;
                     if (user) {
-                        // Eliminar todos los datos del usuario del localStorage
                         Object.keys(localStorage).forEach(key => {
                             if (key.startsWith(user.uid + '_')) {
                                 localStorage.removeItem(key);
                             }
                         });
                         
-                        // Eliminar la cuenta de Firebase
                         await user.delete();
+                        showNotification('Cuenta eliminada correctamente', 'success');
                         
-                        showNotification('Cuenta eliminada correctamente');
-                        
-                        // Redirigir al login después de un breve delay
                         setTimeout(() => {
                             window.location.href = 'login.html';
                         }, 1500);
@@ -402,12 +261,10 @@ function setupDeleteAccount() {
                 } catch (error) {
                     console.error('Error al eliminar la cuenta:', error);
                     
-                    // Si el error es por autenticación reciente, mostrar mensaje específico
                     if (error.code === 'auth/requires-recent-login') {
                         showNotification('Por seguridad, debes iniciar sesión nuevamente antes de eliminar tu cuenta.', 'error');
-                        // Cerrar sesión para forzar re-autenticación
                         setTimeout(() => {
-                            auth.signOut().then(() => {
+                            window.auth.signOut().then(() => {
                                 window.location.href = 'login.html';
                             });
                         }, 2000);
@@ -420,14 +277,12 @@ function setupDeleteAccount() {
             });
         }
         
-        // Cerrar el modal si se hace clic fuera (mantener funcionalidad existente)
         deleteConfirmModal.addEventListener('click', (e) => {
             if (e.target === deleteConfirmModal) {
                 closeModal();
             }
         });
         
-        // NUEVO - Cerrar con tecla Escape
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && deleteConfirmModal.classList.contains('active')) {
                 closeModal();
@@ -436,16 +291,14 @@ function setupDeleteAccount() {
     }
 }
 
-// Función para manejar el botón de donación
+// ===== BOTÓN DONACIÓN =====
 function setupDonationButton() {
     const donationBtn = document.getElementById('donationBtn');
     
     if (donationBtn) {
         donationBtn.addEventListener('click', () => {
-            // Por ahora solo mostramos una notificación
-            showNotification('¡Gracias por tu interés en donar! Esta función estará disponible próximamente.');
+            showNotification('¡Gracias por tu interés en donar! Esta función estará disponible próximamente.', 'info');
             
-            // Cerrar el menú desplegable
             const menuDropdown = document.querySelector('.menu-dropdown');
             if (menuDropdown) {
                 menuDropdown.classList.remove('active');
@@ -454,19 +307,16 @@ function setupDonationButton() {
     }
 }
 
-// Función para mostrar notificaciones
+// ===== NOTIFICACIONES =====
 function showNotification(message, type = 'success') {
-    // Verificar si ya existe una notificación
     let notification = document.querySelector('.notification');
     
-    // Si no existe, crearla
     if (!notification) {
         notification = document.createElement('div');
         notification.className = 'notification';
         document.body.appendChild(notification);
     }
     
-    // Establecer el tipo y mensaje
     notification.className = `notification ${type}`;
     notification.innerHTML = `
         <div class="notification-content">
@@ -478,10 +328,8 @@ function showNotification(message, type = 'success') {
         </button>
     `;
     
-    // Mostrar la notificación
     notification.classList.add('show');
     
-    // Configurar el botón de cierre
     const closeBtn = notification.querySelector('.close-notification');
     if (closeBtn) {
         closeBtn.addEventListener('click', () => {
@@ -489,7 +337,6 @@ function showNotification(message, type = 'success') {
         });
     }
     
-    // Ocultar automáticamente después de 5 segundos
     setTimeout(() => {
         if (notification.classList.contains('show')) {
             notification.classList.remove('show');
@@ -497,7 +344,7 @@ function showNotification(message, type = 'success') {
     }, 5000);
 }
 
-// Función para agregar estilos CSS para las notificaciones
+// ===== ESTILOS PARA NOTIFICACIONES =====
 function addNotificationStyles() {
     const style = document.createElement('style');
     style.textContent = `
@@ -559,320 +406,41 @@ function addNotificationStyles() {
     document.head.appendChild(style);
 }
 
-// Modificar el event listener DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
-    // Inicializar componentes
-    setupToggleMenu();
-    setupAuthButtons();
-    setupInstallApp();
-    setupScrollToTop();
-    initializeImagePreview();
-    setupDarkMode();
-    setupDeleteAccount();
-    setupDonationButton();
-    addNotificationStyles();
+// ===== GESTIÓN DE DATOS POR USUARIO =====
+function getUserData(key) {
+    const user = window.auth?.currentUser;
+    if (!user) return null;
     
-    // Configurar formularios
-    const activityForm = document.querySelector('.activity-form');
-    if (activityForm) {
-        activityForm.addEventListener('submit', addActivity);
+    return localStorage.getItem(`${user.uid}_${key}`);
+}
+
+function setUserData(key, value) {
+    const user = window.auth?.currentUser;
+    if (!user) return;
+    
+    localStorage.setItem(`${user.uid}_${key}`, value);
+}
+
+function migrateTemporaryData() {
+    const user = window.auth?.currentUser;
+    if (!user) return;
+    
+    const tempActivities = localStorage.getItem('activities');
+    if (tempActivities && !getUserData('activities')) {
+        setUserData('activities', tempActivities);
+        localStorage.removeItem('activities');
+        console.log('📦 Datos de actividades migrados al usuario');
     }
     
-    // Cargar actividades
-    loadActivities();
-    
-    // Configurar eventos
-    setupEventListeners();
-    
-    // Event listeners para filtros
-    const searchInput = document.getElementById('activity-search');
-    const dateFilter = document.getElementById('activity-date-filter');
-
-    if (searchInput) {
-        searchInput.addEventListener('input', () => {
-            loadActivities();
-        });
+    const tempStudents = localStorage.getItem('students');
+    if (tempStudents && !getUserData('students')) {
+        setUserData('students', tempStudents);
+        localStorage.removeItem('students');
+        console.log('👥 Datos de estudiantes migrados al usuario');
     }
-
-    if (dateFilter) {
-        dateFilter.addEventListener('change', () => {
-            loadActivities();
-        });
-    }
-
-    // Agregar el observer para el estado de autenticación
-    auth.onAuthStateChanged(user => {
-        console.log('Estado de autenticación cambiado:', user ? user.uid : 'No autenticado');
-        
-        if (user) {
-            // Usuario autenticado
-            updateUserInfo(user);
-            migrateTemporaryData(); // Migrar datos temporales si existen
-            
-            // Recargar datos específicos del usuario
-            setTimeout(() => {
-                loadActivities();
-                // Recargar estudiantes si el modal está abierto
-                const studentsModal = document.getElementById('students-modal');
-                if (studentsModal && studentsModal.style.display === 'block') {
-                    loadStudentsList();
-                }
-            }, 100);
-        } else {
-            // Usuario no autenticado - limpiar datos o redirigir
-            if (!window.location.pathname.includes('login.html')) {
-                window.location.href = 'login.html';
-            }
-        }
-    });
-    
-    // Actualizar estadísticas rápidas
-    updateQuickStudentStats();
-    
-    // Actualizar cuando cambie la autenticación
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            updateQuickStudentStats();
-        }
-    });
-}); // Cierre del DOMContentLoaded que faltaba
-
-function setupEventListeners() {
-    // Event listener para editar título y fecha
-    document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('edit-title-btn')) {
-            const activityCard = e.target.closest('.activity-card');
-            const titleSpan = activityCard.querySelector('.title-text');
-            makeEditable(titleSpan, 'text');
-        }
-        
-        if (e.target.classList.contains('edit-date-btn')) {
-            const activityCard = e.target.closest('.activity-card');
-            const dateSpan = activityCard.querySelector('.date-text');
-            makeEditable(dateSpan, 'date');
-        }
-
-        if (e.target.classList.contains('attendance-btn')) {
-            const activityId = e.target.closest('.activity-card').dataset.id;
-            openAttendanceModal(activityId);
-        }
-    });
-
-    // Event listener para el botón de galería
-    const galleryButton = document.getElementById('gallery');
-    if (galleryButton) {
-        galleryButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.location.href = 'gallery.html';
-        });
-    }
-
-    // Buscar la línea del event listener para el perfil y cambiarla:
-    document.getElementById('profile').addEventListener('click', (e) => {
-        e.preventDefault();
-        window.location.href = 'profile.html';
-    });
-
-    document.getElementById('students-list').addEventListener('click', (e) => {
-        e.preventDefault();
-        window.location.href = 'alumnos.html';
-    });
 }
 
-function makeEditable(element, type) {
-    const currentValue = element.textContent;
-    const input = document.createElement(type === 'date' ? 'input' : 'input');
-    input.type = type === 'date' ? 'date' : 'text';
-    input.value = type === 'date' ? formatDateForInput(currentValue) : currentValue;
-    input.className = 'edit-input';
-
-    const saveBtn = document.createElement('button');
-    saveBtn.innerHTML = '<i class="fas fa-check"></i>';
-    saveBtn.className = 'save-edit-btn';
-
-    const cancelBtn = document.createElement('button');
-    cancelBtn.innerHTML = '<i class="fas fa-times"></i>';
-    cancelBtn.className = 'cancel-edit-btn';
-
-    const editingContainer = document.createElement('div');
-    editingContainer.className = 'editing-field';
-    editingContainer.appendChild(input);
-    editingContainer.appendChild(saveBtn);
-    editingContainer.appendChild(cancelBtn);
-
-    element.parentNode.appendChild(editingContainer);
-    element.style.display = 'none';
-    input.focus();
-
-    saveBtn.onclick = () => saveEdit(element, input.value, type);
-    cancelBtn.onclick = () => cancelEdit(element, editingContainer);
-}
-
-function saveEdit(element, newValue, type) {
-    const activityCard = element.closest('.activity-card');
-    const activityId = activityCard.dataset.id;
-    const activities = JSON.parse(getUserData('activities') || '[]');
-    const activityIndex = activities.findIndex(a => a.id.toString() === activityId);
-
-    if (activityIndex !== -1) {
-        if (type === 'date') {
-            activities[activityIndex].date = newValue;
-            element.textContent = formatDate(newValue);
-        } else {
-            activities[activityIndex].name = newValue;
-            element.textContent = newValue;
-        }
-        setUserData('activities', activities);
-        showNotification('Actividad actualizada correctamente');
-    }
-
-    element.style.display = '';
-    element.parentNode.querySelector('.editing-field').remove();
-}
-
-function cancelEdit(element, editingContainer) {
-    element.style.display = '';
-    editingContainer.remove();
-}
-
-function openAttendanceModal(activityId) {
-    const activities = JSON.parse(getUserData('activities') || '[]');
-    const students = JSON.parse(getUserData('students') || '[]');
-    const activity = activities.find(a => a.id.toString() === activityId.toString());
-
-    if (!activity) return;
-
-    const modal = document.getElementById('attendance-modal');
-    const modalContent = document.createElement('div');
-    modalContent.className = 'modal-content';
-    
-    modalContent.innerHTML = `
-        <div class="modal-header">
-            <h3><i class="fas fa-clipboard-check"></i> Tomar Asistencia</h3>
-            <button class="close-modal"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="modal-body">
-            <h4>${activity.name} - ${formatDate(activity.date)}</h4>
-            <table class="attendance-table">
-                <thead>
-                    <tr>
-                        <th>Alumno</th>
-                        <th>Asistencia</th>
-                        <th>Puntos</th>
-                        <th>Tarea</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${students.map(student => `
-                        <tr data-student-id="${student.id}">
-                            <td>${student.name}</td>
-                            <td>
-                                <select class="attendance-select">
-                                    <option value="present">Presente</option>
-                                    <option value="absent">Ausente</option>
-                                </select>
-                            </td>
-                            <td>
-                                <select class="points-select">
-                                    ${[1,2,3,4,5].map(num => 
-                                        `<option value="${num}">${num}</option>`
-                                    ).join('')}
-                                </select>
-                            </td>
-                            <td>
-                                <select class="completion-select">
-                                    <option value="completed">Completada</option>
-                                    <option value="incomplete">Incompleta</option>
-                                </select>
-                            </td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-            <button class="save-attendance-btn">
-                <i class="fas fa-save"></i> Guardar Asistencia
-            </button>
-        </div>
-    `;
-
-    modal.innerHTML = '';
-    modal.appendChild(modalContent);
-    modal.style.display = 'block';
-
-    // Event listeners para el modal
-    modalContent.querySelector('.close-modal').onclick = () => modal.style.display = 'none';
-    modalContent.querySelector('.save-attendance-btn').onclick = () => saveAttendance(activityId);
-}
-
-function saveAttendance(activityId) {
-    const rows = document.querySelectorAll('.attendance-table tbody tr');
-    const attendanceData = Array.from(rows).map(row => ({
-        studentId: row.dataset.studentId,
-        attendance: row.querySelector('.attendance-select').value,
-        points: row.querySelector('.points-select').value,
-        completion: row.querySelector('.completion-select').value
-    }));
-
-    const attendance = JSON.parse(getUserData('attendance') || '[]');
-    const existingIndex = attendance.findIndex(a => a.activityId === activityId);
-
-    if (existingIndex !== -1) {
-        attendance[existingIndex].attendanceData = attendanceData;
-    } else {
-        attendance.push({
-            activityId,
-            attendanceData
-        });
-    }
-
-    setUserData('attendance', attendance);
-    document.getElementById('attendance-modal').style.display = 'none';
-    showNotification('Asistencia guardada correctamente');
-}
-
-// Funciones auxiliares
-function formatDate(dateString) {
-    return new Date(dateString).toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-}
-
-// Reemplazar la función existente
-function formatDateForInput(dateString) {
-    const date = new Date(dateString);
-    date.setMinutes(date.getMinutes() + date.getTimezoneOffset());
-    return date.toISOString().split('T')[0];
-}
-
-// Crear corazones cada cierto tiempo
-setInterval(createHeart, 1000);
-
-function createHeart() {
-    const heart = document.createElement('i');
-    heart.classList.add('fas', 'fa-heart', 'floating-heart');
-    
-    // Posición aleatoria en X
-    heart.style.left = Math.random() * 100 + 'vw';
-    // Comenzar desde abajo
-    heart.style.bottom = '-20px';
-    // Tamaño aleatorio
-    const size = Math.random() * 15 + 10;
-    heart.style.fontSize = size + 'px';
-    // Duración aleatoria
-    const duration = Math.random() * 10 + 5;
-    heart.style.animationDuration = duration + 's';
-    
-    document.body.appendChild(heart);
-    
-    // Eliminar el corazón después de la animación
-    setTimeout(() => {
-        heart.remove();
-    }, duration * 1000);
-}
-
-// Función para leer archivo como DataURL
+// ===== FUNCIONES AUXILIARES =====
 function readFileAsDataURL(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -882,7 +450,93 @@ function readFileAsDataURL(file) {
     });
 }
 
-// Función para cargar actividades
+function formatDate(dateString) {
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    } catch (error) {
+        return 'Fecha inválida';
+    }
+}
+
+function formatDateForInput(dateString) {
+    try {
+        const date = new Date(dateString);
+        return date.toISOString().split('T')[0];
+    } catch (error) {
+        return new Date().toISOString().split('T')[0];
+    }
+}
+
+// ===== GESTIÓN DE ACTIVIDADES =====
+function addActivity(event) {
+    event.preventDefault();
+    
+    const activityName = document.getElementById('activityName').value;
+    const activityDate = document.getElementById('activityDate').value;
+    
+    try {
+        const imageInput = document.getElementById('activityImage');
+        
+        if (imageInput && imageInput.files && imageInput.files[0]) {
+            readFileAsDataURL(imageInput.files[0]).then(data => {
+                saveActivityWithImage(activityName, activityDate, data);
+            });
+        } else {
+            saveActivityWithImage(activityName, activityDate, null);
+        }
+    } catch (error) {
+        console.error('Error al agregar actividad:', error);
+        showNotification('Error al agregar la actividad: ' + error.message, 'error');
+    }
+}
+
+function saveActivityWithImage(name, date, imageData) {
+    try {
+        const activityId = Date.now();
+        const activity = {
+            id: activityId,
+            name: name,
+            date: date,
+            imageData: imageData
+        };
+
+        let activities = [];
+        const savedActivities = getUserData('activities');
+        
+        if (savedActivities) {
+            if (typeof savedActivities === 'string') {
+                activities = JSON.parse(savedActivities);
+            } else {
+                activities = savedActivities;
+            }
+        }
+        
+        activities.unshift(activity);
+        setUserData('activities', JSON.stringify(activities));
+
+        // Limpiar formulario
+        document.querySelector('.activity-form').reset();
+        const preview = document.getElementById('imagePreview');
+        if (preview) {
+            preview.src = '#';
+            preview.style.display = 'none';
+        }
+        document.querySelector('.remove-image').style.display = 'none';
+        document.querySelector('.upload-placeholder').style.display = 'flex';
+
+        loadActivities();
+        showNotification('Actividad agregada correctamente', 'success');
+    } catch (error) {
+        console.error('Error al guardar actividad:', error);
+        showNotification('Error al guardar la actividad', 'error');
+    }
+}
+
 function loadActivities() {
     const activitiesGrid = document.getElementById('activities-grid');
     if (!activitiesGrid) return;
@@ -896,7 +550,7 @@ function loadActivities() {
             activities = JSON.parse(savedActivities);
         }
         
-        // Aplicar filtros si existen
+        // Aplicar filtros
         const searchTerm = document.getElementById('activity-search')?.value.toLowerCase();
         const dateFilter = document.getElementById('activity-date-filter')?.value;
 
@@ -944,7 +598,7 @@ function loadActivities() {
                     <div class="activity-image" onclick="openGallery('${activity.id}')">
                         <img src="${activity.imageData}" alt="${activity.name}">
                         <div class="image-actions">
-                            <button class="image-action-btn" onclick="event.stopPropagation(); handleImage('${activity.id}', event)" title="Opciones de imagen">
+                            <button class="image-action-btn" onclick="event.stopPropagation(); handleImage('${activity.id}', event)" title="Eliminar imagen">
                                 <i class="fas fa-times"></i>
                             </button>
                         </div>
@@ -979,15 +633,13 @@ function loadActivities() {
             </div>
         `;
     }
-} // Fin de la función loadActivities
+}
 
-// Función para editar campos
 function editField(type, activityId) {
     const card = document.querySelector(`.activity-card[data-id="${activityId}"]`);
     const element = card.querySelector(`.${type}-text`);
     const currentValue = element.textContent.trim();
     
-    // Si ya está en modo edición, no hacer nada
     if (element.querySelector('.edit-input')) return;
     
     const container = document.createElement('div');
@@ -1015,7 +667,6 @@ function editField(type, activityId) {
     const input = container.querySelector('input');
     input.focus();
     
-    // Cerrar al presionar Escape
     input.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             loadActivities();
@@ -1046,428 +697,471 @@ function saveEdit(type, activityId) {
             } else if (type === 'date') {
                 activities[index].date = newValue;
             }
-
-            setUserData('activities', activities);
-            showNotification('Cambios guardados correctamente');
+            
+            setUserData('activities', JSON.stringify(activities));
+            showNotification('Actividad actualizada correctamente', 'success');
             loadActivities();
+        } else {
+            showNotification('Error: No se encontró la actividad', 'error');
         }
     } else {
         loadActivities();
     }
 }
 
-// Función para manejar la imagen
-function handleImage(activityId) {
-    if (confirm('¿Qué deseas hacer con la imagen?')) {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.onchange = (e) => updateImage(activityId, e.target.files[0]);
-        input.click();
-    } else {
-        if (confirm('¿Deseas eliminar la imagen?')) {
-            removeImage(activityId);
-        }
-    }
-}
-
-// Funciones auxiliares para manejar imágenes
-function addImage(activityId, event) {
-    const file = event.target.files[0];
-    if (file) {
-        updateImage(activityId, file);
-    }
-}
-
-function updateImage(activityId, file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const activities = JSON.parse(getUserData('activities') || '[]');
-        const index = activities.findIndex(a => a.id.toString() === activityId.toString());
-        if (index !== -1) {
-            activities[index].imageData = e.target.result;
-            setUserData('activities', activities);
-            loadActivities();
-            showNotification('Imagen actualizada correctamente');
-        }
-    };
-    reader.readAsDataURL(file);
-}
-
-function removeImage(activityId) {
-    const activities = JSON.parse(getUserData('activities') || '[]');
-    const index = activities.findIndex(a => a.id.toString() === activityId.toString());
-    if (index !== -1) {
-        activities[index].imageData = null;
-        setUserData('activities', activities);
-        loadActivities();
-        showNotification('Imagen eliminada correctamente');
-    }
-}
-
-// Agregar la función deleteActivity
 function deleteActivity(activityId) {
-    if (confirm('¿Estás seguro de que deseas eliminar esta actividad?')) {
+    if (confirm('¿Estás seguro de que deseas eliminar esta actividad? Esta acción no se puede deshacer.')) {
         try {
-            let activities = JSON.parse(getUserData('activities') || '[]');
-            activities = activities.filter(activity => activity.id.toString() !== activityId.toString());
-            setUserData('activities', activities);
+            const activities = JSON.parse(getUserData('activities') || '[]');
+            const filteredActivities = activities.filter(a => a.id.toString() !== activityId.toString());
             
-            // Recargar la lista de actividades
+            setUserData('activities', JSON.stringify(filteredActivities));
             loadActivities();
-            
-            showNotification('Actividad eliminada correctamente');
+            showNotification('Actividad eliminada correctamente', 'success');
         } catch (error) {
-            console.error('Error al eliminar la actividad:', error);
+            console.error('Error al eliminar actividad:', error);
             showNotification('Error al eliminar la actividad', 'error');
         }
     }
 }
 
-// Función para configurar los event listeners de la tarjeta
-function setupActivityCardListeners(card) {
-    const attendanceBtn = card.querySelector('.attendance-btn');
-    const deleteBtn = card.querySelector('.delete-activity-btn');
-    const editTitleBtn = card.querySelector('.edit-title-btn');
-    const editDateBtn = card.querySelector('.edit-date-btn');
+function addImage(activityId, event) {
+    const file = event.target.files[0];
+    if (!file) return;
 
-    attendanceBtn?.addEventListener('click', () => {
-        const activity = attendanceBtn.dataset.activity;
-        const date = attendanceBtn.dataset.date;
-        openAttendanceModal(activity, date);
-    });
-
-    deleteBtn?.addEventListener('click', () => {
-        const activityId = deleteBtn.dataset.id;
-        deleteActivity(activityId);
-    });
-
-    editTitleBtn?.addEventListener('click', () => makeEditable(card, 'title', 'text'));
-    editDateBtn?.addEventListener('click', () => makeEditable(card, 'date', 'date'));
-}
-
-// Función para mostrar notificaciones
-function showNotification(message, type = 'success') {
-    // Verificar si ya existe una notificación
-    let notification = document.querySelector('.notification');
-    
-    // Si no existe, crearla
-    if (!notification) {
-        notification = document.createElement('div');
-        notification.className = 'notification';
-        document.body.appendChild(notification);
-    }
-    
-    // Establecer el tipo y mensaje
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
-            <span>${message}</span>
-        </div>
-        <button class="close-notification">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-    
-    // Mostrar la notificación
-    notification.classList.add('show');
-    
-    // Configurar el botón de cierre
-    const closeBtn = notification.querySelector('.close-notification');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            notification.classList.remove('show');
-        });
-    }
-    
-    // Ocultar automáticamente después de 5 segundos
-    setTimeout(() => {
-        if (notification.classList.contains('show')) {
-            notification.classList.remove('show');
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const activities = JSON.parse(getUserData('activities') || '[]');
+            const index = activities.findIndex(a => a.id.toString() === activityId.toString());
+            
+            if (index !== -1) {
+                activities[index].imageData = e.target.result;
+                setUserData('activities', JSON.stringify(activities));
+                loadActivities();
+                showNotification('Imagen agregada correctamente', 'success');
+            }
+        } catch (error) {
+            console.error('Error al agregar imagen:', error);
+            showNotification('Error al agregar la imagen', 'error');
         }
-    }, 5000);
+    };
+    reader.readAsDataURL(file);
 }
 
-// Hacer accesible la función deleteActivityImage globalmente
-window.editField = editField;
-window.saveEdit = saveEdit;
-window.deleteActivity = deleteActivity;
-window.handleImage = handleImage;
-window.addImage = addImage;
-window.openGallery = openGallery;
-window.openAttendanceModal = openAttendanceModal;
-
-function openGallery(startingImageId = null) {
-    const activities = JSON.parse(getUserData('activities') || '[]')
-        .filter(activity => activity.imageData);
+function handleImage(activityId, event) {
+    event.stopPropagation();
     
-    if (activities.length === 0) {
-        showNotification('No hay imágenes en la galería', 'info');
+    if (confirm('¿Deseas eliminar esta imagen?')) {
+        try {
+            const activities = JSON.parse(getUserData('activities') || '[]');
+            const index = activities.findIndex(a => a.id.toString() === activityId.toString());
+            
+            if (index !== -1) {
+                activities[index].imageData = null;
+                setUserData('activities', JSON.stringify(activities));
+                loadActivities();
+                showNotification('Imagen eliminada correctamente', 'success');
+            }
+        } catch (error) {
+            console.error('Error al eliminar imagen:', error);
+            showNotification('Error al eliminar la imagen', 'error');
+        }
+    }
+}
+
+function openGallery(activityId) {
+    window.location.href = `gallery.html?activity=${activityId}`;
+}
+
+// ===== SISTEMA DE ASISTENCIA =====
+function openAttendanceModal(activityId) {
+    console.log('🎯 Abriendo modal de asistencia para actividad:', activityId);
+    
+    const user = window.auth?.currentUser;
+    if (!user) {
+        showNotification('Debes estar autenticado para tomar asistencia', 'error');
         return;
     }
 
-    let currentIndex = startingImageId ? 
-        activities.findIndex(a => a.id.toString() === startingImageId.toString()) : 0;
+    const activities = JSON.parse(getUserData('activities') || '[]');
+    const activity = activities.find(a => a.id.toString() === activityId.toString());
     
-    if (currentIndex === -1) currentIndex = 0;
+    if (!activity) {
+        showNotification('Actividad no encontrada', 'error');
+        return;
+    }
 
-    // Usar el modal existente
-    const modal = document.getElementById('gallery-modal');
-    const container = modal.querySelector('.carousel-slide');
-    const search = modal.querySelector('#gallery-search');
-    const prevBtn = modal.querySelector('.prev-btn');
-    const nextBtn = modal.querySelector('.next-btn');
-    const closeBtn = modal.querySelector('.close-modal');
-    let filteredActivities = [...activities];
+    currentAttendanceActivity = activity;
+    
+    document.getElementById('attendance-activity-name').textContent = activity.name;
+    document.getElementById('attendance-activity-date').textContent = formatDate(activity.date);
+    
+    loadStudentsForAttendance();
+    
+    const modal = document.getElementById('attendance-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+}
 
-    function updateGalleryView() {
-        const activity = filteredActivities[currentIndex];
-        container.innerHTML = `
-            <img src="${activity.imageData}" alt="${activity.name}">
-            <div class="image-info">
-                <h4 class="activity-name">${activity.name}</h4>
-                <p class="activity-date">${formatDate(activity.date)}</p>
+function loadStudentsForAttendance() {
+    const user = window.auth?.currentUser;
+    if (!user) return;
+
+    const students = JSON.parse(getUserData('students') || '[]');
+    const attendanceList = document.getElementById('students-attendance-list');
+    const noStudentsMessage = document.getElementById('no-students-message');
+    
+    document.getElementById('total-students').textContent = students.length;
+    
+    if (students.length === 0) {
+        attendanceList.style.display = 'none';
+        noStudentsMessage.style.display = 'block';
+        return;
+    }
+
+    attendanceList.style.display = 'block';
+    noStudentsMessage.style.display = 'none';
+
+    const existingAttendance = getExistingAttendance(currentAttendanceActivity.id);
+    
+    attendanceList.innerHTML = students.map(student => {
+        const studentAttendance = existingAttendance?.find(a => a.studentId === student.id);
+        const status = studentAttendance?.status || 'present';
+        const notes = studentAttendance?.notes || '';
+        
+        return `
+            <div class="student-attendance-item" data-student-id="${student.id}">
+                <div class="student-info">
+                    <div class="student-avatar">
+                        ${student.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div class="student-details">
+                        <h6>${student.name}</h6>
+                        <p>${student.age} años</p>
+                    </div>
+                </div>
+                
+                <div class="attendance-controls">
+                    <div class="attendance-toggle">
+                        <button class="attendance-option present ${status === 'present' ? 'active' : ''}" 
+                                onclick="setAttendanceStatus('${student.id}', 'present')" 
+                                title="Marcar como presente">
+                            <i class="fas fa-check"></i>
+                            Presente
+                        </button>
+                        <button class="attendance-option absent ${status === 'absent' ? 'active' : ''}" 
+                                onclick="setAttendanceStatus('${student.id}', 'absent')" 
+                                title="Marcar como ausente">
+                            <i class="fas fa-times"></i>
+                            Ausente
+                        </button>
+                    </div>
+                    
+                    <input type="text" 
+                           class="student-notes" 
+                           placeholder="Notas..."
+                           value="${notes}"
+                           data-student-id="${student.id}"
+                           title="Agregar notas sobre el estudiante">
+                </div>
             </div>
         `;
+    }).join('');
+
+    updateAttendanceCounters();
+}
+
+function setAttendanceStatus(studentId, status) {
+    const studentItem = document.querySelector(`[data-student-id="${studentId}"]`);
+    if (!studentItem) return;
+
+    const buttons = studentItem.querySelectorAll('.attendance-option');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    
+    const activeButton = studentItem.querySelector(`.attendance-option.${status}`);
+    if (activeButton) {
+        activeButton.classList.add('active');
+    }
+    
+    updateAttendanceCounters();
+}
+
+function updateAttendanceCounters() {
+    const presentCount = document.querySelectorAll('.attendance-option.present.active').length;
+    const totalStudents = document.querySelectorAll('.student-attendance-item').length;
+    const absentCount = totalStudents - presentCount;
+    
+    document.getElementById('present-count').textContent = presentCount;
+    document.getElementById('absent-count').textContent = absentCount;
+}
+
+function markAllPresent() {
+    const students = document.querySelectorAll('.student-attendance-item');
+    students.forEach(student => {
+        const studentId = student.dataset.studentId;
+        setAttendanceStatus(studentId, 'present');
+    });
+    
+    showNotification('Todos los estudiantes marcados como presentes', 'success');
+}
+
+function markAllAbsent() {
+    const students = document.querySelectorAll('.student-attendance-item');
+    students.forEach(student => {
+        const studentId = student.dataset.studentId;
+        setAttendanceStatus(studentId, 'absent');
+    });
+    
+    showNotification('Todos los estudiantes marcados como ausentes', 'info');
+}
+
+function getExistingAttendance(activityId) {
+    const user = window.auth?.currentUser;
+    if (!user) return null;
+
+    const attendanceRecords = JSON.parse(getUserData('attendance') || '[]');
+    const record = attendanceRecords.find(r => r.activityId === activityId);
+    return record?.attendance || null;
+}
+
+function saveAttendance() {
+    const user = window.auth?.currentUser;
+    if (!user) {
+        showNotification('Debes estar autenticado para guardar asistencia', 'error');
+        return;
     }
 
-    // Inicializar la vista
-    updateGalleryView();
-    modal.style.display = 'block';
+    if (!currentAttendanceActivity) {
+        showNotification('Error: No hay actividad seleccionada', 'error');
+        return;
+    }
 
-    // Event listeners
-    search.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        filteredActivities = activities.filter(activity => 
-            activity.name.toLowerCase().includes(searchTerm)
-        );
-        if (filteredActivities.length > 0) {
-            currentIndex = 0;
-            updateGalleryView();
+    const attendanceData = [];
+    const studentItems = document.querySelectorAll('.student-attendance-item');
+    
+    studentItems.forEach(item => {
+        const studentId = item.dataset.studentId;
+        const activeButton = item.querySelector('.attendance-option.active');
+        const notesInput = item.querySelector('.student-notes');
+        
+        const status = activeButton ? (activeButton.classList.contains('present') ? 'present' : 'absent') : 'present';
+        const notes = notesInput ? notesInput.value.trim() : '';
+        
+        attendanceData.push({
+            studentId,
+            status,
+            notes,
+            timestamp: new Date().toISOString()
+        });
+    });
+
+    try {
+        let attendanceRecords = JSON.parse(getUserData('attendance') || '[]');
+        
+        const existingIndex = attendanceRecords.findIndex(r => r.activityId === currentAttendanceActivity.id);
+        
+        const attendanceRecord = {
+            activityId: currentAttendanceActivity.id,
+            activityName: currentAttendanceActivity.name,
+            activityDate: currentAttendanceActivity.date,
+            attendance: attendanceData,
+            savedAt: new Date().toISOString()
+        };
+        
+        if (existingIndex !== -1) {
+            attendanceRecords[existingIndex] = attendanceRecord;
+            showNotification('Asistencia actualizada correctamente', 'success');
+        } else {
+            attendanceRecords.push(attendanceRecord);
+            showNotification('Asistencia guardada correctamente', 'success');
         }
-    });
+        
+        setUserData('attendance', JSON.stringify(attendanceRecords));
+        closeAttendanceModal();
+        
+        console.log('📊 Asistencia guardada:', attendanceRecord);
+        
+    } catch (error) {
+        console.error('Error al guardar asistencia:', error);
+        showNotification('Error al guardar asistencia: ' + error.message, 'error');
+    }
+}
 
-    prevBtn.addEventListener('click', () => {
-        currentIndex = (currentIndex - 1 + filteredActivities.length) % filteredActivities.length;
-        updateGalleryView();
-    });
-
-    nextBtn.addEventListener('click', () => {
-        currentIndex = (currentIndex + 1) % filteredActivities.length;
-        updateGalleryView();
-    });
-
-    closeBtn.addEventListener('click', () => {
+function closeAttendanceModal() {
+    const modal = document.getElementById('attendance-modal');
+    if (modal) {
         modal.style.display = 'none';
-        search.value = '';
-        filteredActivities = [...activities];
-    });
-
-    // Navegación con teclado
-    function galleryKeyHandler(e) {
-        if (e.key === 'Escape') {
-            modal.style.display = 'none';
-            document.removeEventListener('keydown', galleryKeyHandler);
-        } else if (e.key === 'ArrowLeft') {
-            prevBtn.click();
-        } else if (e.key === 'ArrowRight') {
-            nextBtn.click();
-        }
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
     }
-
-    document.addEventListener('keydown', galleryKeyHandler);
+    currentAttendanceActivity = null;
 }
 
-// Función para guardar datos del usuario
-function setUserData(key, data) {
-    try {
-        const user = window.auth?.currentUser;
-        if (!user) {
-            console.warn('Usuario no autenticado, guardando en localStorage temporal');
-            localStorage.setItem(`temp_${key}`, typeof data === 'string' ? data : JSON.stringify(data));
-            return;
-        }
-        
-        // Usar el UID del usuario para crear una clave única
-        const userKey = `${user.uid}_${key}`;
-        localStorage.setItem(userKey, typeof data === 'string' ? data : JSON.stringify(data));
-        console.log(`Datos guardados para usuario ${user.uid}:`, key);
-    } catch (error) {
-        console.error('Error al guardar datos del usuario:', error);
+function setupAttendanceModal() {
+    const closeModalBtn = document.getElementById('close-attendance-modal');
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', closeAttendanceModal);
     }
-}
-
-// Función para obtener datos del usuario
-function getUserData(key) {
-    try {
-        const user = window.auth?.currentUser;
-        if (!user) {
-            console.warn('Usuario no autenticado, obteniendo datos temporales');
-            return localStorage.getItem(`temp_${key}`);
-        }
-        
-        // Usar el UID del usuario para obtener datos específicos
-        const userKey = `${user.uid}_${key}`;
-        const data = localStorage.getItem(userKey);
-        console.log(`Datos obtenidos para usuario ${user.uid}:`, key, data ? 'Encontrados' : 'No encontrados');
-        return data;
-    } catch (error) {
-        console.error('Error al obtener datos del usuario:', error);
-        return null;
+    
+    const saveBtn = document.getElementById('save-attendance');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', saveAttendance);
     }
-}
-
-// Función para migrar datos temporales cuando el usuario se autentica
-function migrateTemporaryData() {
-    try {
-        const user = window.auth?.currentUser;
-        if (!user) return;
-        
-        const keysToMigrate = ['students', 'activities', 'attendance'];
-        
-        keysToMigrate.forEach(key => {
-            const tempKey = `temp_${key}`;
-            const tempData = localStorage.getItem(tempKey);
-            
-            if (tempData) {
-                const userKey = `${user.uid}_${key}`;
-                // Solo migrar si no existen datos del usuario
-                if (!localStorage.getItem(userKey)) {
-                    localStorage.setItem(userKey, tempData);
-                    console.log(`Datos temporales migrados para ${key}`);
-                }
-                // Limpiar datos temporales
-                localStorage.removeItem(tempKey);
+    
+    const cancelBtn = document.getElementById('cancel-attendance');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', closeAttendanceModal);
+    }
+    
+    const markAllPresentBtn = document.getElementById('mark-all-present');
+    if (markAllPresentBtn) {
+        markAllPresentBtn.addEventListener('click', markAllPresent);
+    }
+    
+    const markAllAbsentBtn = document.getElementById('mark-all-absent');
+    if (markAllAbsentBtn) {
+        markAllAbsentBtn.addEventListener('click', markAllAbsent);
+    }
+    
+    const modal = document.getElementById('attendance-modal');
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeAttendanceModal();
             }
         });
-    } catch (error) {
-        console.error('Error al migrar datos temporales:', error);
     }
-}
-
-// AGREGAR esta función a app.js:
-
-function updateQuickStudentStats() {
-    try {
-        const user = window.auth?.currentUser;
-        if (!user) return;
-        
-        const savedStudents = getUserData('students');
-        const students = savedStudents ? JSON.parse(savedStudents) : [];
-        
-        const quickTotalElement = document.getElementById('quick-total-students');
-        if (quickTotalElement) {
-            quickTotalElement.textContent = students.length;
+    
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal?.classList.contains('show')) {
+            closeAttendanceModal();
         }
-    } catch (error) {
-        console.error('Error actualizando estadísticas rápidas:', error);
+    });
+}
+
+// ===== EVENT LISTENERS =====
+function setupEventListeners() {
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('edit-title-btn')) {
+            const activityCard = e.target.closest('.activity-card');
+            const titleSpan = activityCard.querySelector('.title-text');
+            makeEditable(titleSpan, 'text');
+        }
+        
+        if (e.target.classList.contains('edit-date-btn')) {
+            const activityCard = e.target.closest('.activity-card');
+            const dateSpan = activityCard.querySelector('.date-text');
+            makeEditable(dateSpan, 'date');
+        }
+
+        if (e.target.classList.contains('attendance-btn')) {
+            const activityId = e.target.closest('.activity-card').dataset.id;
+            openAttendanceModal(activityId);
+        }
+    });
+
+    const galleryButton = document.getElementById('gallery');
+    if (galleryButton) {
+        galleryButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'gallery.html';
+        });
+    }
+
+    const profileButton = document.getElementById('profile');
+    if (profileButton) {
+        profileButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'profile.html';
+        });
+    }
+
+    const studentsButton = document.getElementById('students-list');
+    if (studentsButton) {
+        studentsButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'alumnos.html';
+        });
     }
 }
 
-// AGREGAR esta llamada al DOMContentLoaded:
+// ===== INICIALIZACIÓN =====
 document.addEventListener('DOMContentLoaded', () => {
-    // ... código existente ...
+    // Inicializar componentes
+    setupToggleMenu();
+    setupAuthButtons();
+    setupInstallApp();
+    setupScrollToTop();
+    initializeImagePreview();
+    setupDarkMode();
+    setupDeleteAccount();
+    setupDonationButton();
+    addNotificationStyles();
+    setupAttendanceModal();
     
-    // Actualizar estadísticas rápidas
-    updateQuickStudentStats();
+    // Configurar formularios
+    const activityForm = document.querySelector('.activity-form');
+    if (activityForm) {
+        activityForm.addEventListener('submit', addActivity);
+    }
     
-    // Actualizar cuando cambie la autenticación
-    auth.onAuthStateChanged(user => {
+    // Cargar actividades
+    loadActivities();
+    
+    // Configurar eventos
+    setupEventListeners();
+    
+    // Event listeners para filtros
+    const searchInput = document.getElementById('activity-search');
+    const dateFilter = document.getElementById('activity-date-filter');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            loadActivities();
+        });
+    }
+
+    if (dateFilter) {
+        dateFilter.addEventListener('change', () => {
+            loadActivities();
+        });
+    }
+
+    // Observer para autenticación
+    window.auth.onAuthStateChanged(user => {
+        console.log('Estado de autenticación cambiado:', user ? user.uid : 'No autenticado');
+        
         if (user) {
-            updateQuickStudentStats();
-        }
-    });
-});
-
-// Agregar esta función para limpiar datos mezclados (ejecutar una vez):
-
-function cleanMixedUserData() {
-    const confirmed = confirm('¿Quieres limpiar todos los datos locales? Esta acción eliminará todos los estudiantes y actividades guardados localmente.');
-    
-    if (confirmed) {
-        // Limpiar todas las claves relacionadas con la app
-        Object.keys(localStorage).forEach(key => {
-            if (key.includes('students') || key.includes('activities') || key.includes('attendance')) {
-                localStorage.removeItem(key);
-            }
-        });
-        
-        showNotification('Datos locales limpiados. Recarga la página para empezar de nuevo.', 'success');
-        console.log('Datos locales limpiados');
-    }
-}
-
-// Función para mejorar la experiencia móvil
-function setupMobileEnhancements() {
-    // Detectar si es móvil
-    const isMobile = window.innerWidth <= 768;
-    
-    if (isMobile) {
-        // Prevenir zoom en inputs
-        const metaViewport = document.querySelector('meta[name="viewport"]');
-        if (metaViewport) {
-            metaViewport.setAttribute('content', 
-                'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
-            );
-        }
-        
-        // Mejorar el comportamiento del menu dropdown
-        const menuDropdown = document.querySelector('.menu-dropdown');
-        const profileButton = document.querySelector('.profile-button');
-        
-        if (menuDropdown && profileButton) {
-            profileButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                if (menuDropdown.style.display === 'block') {
-                    menuDropdown.style.display = 'none';
-                    document.body.style.overflow = '';
-                } else {
-                    menuDropdown.style.display = 'block';
-                    document.body.style.overflow = 'hidden'; // Prevenir scroll del body
-                }
-            });
+            updateUserInfo(user);
+            migrateTemporaryData();
             
-            // Cerrar menu al hacer clic en overlay
-            menuDropdown.addEventListener('click', (e) => {
-                if (e.target === menuDropdown) {
-                    menuDropdown.style.display = 'none';
-                    document.body.style.overflow = '';
-                }
-            });
-        }
-        
-        // Mejorar inputs de fecha en móviles
-        const dateInputs = document.querySelectorAll('input[type="date"]');
-        dateInputs.forEach(input => {
-            input.addEventListener('focus', () => {
-                input.setAttribute('type', 'date');
-            });
-        });
-        
-        // Mejorar modales en móvil
-        const modals = document.querySelectorAll('.modal');
-        modals.forEach(modal => {
-            const modalContent = modal.querySelector('.modal-content');
-            if (modalContent) {
-                modalContent.style.maxHeight = '95vh';
-                modalContent.style.overflow = 'auto';
+            setTimeout(() => {
+                loadActivities();
+            }, 100);
+        } else {
+            if (!window.location.pathname.includes('login.html')) {
+                window.location.href = 'login.html';
             }
-        });
-    }
-}
-
-// AGREGAR esta función al DOMContentLoaded existente:
-document.addEventListener('DOMContentLoaded', () => {
-    // ... código existente ...
-    
-    // Agregar mejoras móviles
-    setupMobileEnhancements();
-    
-    // Recargar mejoras al redimensionar
-    window.addEventListener('resize', () => {
-        setupMobileEnhancements();
+        }
     });
 });
+
+// ===== FUNCIONES GLOBALES =====
+window.openAttendanceModal = openAttendanceModal;
+window.setAttendanceStatus = setAttendanceStatus;
+window.closeAttendanceModal = closeAttendanceModal;
+window.saveAttendance = saveAttendance;
+window.markAllPresent = markAllPresent;
+window.markAllAbsent = markAllAbsent;
+window.deleteActivity = deleteActivity;
+window.addImage = addImage;
+window.handleImage = handleImage;
+window.openGallery = openGallery;
+window.editField = editField;
+window.saveEdit = saveEdit;
+
+console.log('✅ App.js limpio y funcionando correctamente');

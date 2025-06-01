@@ -96,40 +96,6 @@
             <h1>Horita Feliz</h1>
         </header>
         <main>
-            <!-- CAMBIAR la sección de gestión de estudiantes: -->
-
-            <!-- ANTES: Formulario completo de estudiantes -->
-            <!-- DESPUÉS: Solo enlace a página de alumnos -->
-
-            <!-- LÍNEA 96: Cambiar la sección de gestión de estudiantes -->
-            <section id="student-management">
-                <div class="students-redirect-section">
-                    <div class="redirect-header">
-                        <i class="fas fa-users redirect-icon"></i>
-                        <h2>Gestión de Alumnos</h2>
-                        <p class="redirect-description">
-                            Administra todos tus alumnos en una página dedicada
-                        </p>
-                    </div>
-                    
-                    <div class="redirect-actions">
-                        <a href="alumnos.html" class="redirect-btn">
-                            <i class="fas fa-user-graduate"></i>
-                            <span>Ir a Gestión de Alumnos</span>
-                            <small>Ver, agregar y editar alumnos</small>
-                        </a>
-                        
-                        <div class="quick-stats">
-                            <div class="quick-stat">
-                                <i class="fas fa-child"></i>
-                                <span id="quick-total-students">0</span>
-                                <small>Alumnos registrados</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
             <!-- MANTENER: Solo la sección de actividades como principal -->
             <section id="activity-log">
                 <form class="activity-form">
@@ -269,5 +235,87 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal de Asistencia -->
+<div id="attendance-modal" class="modal">
+    <div class="modal-content attendance-modal-content">
+        <div class="modal-header">
+            <h3>
+                <i class="fas fa-clipboard-check"></i>
+                <span id="attendance-title">Tomar Asistencia</span>
+            </h3>
+            <button class="close-modal" id="close-attendance-modal" aria-label="Cerrar modal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="attendance-info">
+                <div class="activity-details">
+                    <h4 id="attendance-activity-name">Nombre de la Actividad</h4>
+                    <p id="attendance-activity-date">Fecha de la actividad</p>
+                </div>
+                
+                <div class="attendance-summary">
+                    <div class="summary-item">
+                        <i class="fas fa-users"></i>
+                        <span>Total: <strong id="total-students">0</strong></span>
+                    </div>
+                    <div class="summary-item">
+                        <i class="fas fa-check text-success"></i>
+                        <span>Presentes: <strong id="present-count">0</strong></span>
+                    </div>
+                    <div class="summary-item">
+                        <i class="fas fa-times text-danger"></i>
+                        <span>Ausentes: <strong id="absent-count">0</strong></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="students-attendance">
+                <div class="attendance-header">
+                    <h5>
+                        <i class="fas fa-list"></i>
+                        Lista de Alumnos
+                    </h5>
+                    <div class="quick-actions">
+                        <button class="quick-btn" id="mark-all-present" title="Marcar todos presentes">
+                            <i class="fas fa-check-double"></i>
+                            Todos Presentes
+                        </button>
+                        <button class="quick-btn" id="mark-all-absent" title="Marcar todos ausentes">
+                            <i class="fas fa-user-times"></i>
+                            Todos Ausentes
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="students-attendance-list" class="students-list">
+                    <!-- Los estudiantes se cargarán dinámicamente aquí -->
+                </div>
+                
+                <div id="no-students-message" class="empty-state" style="display: none;">
+                    <i class="fas fa-user-plus"></i>
+                    <p>No tienes alumnos registrados</p>
+                    <a href="alumnos.html" class="add-students-btn">
+                        <i class="fas fa-plus"></i>
+                        Agregar Alumnos
+                    </a>
+                </div>
+            </div>
+            
+            <div class="attendance-actions">
+                <button class="save-attendance-btn" id="save-attendance">
+                    <i class="fas fa-save"></i>
+                    Guardar Asistencia
+                </button>
+                <button class="cancel-attendance-btn" id="cancel-attendance">
+                    <i class="fas fa-ban"></i>
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
