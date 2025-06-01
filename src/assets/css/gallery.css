@@ -13,6 +13,19 @@
     --gallery-overlay: rgba(0, 0, 0, 0.8);
 }
 
+/* Variables para modo oscuro en galería */
+body.dark-mode.gallery-page {
+    --gallery-primary: #FF69B4;
+    --gallery-secondary: #87CEEB;
+    --gallery-accent: #90EE90;
+    --gallery-text: #e0e0e0;
+    --gallery-text-light: #b0b0b0;
+    --gallery-bg: #1a1a1a;
+    --gallery-shadow: rgba(0, 0, 0, 0.3);
+    --gallery-border: #404040;
+    --gallery-overlay: rgba(0, 0, 0, 0.9);
+}
+
 /* Reset y configuración base */
 * {
     margin: 0;
@@ -27,6 +40,12 @@ body.gallery-page {
     color: var(--gallery-text);
     line-height: 1.6;
     overflow-x: hidden;
+    transition: all 0.3s ease;
+}
+
+/* Modo oscuro para el body */
+body.dark-mode.gallery-page {
+    background: linear-gradient(135deg, var(--gallery-bg) 0%, #262626 100%);
 }
 
 /* === HEADER === */
@@ -38,6 +57,7 @@ body.gallery-page {
     position: sticky;
     top: 0;
     z-index: 100;
+    transition: all 0.3s ease;
 }
 
 .header-content {
@@ -103,6 +123,15 @@ body.gallery-page {
     padding: 2rem;
 }
 
+.gallery-header,
+.gallery-main,
+.gallery-controls,
+.gallery-content,
+.stat-item,
+.gallery-item {
+    transition: all 0.3s ease;
+}
+
 /* === CONTROLES === */
 .gallery-controls {
     background: white;
@@ -147,6 +176,8 @@ body.gallery-page {
     font-family: 'Quicksand', sans-serif;
     font-size: 0.95rem;
     transition: all 0.3s ease;
+    background: var(--gallery-bg);
+    color: var(--gallery-text);
 }
 
 .search-box input:focus {
@@ -185,7 +216,7 @@ body.gallery-page {
 .view-controls {
     display: flex;
     gap: 0.5rem;
-    background: var(--gallery-bg);
+    background: var(--gallery-border);
     padding: 0.3rem;
     border-radius: 8px;
 }
@@ -263,6 +294,7 @@ body.gallery-page {
     padding: 2rem;
     box-shadow: 0 5px 20px var(--gallery-shadow);
     min-height: 400px;
+    transition: all 0.3s ease;
 }
 
 .gallery-grid {
@@ -304,7 +336,7 @@ body.gallery-page {
 
 /* === ITEMS DE GALERÍA === */
 .gallery-item {
-    background: var(--gallery-bg);
+    background: white;
     border-radius: 12px;
     overflow: hidden;
     transition: all 0.3s ease;
@@ -404,6 +436,7 @@ body.gallery-page {
     opacity: 1;
     transform: translateY(0);
 }
+
 .action-btn {
     background: rgba(255, 255, 255, 0.9);
     border: none;
@@ -418,7 +451,6 @@ body.gallery-page {
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
 }
-
 
 .action-btn:hover {
     background: var(--gallery-primary);
@@ -476,6 +508,7 @@ body.gallery-page {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(255, 182, 193, 0.3);
 }
+
 .image-modal {
     position: fixed;
     top: 0;
@@ -1001,4 +1034,189 @@ body.gallery-page {
         left: 10px;
         max-width: none;
     }
+}
+
+/* === MODO OSCURO COMPLETO === */
+body.dark-mode .gallery-header {
+    background: linear-gradient(135deg, var(--gallery-primary) 0%, var(--gallery-secondary) 100%);
+}
+
+body.dark-mode .gallery-controls,
+body.dark-mode .gallery-content {
+    background: var(--gallery-bg);
+    color: var(--gallery-text);
+    border: 1px solid var(--gallery-border);
+    box-shadow: 0 5px 20px var(--gallery-shadow);
+}
+
+body.dark-mode .stat-item {
+    background: var(--gallery-bg);
+    color: var(--gallery-text);
+    border: 1px solid var(--gallery-border);
+    box-shadow: 0 5px 20px var(--gallery-shadow);
+}
+
+body.dark-mode .search-box input {
+    background: var(--gallery-bg);
+    color: var(--gallery-text);
+    border: 2px solid var(--gallery-border);
+}
+
+body.dark-mode .search-box input:focus {
+    border-color: var(--gallery-primary);
+}
+
+body.dark-mode .filter-btn {
+    background: transparent;
+    border: 2px solid var(--gallery-border);
+    color: var(--gallery-text);
+}
+
+body.dark-mode .filter-btn:hover,
+body.dark-mode .filter-btn.active {
+    background: var(--gallery-primary);
+    border-color: var(--gallery-primary);
+    color: white;
+}
+
+body.dark-mode .view-controls {
+    background: var(--gallery-border);
+}
+
+body.dark-mode .view-btn {
+    background: transparent;
+    color: var(--gallery-text-light);
+}
+
+body.dark-mode .view-btn:hover,
+body.dark-mode .view-btn.active {
+    background: var(--gallery-bg);
+    color: var(--gallery-primary);
+}
+
+body.dark-mode .gallery-item {
+    background: var(--gallery-bg);
+    border: 1px solid var(--gallery-border);
+}
+
+body.dark-mode .item-info h4 {
+    color: var(--gallery-text);
+}
+
+body.dark-mode .item-info p {
+    color: var(--gallery-text-light);
+}
+
+body.dark-mode .image-modal .modal-content {
+    background: var(--gallery-bg);
+    color: var(--gallery-text);
+}
+
+body.dark-mode .image-container {
+    background: #2d2d2d;
+}
+
+body.dark-mode .detail-tabs {
+    background: var(--gallery-border);
+}
+
+body.dark-mode .tab-btn {
+    color: var(--gallery-text-light);
+}
+
+body.dark-mode .tab-btn:hover,
+body.dark-mode .tab-btn.active {
+    background: var(--gallery-bg);
+    color: var(--gallery-primary);
+}
+
+body.dark-mode .image-details {
+    background: var(--gallery-bg);
+    border-top: 1px solid var(--gallery-border);
+}
+
+body.dark-mode .tab-content {
+    background: var(--gallery-bg);
+}
+
+body.dark-mode .info-label {
+    color: var(--gallery-text);
+}
+
+body.dark-mode .info-value {
+    color: var(--gallery-text-light);
+}
+
+body.dark-mode .thumbnail-strip {
+    background: var(--gallery-border);
+    border-top: 1px solid var(--gallery-border);
+}
+
+body.dark-mode .empty-gallery h3 {
+    color: var(--gallery-text);
+}
+
+body.dark-mode .empty-gallery p {
+    color: var(--gallery-text-light);
+}
+
+body.dark-mode .gallery-notification {
+    background: var(--gallery-bg);
+    color: var(--gallery-text);
+    border-left: 4px solid var(--gallery-primary);
+}
+
+/* Toggle de modo oscuro */
+.dark-mode-toggle {
+    margin-left: 1rem;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    cursor: pointer;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.3);
+    transition: .4s;
+    border-radius: 34px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(26px);
+}
+
+.toggle-slider:hover {
+    background-color: rgba(255, 255, 255, 0.4);
 }

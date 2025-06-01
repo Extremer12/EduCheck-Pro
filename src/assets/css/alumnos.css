@@ -1099,21 +1099,203 @@ body.students-page {
     }
 }
 
-/* Estados de carga */
-.loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem;
+/* === MODO OSCURO PARA ALUMNOS === */
+body.dark-mode.students-page {
+    --students-primary: #FF69B4;
+    --students-secondary: #87CEEB;
+    --students-accent: #90EE90;
+    --students-text: #e0e0e0;
+    --students-text-light: #b0b0b0;
+    --students-bg: #1a1a1a;
+    --students-white: #2d2d2d;
+    --students-shadow: rgba(0, 0, 0, 0.3);
+    --students-shadow-hover: rgba(0, 0, 0, 0.4);
+    --students-border: #404040;
+    background: linear-gradient(135deg, var(--students-bg) 0%, #262626 100%);
+}
+
+body.dark-mode .students-header {
+    background: linear-gradient(135deg, var(--students-primary) 0%, var(--students-secondary) 100%);
+}
+
+body.dark-mode .form-card,
+body.dark-mode .students-controls,
+body.dark-mode .students-list-section {
+    background: var(--students-bg);
+    color: var(--students-text);
+    border: 1px solid var(--students-border);
+    box-shadow: 0 5px 20px var(--students-shadow);
+}
+
+body.dark-mode .stat-card {
+    background: var(--students-bg);
+    color: var(--students-text);
+    border: 1px solid var(--students-border);
+    box-shadow: 0 5px 20px var(--students-shadow);
+}
+
+body.dark-mode .student-card {
+    background: var(--students-bg);
+    color: var(--students-text);
+    border: 1px solid var(--students-border);
+}
+
+body.dark-mode .student-card:hover {
+    background: var(--students-white);
+}
+
+body.dark-mode .form-group input,
+body.dark-mode .form-group select,
+body.dark-mode .form-group textarea {
+    background: var(--students-white);
+    color: var(--students-text);
+    border: 2px solid var(--students-border);
+}
+
+body.dark-mode .form-group input:focus,
+body.dark-mode .form-group select:focus,
+body.dark-mode .form-group textarea:focus {
+    background: var(--students-bg);
+    border-color: var(--students-primary);
+    color: var(--students-text);
+}
+
+body.dark-mode .search-box input,
+body.dark-mode .filter-section select,
+body.dark-mode .sort-section select {
+    background: var(--students-white);
+    color: var(--students-text);
+    border: 2px solid var(--students-border);
+}
+
+body.dark-mode .search-box input:focus,
+body.dark-mode .filter-section select:focus,
+body.dark-mode .sort-section select:focus {
+    background: var(--students-bg);
+    border-color: var(--students-primary);
+    color: var(--students-text);
+}
+
+body.dark-mode .view-controls {
+    background: var(--students-border);
+}
+
+body.dark-mode .view-btn {
     color: var(--students-text-light);
 }
 
-.loading i {
-    animation: spin 1s linear infinite;
-    margin-right: 0.5rem;
+body.dark-mode .view-btn:hover,
+body.dark-mode .view-btn.active {
+    background: var(--students-white);
+    color: var(--students-primary);
 }
 
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+body.dark-mode .form-header {
+    background: linear-gradient(135deg, var(--students-bg) 0%, var(--students-white) 100%);
+}
+
+body.dark-mode .form-title h2,
+body.dark-mode .section-header h3,
+body.dark-mode .student-basic-info h4 {
+    color: var(--students-text);
+}
+
+body.dark-mode .form-title p,
+body.dark-mode .student-age,
+body.dark-mode .detail-item span,
+body.dark-mode .notes-text {
+    color: var(--students-text-light);
+}
+
+body.dark-mode .form-group label {
+    color: var(--students-text);
+}
+
+body.dark-mode .student-notes {
+    background: rgba(255, 105, 180, 0.1);
+    border-left: 4px solid var(--students-primary);
+}
+
+body.dark-mode .notes-label {
+    color: var(--students-text);
+}
+
+body.dark-mode .modal-content {
+    background: var(--students-bg);
+    color: var(--students-text);
+}
+
+body.dark-mode .modal-body {
+    background: var(--students-bg);
+}
+
+body.dark-mode .confirm-content h4 {
+    color: var(--students-text);
+}
+
+body.dark-mode .confirm-content p {
+    color: var(--students-text-light);
+}
+
+body.dark-mode .empty-students h3 {
+    color: var(--students-text);
+}
+
+body.dark-mode .empty-students p {
+    color: var(--students-text-light);
+}
+
+/* Toggle de modo oscuro */
+.dark-mode-toggle {
+    margin-left: 1rem;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    cursor: pointer;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.3);
+    transition: .4s;
+    border-radius: 34px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(26px);
+}
+
+.toggle-slider:hover {
+    background-color: rgba(255, 255, 255, 0.4);
 }

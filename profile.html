@@ -26,12 +26,19 @@
                 <p>Panel de control y estadísticas personales</p>
             </div>
             <div class="header-actions">
+                <!-- Agregar en header-actions de cada página -->
+        <div class="dark-mode-toggle">
+            <label class="toggle-switch" for="darkModeToggle" title="Activar/desactivar modo oscuro">
+                <input type="checkbox" id="darkModeToggle" title="Activar/desactivar modo oscuro">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>                
                 <button class="export-btn" id="exportData" title="Exportar datos">
                     <i class="fas fa-download"></i>
                     <span>Exportar</span>
                 </button>
             </div>
-        </div>
+        </div>  
     </header>
 
     <main class="profile-main">

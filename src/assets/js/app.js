@@ -187,27 +187,113 @@ function setupScrollToTop() {
 // ===== MODO OSCURO =====
 function setupDarkMode() {
     const darkModeToggle = document.getElementById('darkModeToggle');
-    const isDarkMode = localStorage.getItem('darkMode') === 'true';
     
-    if (isDarkMode) {
-        document.body.classList.add('dark-mode');
-        if (darkModeToggle) {
-            darkModeToggle.checked = true;
-        }
+    // Verificar preferencia guardada o del sistema
+    const savedTheme = localStorage.getItem('darkMode');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    // Determinar tema inicial
+    let isDarkMode = false;
+    if (savedTheme !== null) {
+        isDarkMode = savedTheme === 'true';
+    } else {
+        isDarkMode = systemPrefersDark;
     }
     
+    // Aplicar tema inicial
+    applyTheme(isDarkMode);
+    
+    // Configurar toggle
     if (darkModeToggle) {
+        darkModeToggle.checked = isDarkMode;
+        
         darkModeToggle.addEventListener('change', () => {
-            if (darkModeToggle.checked) {
-                document.body.classList.add('dark-mode');
-                localStorage.setItem('darkMode', 'true');
-            } else {
-                document.body.classList.remove('dark-mode');
-                localStorage.setItem('darkMode', 'false');
-            }
+            const newTheme = darkModeToggle.checked;
+            applyTheme(newTheme);
+            localStorage.setItem('darkMode', newTheme.toString());
+            
+            // Notificación de cambio
+            const message = newTheme ? 'Modo oscuro activado' : 'Modo claro activado';
+            showNotification(message, 'info');
         });
     }
+    
+    // Escuchar cambios en la preferencia del sistema
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (localStorage.getItem('darkMode') === null) {
+            applyTheme(e.matches);
+            if (darkModeToggle) {
+                darkModeToggle.checked = e.matches;
+            }
+        }
+    });
 }
+
+function applyTheme(isDark) {
+    const body = document.body;
+    
+    if (isDark) {
+        body.classList.add('dark-mode');
+        
+        // Actualizar meta theme-color para móviles
+        updateThemeColor('#2d2d2d');
+        
+        console.log('🌙 Modo oscuro activado');
+    } else {
+        body.classList.remove('dark-mode');
+        
+        // Restaurar color original
+        updateThemeColor('#FFB6C1');
+        
+        console.log('☀️ Modo claro activado');
+    }
+    
+    // Trigger para re-renderizar elementos si es necesario
+    document.dispatchEvent(new CustomEvent('themeChanged', { 
+        detail: { isDark } 
+    }));
+}
+
+function updateThemeColor(color) {
+    // Actualizar meta theme-color
+    let themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    if (!themeColorMeta) {
+        themeColorMeta = document.createElement('meta');
+        themeColorMeta.name = 'theme-color';
+        document.head.appendChild(themeColorMeta);
+    }
+    themeColorMeta.content = color;
+    
+    // Actualizar también para Apple
+    let appleMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+    if (!appleMeta) {
+        appleMeta = document.createElement('meta');
+        appleMeta.name = 'apple-mobile-web-app-status-bar-style';
+        document.head.appendChild(appleMeta);
+    }
+    appleMeta.content = color === '#2d2d2d' ? 'black-translucent' : 'default';
+}
+
+// AGREGAR función para toggle rápido (opcional):
+function toggleDarkMode() {
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    if (darkModeToggle) {
+        darkModeToggle.checked = !darkModeToggle.checked;
+        darkModeToggle.dispatchEvent(new Event('change'));
+    }
+}
+
+// AGREGAR escuchador para atajos de teclado (opcional):
+document.addEventListener('keydown', (e) => {
+    // Ctrl/Cmd + Shift + D para toggle modo oscuro
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'D') {
+        e.preventDefault();
+        toggleDarkMode();
+    }
+});
+
+// Hacer función global para debugging
+window.toggleDarkMode = toggleDarkMode;
 
 // ===== ELIMINAR CUENTA =====
 function setupDeleteAccount() {

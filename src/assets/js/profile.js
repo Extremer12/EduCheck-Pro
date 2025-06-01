@@ -83,3 +83,34 @@ async function updateProfile(newDisplayName) {
         showNotification('Error al actualizar perfil', 'error');
     }
 }
+
+// Función para inicializar el modo oscuro
+function initializeDarkMode() {
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    
+    // Cargar preferencia guardada
+    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (savedDarkMode) {
+        document.body.classList.add('dark-mode');
+        if (darkModeToggle) darkModeToggle.checked = true;
+    }
+    
+    // Event listener para el toggle
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'true');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'false');
+            }
+        });
+    }
+}
+
+// Llamar la función al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    initializeDarkMode();
+    // ... resto del código de inicialización
+});

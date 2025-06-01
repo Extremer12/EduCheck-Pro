@@ -12,6 +12,55 @@
     --border-color: #f0f0f0;
 }
 
+/* Variables para modo oscuro */
+:root {
+    /* Variables existentes */
+    --primary-color: #FFB6C1;
+    --primary-color-rgb: 255, 182, 193;
+    --secondary-color: #B0E0E6;
+    --accent-color: #98FB98;
+    --background-color: #FFF5EE;
+    --text-color: #696969;
+    --card-bg: #ffffff;
+    --border-color: #f0f0f0;
+    
+    /* Variables específicas para modo oscuro */
+    --bg-gradient-start: #FFF5EE;
+    --bg-gradient-end: #f8f9fa;
+    --header-gradient-start: #FFB6C1;
+    --header-gradient-end: #B0E0E6;
+    --modal-bg: #ffffff;
+    --input-bg: #f8f9fa;
+    --input-focus-bg: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --notification-bg: #ffffff;
+    --notification-text: #333333;
+}
+
+/* Modo oscuro */
+body.dark-mode {
+    --primary-color: #FF69B4;
+    --primary-color-rgb: 255, 105, 180;
+    --secondary-color: #87CEEB;
+    --accent-color: #90EE90;
+    --background-color: #1a1a1a;
+    --text-color: #e0e0e0;
+    --card-bg: #2d2d2d;
+    --border-color: #404040;
+    
+    /* Gradientes y fondos específicos para modo oscuro */
+    --bg-gradient-start: #1a1a1a;
+    --bg-gradient-end: #262626;
+    --header-gradient-start: #FF69B4;
+    --header-gradient-end: #87CEEB;
+    --modal-bg: #2d2d2d;
+    --input-bg: #3a3a3a;
+    --input-focus-bg: #404040;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --notification-bg: #2d2d2d;
+    --notification-text: #e0e0e0;
+}
+
 /* Reset básico */
 * {
     margin: 0;
@@ -21,25 +70,27 @@
 
 body {
     font-family: 'Quicksand', sans-serif;
-    background: linear-gradient(135deg, var(--background-color) 0%, #f8f9fa 100%);
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
     color: var(--text-color);
     overflow-x: hidden;
     width: 100%;
     min-height: 100vh;
     line-height: 1.6;
+    transition: all 0.3s ease;
 }
 
 /* HEADER */
 header {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    background: linear-gradient(135deg, var(--header-gradient-start) 0%, var(--header-gradient-end) 100%);
     padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 20px var(--shadow-color);
     position: sticky;
     top: 0;
     z-index: 100;
+    transition: all 0.3s ease;
 }
 
 h1 {
@@ -104,15 +155,15 @@ h1 {
     top: 80px;
     right: 20px;
     width: 350px;
-    background: white;
+    background: var(--card-bg);
     border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 40px var(--shadow-color);
     padding: 2rem;
     z-index: 1000;
     display: none;
     max-height: calc(100vh - 100px);
     overflow-y: auto;
-    border: 1px solid rgba(0,0,0,0.05);
+    border: 1px solid var(--border-color);
 }
 
 .menu-dropdown.active {
@@ -135,7 +186,7 @@ h1 {
     text-align: center;
     padding: 1.5rem 0;
     margin-bottom: 1.5rem;
-    border-bottom: 2px solid #f0f0f0;
+    border-bottom: 2px solid var(--border-color);
 }
 
 .large-profile-img {
@@ -199,7 +250,7 @@ h1 {
 
 .menu-divider {
     height: 1px;
-    background: #f0f0f0;
+    background: var(--border-color);
     margin: 1rem 0;
 }
 
@@ -290,13 +341,13 @@ input:checked + .toggle-slider:before {
 
 /* SECCIÓN DE REDIRECCIÓN A ALUMNOS */
 .students-redirect-section {
-    background: white;
+    background: var(--card-bg);
     border-radius: 20px;
     padding: 3rem 2rem;
     margin: 2rem;
     text-align: center;
     box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-    border: 1px solid #f0f0f0;
+    border: 1px solid var(--border-color);
 }
 
 .redirect-header {
@@ -398,7 +449,8 @@ input:checked + .toggle-slider:before {
 }
 
 .quick-stat {
-    background: white;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
     padding: 1.5rem;
     border-radius: 15px;
     display: flex;
@@ -406,7 +458,6 @@ input:checked + .toggle-slider:before {
     align-items: center;
     min-width: 140px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    border: 1px solid #f0f0f0;
     transition: all 0.3s ease;
 }
 
@@ -436,19 +487,19 @@ input:checked + .toggle-slider:before {
 
 /* FORMULARIO DE ACTIVIDADES */
 .activity-form {
-    background: white;
+    background: var(--card-bg);
     border-radius: 20px;
     padding: 2.5rem;
     margin: 2rem;
     box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-    border: 1px solid #f0f0f0;
+    border: 1px solid var(--border-color);
 }
 
 .form-header {
     text-align: center;
     margin-bottom: 2.5rem;
     padding-bottom: 1.5rem;
-    border-bottom: 2px solid #f0f0f0;
+    border-bottom: 2px solid var(--border-color);
 }
 
 .form-icon {
@@ -499,22 +550,21 @@ input:checked + .toggle-slider:before {
 .form-group textarea {
     width: 100%;
     padding: 1.2rem;
-    border: 2px solid #f0f0f0;
+    border: 2px solid var(--border-color);
     border-radius: 12px;
     font-family: 'Quicksand', sans-serif;
     font-size: 1rem;
     transition: all 0.3s ease;
-    background: #f8f9fa;
+    background: var(--input-bg);
+    color: var(--text-color);
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-    outline: none;
+    background: var(--input-focus-bg);
     border-color: var(--primary-color);
-    background: white;
-    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
-    transform: translateY(-2px);
+    color: var(--text-color);
 }
 
 /* CARGA DE IMÁGENES */
@@ -533,7 +583,7 @@ input:checked + .toggle-slider:before {
     color: var(--primary-color);
     cursor: pointer;
     transition: all 0.3s ease;
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    background: linear-gradient(135deg, var(--input-bg) 0%, var(--card-bg) 100%);
 }
 
 .upload-placeholder:hover {
@@ -640,17 +690,17 @@ input:checked + .toggle-slider:before {
 
 /* LISTA DE ACTIVIDADES */
 .activities-container {
-    background: white;
+    background: var(--card-bg);
     border-radius: 20px;
     padding: 2.5rem;
     margin: 2rem;
     box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-    border: 1px solid #f0f0f0;
+    border: 1px solid var(--border-color);
 }
 
 .activities-container .form-header {
     margin-bottom: 2rem;
-    border-bottom: 2px solid #f0f0f0;
+    border-bottom: 2px solid var(--border-color);
 }
 
 /* FILTROS DE ACTIVIDADES */
@@ -659,9 +709,10 @@ input:checked + .toggle-slider:before {
     gap: 2rem;
     margin-bottom: 2.5rem;
     padding: 2rem;
-    background: #f8f9fa;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
     border-radius: 15px;
-    border: 1px solid #f0f0f0;
+    transition: all 0.3s ease;
 }
 
 .filter-group {
@@ -689,7 +740,8 @@ input:checked + .toggle-slider:before {
     border-radius: 12px;
     font-size: 1rem;
     transition: all 0.3s ease;
-    background: white;
+    background: var(--input-bg);
+    color: var(--text-color);
 }
 
 .filter-group input:focus {
@@ -707,14 +759,11 @@ input:checked + .toggle-slider:before {
 
 /* TARJETAS DE ACTIVIDAD */
 .activity-card {
-    background: white;
-    border-radius: 20px;
-    padding: 2rem;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-    position: relative;
+    background: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 8px 25px var(--shadow-color);
     transition: all 0.4s ease;
-    border: 1px solid #f0f0f0;
-    overflow: hidden;
 }
 
 .activity-card::before {
@@ -731,7 +780,7 @@ input:checked + .toggle-slider:before {
 
 .activity-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+    box-shadow: 0 15px 40px var(--shadow-color);
 }
 
 .activity-card:hover::before {
@@ -863,7 +912,7 @@ input:checked + .toggle-slider:before {
     cursor: pointer;
     transition: all 0.3s ease;
     margin: 1.5rem 0;
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    background: linear-gradient(135deg, var(--input-bg) 0%, var(--card-bg) 100%);
 }
 
 .add-image-placeholder:hover {
@@ -988,7 +1037,8 @@ input:checked + .toggle-slider:before {
 }
 
 .attendance-modal-content {
-    background: white;
+    background: var(--modal-bg);
+    color: var(--text-color);
     border-radius: 20px;
     width: 95%;
     max-width: 800px;
@@ -1060,14 +1110,8 @@ input:checked + .toggle-slider:before {
 
 /* Información de la actividad */
 .attendance-info {
-    background: var(--background-color);
-    border-radius: 15px;
-    padding: 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
+    background: var(--input-bg);
+    transition: all 0.3s ease;
 }
 
 .activity-details h4 {
@@ -1153,7 +1197,6 @@ input:checked + .toggle-slider:before {
     background: var(--primary-color);
     border-color: var(--primary-color);
     color: white;
-    transform: translateY(-2px);
 }
 
 /* Lista de estudiantes */
@@ -1162,7 +1205,8 @@ input:checked + .toggle-slider:before {
     overflow-y: auto;
     border: 1px solid var(--border-color);
     border-radius: 12px;
-    background: white;
+    background: var(--card-bg);
+    transition: all 0.3s ease;
 }
 
 .student-attendance-item {
@@ -1178,7 +1222,7 @@ input:checked + .toggle-slider:before {
 }
 
 .student-attendance-item:hover {
-    background: rgba(var(--primary-color-rgb), 0.05);
+    background: rgba(var(--primary-color-rgb), 0.1);
 }
 
 .student-info {
@@ -1224,7 +1268,7 @@ input:checked + .toggle-slider:before {
 .attendance-toggle {
     display: flex;
     gap: 0.3rem;
-    background: var(--background-color);
+    background: var(--input-bg);
     border-radius: 8px;
     padding: 0.3rem;
 }
@@ -1252,9 +1296,8 @@ input:checked + .toggle-slider:before {
 }
 
 .attendance-option.active {
-    background: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transform: scale(1.05);
+    background: var(--card-bg);
+    color: var(--text-color);
 }
 
 .attendance-option.present.active {
@@ -1275,12 +1318,12 @@ input:checked + .toggle-slider:before {
     border-radius: 6px;
     font-size: 0.8rem;
     transition: all 0.3s ease;
+    background: var(--input-bg);
+    color: var(--text-color);
 }
 
 .student-notes:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.15);
+    background: var(--input-focus-bg);
 }
 
 /* Acciones de la modal */
@@ -1916,7 +1959,8 @@ img {
 }
 
 .confirm-content {
-    background: white;
+    background: var(--modal-bg);
+    color: var(--text-color);
     border-radius: 20px;
     padding: 2.5rem;
     width: 90%;
@@ -2018,7 +2062,8 @@ img {
 
 /* Ajustar el contenido para dar espacio al botón de cierre */
 .confirm-content {
-    background: white;
+    background: var(--modal-bg);
+    color: var(--text-color);
     border-radius: 20px;
     padding: 2.5rem;
     width: 90%;
@@ -2048,4 +2093,81 @@ img {
         flex-direction: column;
         gap: 1rem;
     }
+}
+
+/* Iconos en modo oscuro */
+body.dark-mode .form-icon,
+body.dark-mode .redirect-icon,
+body.dark-mode .empty-state i {
+    color: var(--primary-color);
+}
+
+/* Textos específicos en modo oscuro */
+body.dark-mode .form-description,
+body.dark-mode .redirect-description,
+body.dark-mode .activity-details p,
+body.dark-mode .student-details p,
+body.dark-mode .info-value {
+    color: #b0b0b0;
+}
+
+/* Placeholders en modo oscuro */
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+    color: #888;
+}
+
+/* Scrollbar en modo oscuro */
+body.dark-mode ::-webkit-scrollbar {
+    width: 8px;
+}
+
+body.dark-mode ::-webkit-scrollbar-track {
+    background: var(--input-bg);
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+}
+
+/* Mejor contraste para textos en modo oscuro */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+    color: #f0f0f0;
+}
+
+body.dark-mode .activity-title h3,
+body.dark-mode .student-details h6 {
+    color: #f0f0f0;
+}
+
+/* Mejorar visibilidad de botones en modo oscuro */
+body.dark-mode .quick-btn {
+    background: var(--input-bg);
+    border: 2px solid var(--border-color);
+    color: var(--text-color);
+}
+
+body.dark-mode .quick-btn:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Toggle específico mejorado */
+body.dark-mode .toggle-slider {
+    background-color: var(--border-color);
+}
+
+body.dark-mode input:checked + .toggle-slider {
+    background-color: var(--primary-color);
 }
