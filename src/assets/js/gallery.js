@@ -18,16 +18,9 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeGallery() {
     console.log('🖼️ Inicializando galería...');
     
-    // Cargar datos de la galería
     loadGalleryData();
-    
-    // Configurar event listeners
     setupEventListeners();
-    
-    // Configurar vista por defecto
     setViewMode('grid');
-    
-    // Cargar imágenes
     displayGalleryImages();
     
     console.log('✅ Galería inicializada correctamente');
@@ -36,26 +29,31 @@ function initializeGallery() {
 // Función para cargar datos de la galería
 function loadGalleryData() {
     try {
-        // Cargar actividades desde localStorage
-        const activities = JSON.parse(localStorage.getItem('activities') || '[]');
+        const user = window.auth?.currentUser;
+        if (!user) {
+            console.log('❌ Usuario no autenticado');
+            return;
+        }
+        
+        // Cargar actividades usando el patrón UID
+        const savedActivities = localStorage.getItem(`${user.uid}_activities`);
+        const activities = savedActivities ? JSON.parse(savedActivities) : [];
         
         // Convertir actividades a formato de galería
         galleryImages = activities
-            .filter(activity => activity.image) // Solo actividades con imagen
+            .filter(activity => activity.imageData) // Solo actividades con imagen
             .map((activity, index) => ({
                 id: activity.id || `activity-${index}`,
-                src: activity.image,
+                src: activity.imageData,
                 title: activity.name || 'Actividad sin nombre',
                 date: activity.date || new Date().toISOString().split('T')[0],
-                participants: activity.participants || 0,
-                type: activity.type || 'general',
+                participants: 0, // Aquí podrías calcular desde asistencias
+                type: 'actividad',
                 favorite: activity.favorite || false,
                 timestamp: new Date(activity.date || Date.now()).getTime()
             }));
         
         console.log(`📊 Cargadas ${galleryImages.length} imágenes de la galería`);
-        
-        // Actualizar estadísticas
         updateGalleryStats();
         
     } catch (error) {
@@ -70,7 +68,6 @@ function updateGalleryStats() {
     const totalActivities = new Set(galleryImages.map(img => img.title)).size;
     const dateRange = getDateRange();
     
-    // Actualizar elementos del DOM
     updateElement('total-images', totalImages);
     updateElement('total-activities', totalActivities);
     updateElement('date-range', dateRange);
@@ -95,11 +92,7 @@ function getDateRange() {
     const minYear = minDate.getFullYear();
     const maxYear = maxDate.getFullYear();
     
-    if (minYear === maxYear) {
-        return minYear.toString();
-    } else {
-        return `${minYear} - ${maxYear}`;
-    }
+    return minYear === maxYear ? minYear.toString() : `${minYear} - ${maxYear}`;
 }
 
 // Configurar event listeners
@@ -111,27 +104,22 @@ function setupEventListeners() {
     }
     
     // Filtros
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    filterButtons.forEach(btn => {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', handleFilter);
     });
     
     // Controles de vista
-    const viewButtons = document.querySelectorAll('.view-btn');
-    viewButtons.forEach(btn => {
+    document.querySelectorAll('.view-btn').forEach(btn => {
         btn.addEventListener('click', handleViewChange);
     });
     
-    // Presentación de diapositivas
+    // Presentación
     const slideshowBtn = document.getElementById('startSlideshow');
     if (slideshowBtn) {
         slideshowBtn.addEventListener('click', startSlideshow);
     }
     
-    // Modal de imagen
     setupImageModal();
-    
-    // Modal de presentación
     setupSlideshowModal();
     
     // Eventos de teclado
@@ -150,8 +138,7 @@ function handleSearch(event) {
 
 // Función para manejar filtros
 function handleFilter(event) {
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    filterButtons.forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
     
     currentFilter = event.target.dataset.filter;
@@ -164,7 +151,6 @@ function applyCurrentFilter() {
     
     switch (currentFilter) {
         case 'recent':
-            // Últimas 30 días
             const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
             filteredImages = galleryImages.filter(img => img.timestamp > thirtyDaysAgo);
             break;
@@ -182,12 +168,10 @@ function applyCurrentFilter() {
 
 // Función para manejar cambio de vista
 function handleViewChange(event) {
-    const viewButtons = document.querySelectorAll('.view-btn');
-    viewButtons.forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
     
-    const newView = event.target.dataset.view;
-    setViewMode(newView);
+    setViewMode(event.target.dataset.view);
 }
 
 // Función para establecer modo de vista
@@ -196,10 +180,8 @@ function setViewMode(view) {
     const galleryGrid = document.getElementById('gallery-grid');
     
     if (galleryGrid) {
-        // Remover clases existentes
         galleryGrid.classList.remove('list-view', 'masonry-view');
         
-        // Agregar nueva clase
         if (view === 'list') {
             galleryGrid.classList.add('list-view');
         } else if (view === 'masonry') {
@@ -207,7 +189,6 @@ function setViewMode(view) {
         }
     }
     
-    // Actualizar la vista
     displayGalleryImages();
 }
 
@@ -225,65 +206,49 @@ function displayFilteredImages(images) {
     
     if (images.length === 0) {
         galleryGrid.style.display = 'none';
-        if (emptyGallery) {
-            emptyGallery.style.display = 'block';
-        }
+        if (emptyGallery) emptyGallery.style.display = 'block';
         return;
     }
     
     galleryGrid.style.display = 'grid';
-    if (emptyGallery) {
-        emptyGallery.style.display = 'none';
-    }
+    if (emptyGallery) emptyGallery.style.display = 'none';
     
-    galleryGrid.innerHTML = '';
-    
-    images.forEach((image, index) => {
-        const galleryItem = createGalleryItem(image, index);
-        galleryGrid.appendChild(galleryItem);
-    });
+    galleryGrid.innerHTML = images.map((image, index) => createGalleryItem(image, index)).join('');
 }
 
 // Función para crear elemento de galería
 function createGalleryItem(image, index) {
-    const item = document.createElement('div');
-    item.className = 'gallery-item';
-    item.dataset.index = index;
-    
     const formattedDate = formatDate(image.date);
     
-    item.innerHTML = `
-        <div class="image-wrapper">
-            <img src="${image.src}" alt="${image.title}" loading="lazy">
-            <div class="image-overlay">
-                <div class="overlay-content">
+    return `
+        <div class="gallery-item" data-index="${index}" onclick="openImageModal(${index})">
+            <div class="image-wrapper">
+                <img src="${image.src}" alt="${image.title}" loading="lazy">
+                <div class="image-overlay">
+                    <div class="overlay-content">
+                        <h4>${image.title}</h4>
+                        <p>${formattedDate}</p>
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <button class="action-btn favorite-btn ${image.favorite ? 'active' : ''}" 
+                            onclick="event.stopPropagation(); toggleFavorite('${image.id}')" title="Marcar como favorita">
+                        <i class="fa${image.favorite ? 's' : 'r'} fa-heart"></i>
+                    </button>
+                    <button class="action-btn download-btn" 
+                            onclick="event.stopPropagation(); downloadImage('${image.src}', '${image.title}')" title="Descargar">
+                        <i class="fas fa-download"></i>
+                    </button>
+                </div>
+            </div>
+            ${currentView !== 'masonry' ? `
+                <div class="item-info">
                     <h4>${image.title}</h4>
                     <p>${formattedDate}</p>
                 </div>
-            </div>
-            <div class="item-actions">
-                <button class="action-btn favorite-btn ${image.favorite ? 'active' : ''}" 
-                        onclick="toggleFavorite('${image.id}')" title="Marcar como favorita">
-                    <i class="fa${image.favorite ? 's' : 'r'} fa-heart"></i>
-                </button>
-                <button class="action-btn download-btn" 
-                        onclick="downloadImage('${image.src}', '${image.title}')" title="Descargar">
-                    <i class="fas fa-download"></i>
-                </button>
-            </div>
+            ` : ''}
         </div>
-        ${currentView !== 'masonry' ? `
-            <div class="item-info">
-                <h4>${image.title}</h4>
-                <p>${formattedDate}</p>
-            </div>
-        ` : ''}
     `;
-    
-    // Agregar evento de clic para abrir modal
-    item.addEventListener('click', () => openImageModal(index));
-    
-    return item;
 }
 
 // Función para formatear fecha
@@ -298,20 +263,15 @@ function formatDate(dateString) {
 
 // Función para alternar favorito
 function toggleFavorite(imageId) {
-    event.stopPropagation();
-    
     const imageIndex = galleryImages.findIndex(img => img.id === imageId);
     if (imageIndex !== -1) {
         galleryImages[imageIndex].favorite = !galleryImages[imageIndex].favorite;
         
-        // Actualizar en localStorage
         updateActivityFavoriteStatus(imageId, galleryImages[imageIndex].favorite);
         
-        // Recargar vista si está en filtro de favoritos
         if (currentFilter === 'favorites') {
             applyCurrentFilter();
         } else {
-            // Solo actualizar el botón
             const favoriteBtn = event.target.closest('.favorite-btn');
             const icon = favoriteBtn.querySelector('i');
             
@@ -335,12 +295,16 @@ function toggleFavorite(imageId) {
 // Función para actualizar estado de favorito en actividades
 function updateActivityFavoriteStatus(imageId, isFavorite) {
     try {
-        const activities = JSON.parse(localStorage.getItem('activities') || '[]');
+        const user = window.auth?.currentUser;
+        if (!user) return;
+        
+        const savedActivities = localStorage.getItem(`${user.uid}_activities`);
+        const activities = savedActivities ? JSON.parse(savedActivities) : [];
         const activityIndex = activities.findIndex(activity => activity.id === imageId);
         
         if (activityIndex !== -1) {
             activities[activityIndex].favorite = isFavorite;
-            localStorage.setItem('activities', JSON.stringify(activities));
+            localStorage.setItem(`${user.uid}_activities`, JSON.stringify(activities));
         }
     } catch (error) {
         console.error('Error actualizando favorito:', error);
@@ -349,8 +313,6 @@ function updateActivityFavoriteStatus(imageId, isFavorite) {
 
 // Función para descargar imagen
 function downloadImage(src, title) {
-    event.stopPropagation();
-    
     const link = document.createElement('a');
     link.href = src;
     link.download = `${title}.jpg`;
@@ -361,46 +323,27 @@ function downloadImage(src, title) {
     showNotification('📥 Imagen descargada');
 }
 
-// Configurar modal de imagen
+// === MODAL DE IMAGEN ===
 function setupImageModal() {
     const modal = document.getElementById('image-modal');
     const closeBtn = document.getElementById('close-modal');
     const prevBtn = document.getElementById('prev-image');
     const nextBtn = document.getElementById('next-image');
-    const toggleFavoriteBtn = document.getElementById('toggle-favorite');
-    const downloadBtn = document.getElementById('download-image');
     
-    // Cerrar modal
-    if (closeBtn) {
-        closeBtn.addEventListener('click', closeImageModal);
-    }
+    if (closeBtn) closeBtn.addEventListener('click', closeImageModal);
+    if (prevBtn) prevBtn.addEventListener('click', () => navigateImage(-1));
+    if (nextBtn) nextBtn.addEventListener('click', () => navigateImage(1));
     
-    // Navegación
-    if (prevBtn) {
-        prevBtn.addEventListener('click', () => navigateImage(-1));
-    }
-    
-    if (nextBtn) {
-        nextBtn.addEventListener('click', () => navigateImage(1));
-    }
-    
-    // Cerrar al hacer clic en overlay
     if (modal) {
         modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeImageModal();
-            }
+            if (e.target === modal) closeImageModal();
         });
     }
     
-    // Configurar controles de zoom
     setupZoomControls();
-    
-    // Configurar tabs
     setupModalTabs();
 }
 
-// Función para abrir modal de imagen
 function openImageModal(index) {
     currentImageIndex = index;
     const modal = document.getElementById('image-modal');
@@ -410,31 +353,23 @@ function openImageModal(index) {
         modal.classList.add('show');
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
-        
-        // Generar miniaturas
         generateThumbnails();
     }
 }
 
-// Función para actualizar contenido del modal
 function updateModalContent(image) {
-    // Actualizar imagen principal
     const modalImage = document.getElementById('modal-image');
     if (modalImage) {
         modalImage.src = image.src;
         modalImage.alt = image.title;
     }
     
-    // Actualizar título y fecha
     updateElement('modal-activity-name', image.title);
     updateElement('modal-activity-date', formatDate(image.date));
-    
-    // Actualizar información
     updateElement('info-activity', image.title);
     updateElement('info-date', formatDate(image.date));
     updateElement('info-participants', `${image.participants} participantes`);
     
-    // Actualizar botón de favorito
     const favoriteBtn = document.getElementById('toggle-favorite');
     if (favoriteBtn) {
         const icon = favoriteBtn.querySelector('i');
@@ -446,24 +381,17 @@ function updateModalContent(image) {
             icon.className = 'far fa-heart';
         }
         
-        // Actualizar evento
         favoriteBtn.onclick = () => toggleFavoriteInModal();
     }
     
-    // Actualizar botón de descarga
     const downloadBtn = document.getElementById('download-image');
     if (downloadBtn) {
         downloadBtn.onclick = () => downloadImage(image.src, image.title);
     }
     
-    // Resetear zoom
-    zoomLevel = 1;
-    if (modalImage) {
-        modalImage.style.transform = `scale(${zoomLevel})`;
-    }
+    resetZoom();
 }
 
-// Función para cerrar modal de imagen
 function closeImageModal() {
     const modal = document.getElementById('image-modal');
     if (modal) {
@@ -473,7 +401,6 @@ function closeImageModal() {
     }
 }
 
-// Función para navegar entre imágenes
 function navigateImage(direction) {
     const newIndex = currentImageIndex + direction;
     
@@ -484,7 +411,6 @@ function navigateImage(direction) {
     }
 }
 
-// Función para alternar favorito en modal
 function toggleFavoriteInModal() {
     const image = galleryImages[currentImageIndex];
     if (image) {
@@ -493,32 +419,22 @@ function toggleFavoriteInModal() {
     }
 }
 
-// Configurar controles de zoom
+// === ZOOM CONTROLS ===
 function setupZoomControls() {
     const zoomInBtn = document.getElementById('zoom-in');
     const zoomOutBtn = document.getElementById('zoom-out');
     const zoomResetBtn = document.getElementById('zoom-reset');
     
-    if (zoomInBtn) {
-        zoomInBtn.addEventListener('click', () => zoom(0.2));
-    }
+    if (zoomInBtn) zoomInBtn.addEventListener('click', () => zoom(0.2));
+    if (zoomOutBtn) zoomOutBtn.addEventListener('click', () => zoom(-0.2));
+    if (zoomResetBtn) zoomResetBtn.addEventListener('click', resetZoom);
     
-    if (zoomOutBtn) {
-        zoomOutBtn.addEventListener('click', () => zoom(-0.2));
-    }
-    
-    if (zoomResetBtn) {
-        zoomResetBtn.addEventListener('click', resetZoom);
-    }
-    
-    // Zoom con rueda del mouse
     const modalImage = document.getElementById('modal-image');
     if (modalImage) {
         modalImage.addEventListener('wheel', handleWheelZoom);
     }
 }
 
-// Función de zoom
 function zoom(delta) {
     zoomLevel = Math.max(0.5, Math.min(3, zoomLevel + delta));
     const modalImage = document.getElementById('modal-image');
@@ -527,7 +443,6 @@ function zoom(delta) {
     }
 }
 
-// Función para resetear zoom
 function resetZoom() {
     zoomLevel = 1;
     const modalImage = document.getElementById('modal-image');
@@ -536,18 +451,15 @@ function resetZoom() {
     }
 }
 
-// Manejar zoom con rueda del mouse
 function handleWheelZoom(event) {
     event.preventDefault();
     const delta = event.deltaY > 0 ? -0.1 : 0.1;
     zoom(delta);
 }
 
-// Configurar tabs del modal
+// === MODAL TABS ===
 function setupModalTabs() {
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    
-    tabButtons.forEach(btn => {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const targetTab = e.target.dataset.tab;
             switchTab(targetTab);
@@ -555,64 +467,49 @@ function setupModalTabs() {
     });
 }
 
-// Función para cambiar tab
 function switchTab(targetTab) {
-    // Actualizar botones
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    tabButtons.forEach(btn => {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.tab === targetTab);
     });
     
-    // Actualizar paneles
-    const tabPanels = document.querySelectorAll('.tab-panel');
-    tabPanels.forEach(panel => {
+    document.querySelectorAll('.tab-panel').forEach(panel => {
         panel.classList.toggle('active', panel.id === `${targetTab}-panel`);
     });
 }
 
-// Generar miniaturas
+// === THUMBNAILS ===
 function generateThumbnails() {
     const container = document.getElementById('thumbnails-container');
     if (!container) return;
     
-    container.innerHTML = '';
-    
-    galleryImages.forEach((image, index) => {
-        const thumbnail = document.createElement('div');
-        thumbnail.className = `thumbnail ${index === currentImageIndex ? 'active' : ''}`;
-        thumbnail.innerHTML = `<img src="${image.src}" alt="${image.title}">`;
-        thumbnail.addEventListener('click', () => {
-            currentImageIndex = index;
-            updateModalContent(galleryImages[index]);
-            updateThumbnailSelection();
-        });
-        container.appendChild(thumbnail);
-    });
+    container.innerHTML = galleryImages.map((image, index) => 
+        `<div class="thumbnail ${index === currentImageIndex ? 'active' : ''}" onclick="selectThumbnail(${index})">
+            <img src="${image.src}" alt="${image.title}">
+        </div>`
+    ).join('');
 }
 
-// Actualizar selección de miniaturas
+function selectThumbnail(index) {
+    currentImageIndex = index;
+    updateModalContent(galleryImages[index]);
+    updateThumbnailSelection();
+}
+
 function updateThumbnailSelection() {
-    const thumbnails = document.querySelectorAll('.thumbnail');
-    thumbnails.forEach((thumb, index) => {
+    document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
         thumb.classList.toggle('active', index === currentImageIndex);
     });
 }
 
-// Configurar modal de presentación
+// === SLIDESHOW ===
 function setupSlideshowModal() {
     const pauseBtn = document.getElementById('pause-slideshow');
     const stopBtn = document.getElementById('stop-slideshow');
     
-    if (pauseBtn) {
-        pauseBtn.addEventListener('click', toggleSlideshow);
-    }
-    
-    if (stopBtn) {
-        stopBtn.addEventListener('click', stopSlideshow);
-    }
+    if (pauseBtn) pauseBtn.addEventListener('click', toggleSlideshow);
+    if (stopBtn) stopBtn.addEventListener('click', stopSlideshow);
 }
 
-// Iniciar presentación
 function startSlideshow() {
     if (galleryImages.length === 0) {
         showNotification('❌ No hay imágenes para mostrar');
@@ -629,31 +526,24 @@ function startSlideshow() {
         isSlideshow = true;
         updateSlideshowContent();
         
-        // Iniciar intervalo
-        slideshowInterval = setInterval(() => {
-            nextSlideshowImage();
-        }, 5000); // 5 segundos por imagen
+        slideshowInterval = setInterval(nextSlideshowImage, 5000);
     }
 }
 
-// Actualizar contenido de presentación
 function updateSlideshowContent() {
     const image = galleryImages[currentImageIndex];
     if (!image) return;
     
-    // Actualizar imagen
     const slideshowImg = document.getElementById('slideshow-img');
     if (slideshowImg) {
         slideshowImg.src = image.src;
         slideshowImg.alt = image.title;
     }
     
-    // Actualizar información
     updateElement('slideshow-activity', image.title);
     updateElement('slideshow-date', formatDate(image.date));
     updateElement('slideshow-progress', `${currentImageIndex + 1} de ${galleryImages.length}`);
     
-    // Actualizar barra de progreso
     const progressFill = document.getElementById('slideshow-progress-fill');
     if (progressFill) {
         const progress = ((currentImageIndex + 1) / galleryImages.length) * 100;
@@ -661,13 +551,11 @@ function updateSlideshowContent() {
     }
 }
 
-// Siguiente imagen en presentación
 function nextSlideshowImage() {
     currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
     updateSlideshowContent();
 }
 
-// Alternar pausa en presentación
 function toggleSlideshow() {
     const pauseBtn = document.getElementById('pause-slideshow');
     const icon = pauseBtn.querySelector('i');
@@ -678,16 +566,13 @@ function toggleSlideshow() {
         icon.className = 'fas fa-play';
         pauseBtn.title = 'Reanudar';
     } else {
-        slideshowInterval = setInterval(() => {
-            nextSlideshowImage();
-        }, 5000);
+        slideshowInterval = setInterval(nextSlideshowImage, 5000);
         isSlideshow = true;
         icon.className = 'fas fa-pause';
         pauseBtn.title = 'Pausar';
     }
 }
 
-// Detener presentación
 function stopSlideshow() {
     clearInterval(slideshowInterval);
     isSlideshow = false;
@@ -700,106 +585,95 @@ function stopSlideshow() {
     }
 }
 
-// Manejar eventos de teclado
+// === KEYBOARD EVENTS ===
 function handleKeyboardEvents(event) {
-    // Solo en modales
     const imageModal = document.getElementById('image-modal');
     const slideshowModal = document.getElementById('slideshow-modal');
     
     if (imageModal && imageModal.style.display === 'flex') {
         switch (event.key) {
-            case 'Escape':
-                closeImageModal();
-                break;
-            case 'ArrowLeft':
-                navigateImage(-1);
-                break;
-            case 'ArrowRight':
-                navigateImage(1);
-                break;
-            case '+':
-            case '=':
-                zoom(0.2);
-                break;
-            case '-':
-                zoom(-0.2);
-                break;
-            case '0':
-                resetZoom();
-                break;
+            case 'Escape': closeImageModal(); break;
+            case 'ArrowLeft': navigateImage(-1); break;
+            case 'ArrowRight': navigateImage(1); break;
+            case '+': case '=': zoom(0.2); break;
+            case '-': zoom(-0.2); break;
+            case '0': resetZoom(); break;
         }
     }
     
     if (slideshowModal && slideshowModal.style.display === 'flex') {
         switch (event.key) {
-            case 'Escape':
-                stopSlideshow();
-                break;
-            case ' ':
+            case 'Escape': stopSlideshow(); break;
+            case ' ': 
                 event.preventDefault();
-                toggleSlideshow();
+                toggleSlideshow(); 
                 break;
         }
     }
 }
 
-// Función para mostrar notificaciones
+// === NOTIFICACIONES ===
 function showNotification(message, type = 'info') {
-    // Crear elemento de notificación
     const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
+    notification.className = `gallery-notification ${type}`;
     notification.innerHTML = `
         <div class="notification-content">
             <i class="fas fa-info-circle"></i>
             <span>${message}</span>
         </div>
-        <button class="close-notification">
+        <button class="close-notification" onclick="this.parentElement.remove()">
             <i class="fas fa-times"></i>
         </button>
     `;
     
-    // Agregar al DOM
+    // Estilos inline
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: white;
+        color: #2C3E50;
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 3000;
+        max-width: 350px;
+        transform: translateX(120%);
+        transition: transform 0.3s ease;
+        border-left: 4px solid var(--gallery-primary);
+    `;
+    
     document.body.appendChild(notification);
     
-    // Mostrar notificación
     setTimeout(() => {
-        notification.classList.add('show');
+        notification.style.transform = 'translateX(0)';
     }, 100);
     
-    // Auto-ocultar después de 3 segundos
     setTimeout(() => {
-        hideNotification(notification);
+        notification.style.transform = 'translateX(120%)';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
     }, 3000);
-    
-    // Evento para cerrar manualmente
-    const closeBtn = notification.querySelector('.close-notification');
-    closeBtn.addEventListener('click', () => {
-        hideNotification(notification);
-    });
 }
 
-// Función para ocultar notificación
-function hideNotification(notification) {
-    notification.classList.remove('show');
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
-        }
-    }, 300);
-}
-
-// Función global para cargar galería (llamada desde HTML)
+// === FUNCIONES GLOBALES ===
 window.loadGallery = function() {
     loadGalleryData();
     displayGalleryImages();
 };
 
-// Exportar funciones necesarias
 window.toggleFavorite = toggleFavorite;
 window.downloadImage = downloadImage;
 window.openImageModal = openImageModal;
 window.closeImageModal = closeImageModal;
 window.startSlideshow = startSlideshow;
 window.stopSlideshow = stopSlideshow;
+window.selectThumbnail = selectThumbnail;
 
-console.log('📸 Gallery.js cargado correctamente');
+console.log('📸 Gallery.js optimizado cargado correctamente');

@@ -1493,406 +1493,6 @@ img {
     }
 }
 
-/* Mejoras específicas para evitar scroll horizontal */
-* {
-    max-width: 100%;
-    box-sizing: border-box;
-}
-
-body {
-    overflow-x: hidden;
-    width: 100%;
-}
-
-img {
-    max-width: 100%;
-    height: auto;
-}
-
-/* Mejoras para inputs en móviles */
-@media (max-width: 768px) {
-    input[type="text"],
-    input[type="email"],
-    input[type="password"],
-    input[type="date"],
-    input[type="file"],
-    select,
-    textarea {
-        font-size: 16px !important; /* Evita zoom en iOS */
-        -webkit-appearance: none;
-        border-radius: 8px;
-    }
-}
-
-/* Fix para imágenes de actividades */
-.activity-image img,
-.image-preview img {
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    object-fit: cover;
-}
-
-/* Fix para upload placeholder */
-.upload-placeholder {
-    padding: 1rem;
-    text-align: center;
-    min-height: 120px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Mejoras para notificaciones en móvil */
-@media (max-width: 768px) {
-    .notification {
-        top: 10px;
-        right: 10px;
-        left: 10px;
-        max-width: none;
-        transform: translateY(-120%);
-    }
-    
-    .notification.show {
-        transform: translateY(0);
-    }
-}
-
-/* Fix para el scroll-to-top button */
-.scroll-to-top {
-    bottom: 20px;
-    right: 20px;
-    z-index: 1000;
-}
-
-@media (max-width: 768px) {
-    .scroll-to-top {
-        bottom: 80px; /* Para evitar conflicto con navegación móvil */
-        right: 15px;
-        width: 45px;
-    height: 45px;
-}
-}
-
-/* Mejoras para el dark mode toggle */
-@media (max-width: 768px) {
-    .dark-mode-toggle {
-        flex-direction: column;
-        align-items: center;
-        gap: 0.5rem;
-    }
-}
-
-/* Fix para el menu dropdown en pantallas pequeñas */
-@media (max-width: 768px) {
-    .teacher-toggle {
-        position: relative;
-        width: 100%;
-    }
-    
-    .menu-dropdown {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        width: 100vw;
-        height: 100vh;
-        max-width: none;
-        max-height: none;
-        margin: 0;
-        border-radius: 0;
-        z-index: 9999;
-        overflow-y: auto;
-        padding-bottom: 2rem;
-    }
-    
-    .menu-header {
-        padding: 2rem 1.5rem 1.5rem;
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        color: white;
-    }
-    
-    .menu-item {
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid #f0f0f0;
-    }
-}
-
-/* AGREGAR estos estilos responsive al final de styles.css: */
-
-/* ===== RESPONSIVE DESIGN FIXES ===== */
-
-/* Viewport base */
-@media (max-width: 1200px) {
-    .activities-container {
-        margin: 1rem;
-        padding: 1.5rem;
-    }
-    
-    header {
-        padding: 1rem;
-    }
-}
-
-@media (max-width: 768px) {
-    /* Header responsive */
-    header {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-        padding: 1rem;
-    }
-    
-    h1 {
-        font-size: 2rem;
-        padding-left: 0;
-    }
-    
-    /* Menu dropdown responsive */
-    .menu-dropdown {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        width: 100vw;
-        max-width: none;
-        margin: 0;
-        border-radius: 0 0 20px 20px;
-        max-height: 90vh;
-        overflow-y: auto;
-    }
-    
-    .menu-header {
-        padding: 2rem 1.5rem 1.5rem;
-    }
-    
-    /* Formularios responsive */
-    .activity-form {
-        padding: 1.5rem;
-        margin: 1rem;
-    }
-    
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-    
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-        padding: 1rem;
-        font-size: 16px; /* Evita zoom en iOS */
-    }
-    
-    /* Sección de redirección responsive */
-    .students-redirect-section {
-        margin: 1rem;
-        padding: 1.5rem;
-        text-align: center;
-    }
-    
-    .redirect-actions {
-        flex-direction: column;
-        gap: 1.5rem;
-    }
-    
-    .redirect-btn {
-        padding: 1.2rem 1.5rem;
-        min-width: unset;
-        width: 100%;
-    }
-    
-    .quick-stats {
-        justify-content: center;
-    }
-    
-    .quick-stat {
-        min-width: 100px;
-        padding: 1rem 0.8rem;
-    }
-    
-    /* Actividades responsive */
-    .activities-container {
-        margin: 1rem;
-        padding: 1.5rem;
-    }
-    
-    .activities-filters {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .filter-group {
-        flex: none;
-    }
-    
-    .filter-group input {
-        padding: 1rem;
-        font-size: 16px;
-    }
-    
-    /* Grid de actividades responsive */
-    #activities-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
-    .activity-card {
-        padding: 1.5rem;
-    }
-    
-    .activity-header {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: flex-start;
-    }
-    
-    .activity-title,
-    .activity-date {
-        width: 100%;
-    }
-    
-    .delete-activity-icon {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-    }
-    
-    /* Botones responsive */
-    .attendance-btn,
-    .add-activity-btn {
-        padding: 1rem;
-        font-size: 1rem;
-        width: 100%;
-    }
-    
-    /* Estados vacíos responsive */
-    .empty-state {
-        padding: 2rem 1rem;
-    }
-    
-    .empty-state i {
-        font-size: 2.5rem;
-    }
-}
-
-@media (max-width: 480px) {
-    /* Ajustes para pantallas muy pequeñas */
-    .students-main,
-    .gallery-main,
-    .profile-main {
-        padding: 0.5rem;
-    }
-    
-    /* Header muy compacto */
-    h1 {
-        font-size: 1.8rem;
-    }
-    
-    .teacher-toggle {
-        width: 100%;
-    }
-    
-    .profile-button {
-        width: 100%;
-        justify-content: center;
-        padding: 0.8rem;
-    }
-    
-    /* Formularios muy compactos */
-    .activity-form,
-    .form-card {
-        margin: 0.5rem;
-        padding: 1rem;
-        border-radius: 10px;
-    }
-    
-    .form-header {
-        padding: 1rem;
-        flex-direction: column;
-        text-align: center;
-        gap: 1rem;
-    }
-    
-    .form-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
-    }
-    
-    .form-title h2 {
-        font-size: 1.5rem;
-    }
-    
-    /* Botones más grandes para touch */
-    .add-activity-btn,
-    .add-student-btn,
-    .redirect-btn {
-        padding: 1.2rem;
-        font-size: 1rem;
-        border-radius: 12px;
-    }
-    
-    /* Estadísticas en columna única */
-    .stats-grid,
-    .gallery-stats {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
-    .stat-card,
-    .stat-item {
-        padding: 1rem;
-    }
-    
-    /* Controles compactos */
-    .students-controls,
-    .gallery-controls {
-        padding: 1rem;
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .search-section {
-        flex-direction: column;
-        gap: 0.8rem;
-    }
-    
-    .filter-section {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.5rem;
-    }
-    
-    /* Modales responsive */
-    .modal-content {
-        width: 98%;
-        margin: 1% auto;
-        max-height: 95vh;
-    }
-    
-    .modal-header {
-        padding: 1rem 1.5rem;
-    }
-    
-    .modal-body {
-        padding: 1rem 1.5rem;
-    }
-    
-    /* Scroll horizontal prevention */
-    .attendance-table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-    }
-    
-    .attendance-table th,
-    .attendance-table td {
-        min-width: 120px;
-    }
-}
-
 /* MODAL DE CONFIRMACIÓN */
 .confirm-modal {
     position: fixed;
@@ -1989,10 +1589,61 @@ img {
     transform: translateY(-2px);
 }
 
+.confirm-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: #6c757d;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.confirm-close:hover {
+    background: rgba(108, 117, 125, 0.1);
+    color: #495057;
+    transform: scale(1.1);
+}
+
+.confirm-close:active {
+    transform: scale(0.95);
+}
+
+/* Ajustar el contenido para dar espacio al botón de cierre */
+.confirm-content {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    transform: scale(0.8);
+    transition: all 0.3s ease;
+    position: relative; /* Importante para el posicionamiento del botón */
+}
+
 @media (max-width: 480px) {
     .confirm-content {
         padding: 2rem;
         margin: 1rem;
+    }
+    
+    .confirm-close {
+        top: 0.8rem;
+        right: 0.8rem;
+        width: 35px;
+        height: 35px;
+        font-size: 1.3rem;
     }
     
     .confirm-buttons {

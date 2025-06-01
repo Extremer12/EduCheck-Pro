@@ -346,6 +346,7 @@ function setupDeleteAccount() {
     const deleteConfirmModal = document.getElementById('deleteConfirmModal');
     const cancelDeleteBtn = document.getElementById('cancelDelete');
     const confirmDeleteBtn = document.getElementById('confirmDelete');
+    const closeConfirmBtn = document.getElementById('closeConfirmModal'); // NUEVO
     
     if (deleteAccountBtn && deleteConfirmModal) {
         // Mostrar el modal de confirmación
@@ -360,11 +361,19 @@ function setupDeleteAccount() {
             }
         });
         
+        // Función para cerrar el modal
+        function closeModal() {
+            deleteConfirmModal.classList.remove('active');
+        }
+        
         // Cancelar la eliminación
         if (cancelDeleteBtn) {
-            cancelDeleteBtn.addEventListener('click', () => {
-                deleteConfirmModal.classList.remove('active');
-            });
+            cancelDeleteBtn.addEventListener('click', closeModal);
+        }
+        
+        // NUEVO - Botón de cierre (X)
+        if (closeConfirmBtn) {
+            closeConfirmBtn.addEventListener('click', closeModal);
         }
         
         // Confirmar la eliminación
@@ -373,34 +382,55 @@ function setupDeleteAccount() {
                 try {
                     const user = auth.currentUser;
                     if (user) {
-                        // Eliminar el usuario
+                        // Eliminar todos los datos del usuario del localStorage
+                        Object.keys(localStorage).forEach(key => {
+                            if (key.startsWith(user.uid + '_')) {
+                                localStorage.removeItem(key);
+                            }
+                        });
+                        
+                        // Eliminar la cuenta de Firebase
                         await user.delete();
-                        // Redirigir al login
-                        window.location.href = 'login.html';
+                        
                         showNotification('Cuenta eliminada correctamente');
+                        
+                        // Redirigir al login después de un breve delay
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 1500);
                     }
                 } catch (error) {
                     console.error('Error al eliminar la cuenta:', error);
                     
                     // Si el error es por autenticación reciente, mostrar mensaje específico
                     if (error.code === 'auth/requires-recent-login') {
-                        showNotification('Por seguridad, debes volver a iniciar sesión antes de eliminar tu cuenta', 'error');
-                        // Cerrar sesión y redirigir al login
-                        await auth.signOut();
-                        window.location.href = 'login.html';
+                        showNotification('Por seguridad, debes iniciar sesión nuevamente antes de eliminar tu cuenta.', 'error');
+                        // Cerrar sesión para forzar re-autenticación
+                        setTimeout(() => {
+                            auth.signOut().then(() => {
+                                window.location.href = 'login.html';
+                            });
+                        }, 2000);
                     } else {
                         showNotification('Error al eliminar la cuenta: ' + error.message, 'error');
                     }
                 } finally {
-                    deleteConfirmModal.classList.remove('active');
+                    closeModal();
                 }
             });
         }
         
-        // Cerrar el modal si se hace clic fuera
+        // Cerrar el modal si se hace clic fuera (mantener funcionalidad existente)
         deleteConfirmModal.addEventListener('click', (e) => {
             if (e.target === deleteConfirmModal) {
-                deleteConfirmModal.classList.remove('active');
+                closeModal();
+            }
+        });
+        
+        // NUEVO - Cerrar con tecla Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && deleteConfirmModal.classList.contains('active')) {
+                closeModal();
             }
         });
     }
