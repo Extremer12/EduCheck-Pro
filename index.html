@@ -96,35 +96,41 @@
             <h1>Horita Feliz</h1>
         </header>
         <main>
+            <!-- CAMBIAR la sección de gestión de estudiantes: -->
+
+            <!-- ANTES: Formulario completo de estudiantes -->
+            <!-- DESPUÉS: Solo enlace a página de alumnos -->
+
+            <!-- LÍNEA 96: Cambiar la sección de gestión de estudiantes -->
             <section id="student-management">
-                <form class="student-form">
-                    <div class="form-header">
-                        <i class="fas fa-child form-icon"></i>
-                        <h2>Agregar Alumnos</h2>
-                        <p class="form-description">
-                            Registra aquí a todos los niños que asisten a tu clase. 
-                            Esto te permitirá llevar un control de asistencia y seguimiento 
-                            de sus actividades.
+                <div class="students-redirect-section">
+                    <div class="redirect-header">
+                        <i class="fas fa-users redirect-icon"></i>
+                        <h2>Gestión de Alumnos</h2>
+                        <p class="redirect-description">
+                            Administra todos tus alumnos en una página dedicada
                         </p>
                     </div>
-                    <div class="form-group">
-                        <label for="studentName">
-                            <i class="fas fa-user"></i> Nombre del Alumno
-                        </label>
-                        <input type="text" id="studentName" required>
+                    
+                    <div class="redirect-actions">
+                        <a href="alumnos.html" class="redirect-btn">
+                            <i class="fas fa-user-graduate"></i>
+                            <span>Ir a Gestión de Alumnos</span>
+                            <small>Ver, agregar y editar alumnos</small>
+                        </a>
+                        
+                        <div class="quick-stats">
+                            <div class="quick-stat">
+                                <i class="fas fa-child"></i>
+                                <span id="quick-total-students">0</span>
+                                <small>Alumnos registrados</small>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="studentAge">
-                            <i class="fas fa-birthday-cake"></i> Edad
-                        </label>
-                        <input type="number" id="studentAge" min="1" max="15" required>
-                    </div>
-                    <button type="submit" class="add-student-btn">
-                        <i class="fas fa-plus"></i> Agregar Alumno
-                    </button>
-                </form>
+                </div>
             </section>
 
+            <!-- MANTENER: Solo la sección de actividades como principal -->
             <section id="activity-log">
                 <form class="activity-form">
                     <div class="form-header">
@@ -205,156 +211,14 @@
                 <div id="activities-grid"></div>
             </section>
 
-            <div id="attendance-modal" class="modal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 id="modal-activity-title"></h3>
-                        <button class="close-modal" label="Cerrar ventana" title="Cerrar ventana"><i class="fas fa-times"></i></button>
-                    </div>
-                    <div class="modal-body">
-                        <table class="attendance-table">
-                            <thead>
-                                <tr>
-                                    <th><i class="fas fa-user"></i>Alumno</th>
-                                    <th><i class="fas fa-clipboard-check"></i>Asistencia</th>
-                                    <th><i class="fas fa-star"></i>Puntos</th>
-                                    <th><i class="fas fa-tasks"></i>Estado Tarea</th>
-                                </tr>
-                            </thead>
-                            <tbody id="modal-attendance-list"></tbody>
-                        </table>
-                        <button class="save-attendance-btn">
-                            <i class="fas fa-save"></i> Guardar Asistencia
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Modal para lista de alumnos -->
-            <div id="students-modal" class="modal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-users"></i> Mis Alumnos</h3>
-                        <button class="close-modal" aria-label="Cerrar ventana" title="Cerrar ventana"><i class="fas fa-times"></i></button>
-                    </div>
-                    <div class="modal-body">
-                        <div id="students-list-container" class="students-list">
-                            <!-- Students will be added here dynamically -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Modal para perfil -->
-            <div id="profile-modal" class="modal">
-                <div class="modal-content profile-content">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-user-circle"></i> Mi Perfil</h3>
-                        <button class="close-modal" title="Cerrar ventana"><i class="fas fa-times"></i></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="profile-header">
-                            <div class="profile-avatar-container">
-                                <span class="profile-avatar-label">Docente</span>
-                                <div class="profile-avatar">
-                                    <img id="profile-image" src="https://img.freepik.com/vector-gratis/circulo-azul-usuario-blanco_78370-4707.jpg?semt=ais_hybrid&w=740" alt="Profile">
-                                    <input type="file" id="profile-photo-input" accept="image/*" style="display: none;" title="Seleccionar foto de perfil" aria-label="Seleccionar foto de perfil">
-                                    <button class="change-avatar-btn" onclick="document.getElementById('profile-photo-input').click()" aria-label="Cambiar foto de perfil" title="Cambiar foto de perfil">
-                                        <i class="fas fa-camera" aria-hidden="true"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="profile-info">
-                                <h2 class="teacher-name">Nombre de la Docente</h2>
-                                <p class="teacher-role">Educadora Infantil</p>
-                            </div>
-                        </div>
-                        <!-- Stats moved here -->
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-icon">
-                                    <i class="fas fa-users"></i>
-                                </div>
-                                <div class="stat-details">
-                                    <span class="stat-value" id="profile-total-students">0</span>
-                                    <span class="stat-label">Alumnos Totales</span>
-                                </div>
-                            </div>
-                            
-                            <div class="stat-card">
-                                <div class="stat-icon">
-                                    <i class="fas fa-star"></i>
-                                </div>
-                                <div class="stat-details">
-                                    <span class="stat-value" id="profile-total-activities">0</span>
-                                    <span class="stat-label">Actividades Realizadas</span>
-                                </div>
-                            </div>
-
-                            <div class="stat-card">
-                                <div class="stat-icon">
-                                    <i class="fas fa-chart-line"></i>
-                                </div>
-                                <div class="stat-details">
-                                    <span class="stat-value" id="profile-attendance-rate">0%</span>
-                                    <span class="stat-label">Asistencia Promedio</span>
-                                </div>
-                            </div>
-
-                            <div class="stat-card">
-                                <div class="stat-icon">
-                                    <i class="fas fa-check-circle"></i>
-                                </div>
-                                <div class="stat-details">
-                                    <span class="stat-value" id="profile-completion-rate">0%</span>
-                                    <span class="stat-label">Tareas Completadas</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Modal para galería -->
-            <div id="gallery-modal" class="modal">
-                <div class="modal-content gallery-modal-content">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-images"></i> Galería de Actividades</h3>
-                        <button class="close-modal" aria-label="Cerrar ventana" title="Cerrar ventana"><i class="fas fa-times"></i></button>
-                    </div>
-                    <div class="gallery-search">
-                        <div class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input type="text" id="gallery-search" placeholder="Buscar actividad...">
-                        </div>
-                    </div>
-                    <div class="modal-body gallery-carousel">
-                        <button class="carousel-btn prev-btn" aria-label="Imagen anterior">
-                            <i class="fas fa-chevron-left" aria-hidden="true"></i>
-                        </button>
-                        
-                        <div class="carousel-container">
-                            <div class="carousel-slide">
-                                <img src="" alt="Imagen de actividad">
-                                <div class="image-info">
-                                    <h4 class="activity-name"></h4>
-                                    <p class="activity-date"></p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button class="carousel-btn next-btn" aria-label="Siguiente imagen">
-                            <i class="fas fa-chevron-right" aria-hidden="true"></i>
-                        </button>
-                    </div>
-                    <div class="carousel-indicators"></div>
-                </div>
-            </div>
         </main>
     </div>
+
     <button id="scroll-to-top" class="scroll-to-top" aria-label="Volver arriba">
         <i class="fas fa-chevron-up" aria-hidden="true"></i>
     </button>
+
+    <!-- Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
@@ -385,32 +249,20 @@
         });
     </script>
     <script src="src/assets/js/app.js"></script>
-    <script src="src/assets/js/students.js"></script>
-    <script type="module" src="src/assets/js/attendance.js"></script>
-    <script type="module" src="src/assets/js/profile.js"></script>
-    <script>
-    if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js")
-    .then(reg => console.log("SW registrado"))
-    .catch(err => console.error("Error al registrar SW", err));
-}
-</script>
-</body>
-</html>
 
-<!-- Modal de confirmación para eliminar cuenta -->
-<div id="deleteConfirmModal" class="confirm-modal">
-    <div class="confirm-content">
-        <div class="confirm-icon">
-            <i class="fas fa-exclamation-triangle"></i>
-        </div>
-        <h3 class="confirm-title">¿Estás seguro?</h3>
-        <p class="confirm-text">Esta acción eliminará permanentemente tu cuenta y todos tus datos. Esta operación no se puede deshacer.</p>
-        <div class="confirm-buttons">
-            <button id="cancelDelete" class="confirm-cancel">Cancelar</button>
-            <button id="confirmDelete" class="confirm-delete">Eliminar Cuenta</button>
+    <!-- Modal de confirmación para eliminar cuenta -->
+    <div id="deleteConfirmModal" class="confirm-modal">
+        <div class="confirm-content">
+            <div class="confirm-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 class="confirm-title">¿Estás seguro?</h3>
+            <p class="confirm-text">Esta acción eliminará permanentemente tu cuenta y todos tus datos. Esta operación no se puede deshacer.</p>
+            <div class="confirm-buttons">
+                <button id="cancelDelete" class="confirm-cancel">Cancelar</button>
+                <button id="confirmDelete" class="confirm-delete">Eliminar Cuenta</button>
+            </div>
         </div>
     </div>
-</div>
 </body>
 </html>

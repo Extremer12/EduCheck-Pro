@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Galería de actividades - Horita Feliz">
+    <meta name="keywords" content="galería, actividades, fotos, educación">
+    <meta name="author" content="Cristian Bordón">
+    <meta name="theme-color" content="#FFB6C1">
+    <link rel="icon" href="icon-192.png" type="image/png">
+    <title>Galería - Horita Feliz</title>
+    
+    <!-- CSS específico para galería -->
+    <link rel="stylesheet" href="src/assets/css/gallery.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="gallery-page">
+    <!-- Header de la galería -->
+    <header class="gallery-header">
+        <div class="header-content">
+            <button class="back-btn" onclick="window.location.href='index.html'" title="Volver a la aplicación">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="header-title">
+                <h1><i class="fas fa-images"></i> Galería de Actividades</h1>
+                <p>Explora todas las memorias de tus actividades</p>
+            </div>
+            <div class="header-actions">
+                <button class="slideshow-btn" id="startSlideshow" title="Iniciar presentación">
+                    <i class="fas fa-play"></i>
+                    <span>Presentación</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="gallery-main">
+        <!-- Barra de búsqueda y filtros -->
+        <section class="gallery-controls">
+            <div class="search-section">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="gallery-search" placeholder="Buscar actividad...">
+                </div>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">
+                        <i class="fas fa-th"></i>
+                        Todas
+                    </button>
+                    <button class="filter-btn" data-filter="recent">
+                        <i class="fas fa-clock"></i>
+                        Recientes
+                    </button>
+                    <button class="filter-btn" data-filter="favorites">
+                        <i class="fas fa-heart"></i>
+                        Favoritas
+                    </button>
+                </div>
+            </div>
+            
+            <div class="view-controls">
+                <button class="view-btn active" data-view="grid" title="Vista en cuadrícula">
+                    <i class="fas fa-th-large"></i>
+                </button>
+                <button class="view-btn" data-view="list" title="Vista en lista">
+                    <i class="fas fa-list"></i>
+                </button>
+                <button class="view-btn" data-view="masonry" title="Vista mosaico">
+                    <i class="fas fa-th"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Estadísticas de la galería -->
+        <section class="gallery-stats">
+            <div class="stat-item">
+                <i class="fas fa-images"></i>
+                <div class="stat-content">
+                    <span class="stat-number" id="total-images">0</span>
+                    <span class="stat-label">Imágenes</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-star"></i>
+                <div class="stat-content">
+                    <span class="stat-number" id="total-activities">0</span>
+                    <span class="stat-label">Actividades</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-calendar"></i>
+                <div class="stat-content">
+                    <span class="stat-number" id="date-range">2024</span>
+                    <span class="stat-label">Período</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Galería principal -->
+        <section class="gallery-content">
+            <div class="gallery-grid" id="gallery-grid">
+                <!-- Las imágenes se cargarán dinámicamente aquí -->
+            </div>
+
+            <!-- Estado vacío -->
+            <div class="empty-gallery" id="empty-gallery" style="display: none;">
+                <div class="empty-icon">
+                    <i class="fas fa-images"></i>
+                </div>
+                <h3>No hay imágenes aún</h3>
+                <p>Las fotos de tus actividades aparecerán aquí cuando las agregues desde el registro de actividades.</p>
+                <button onclick="window.location.href='index.html'" class="add-activity-btn">
+                    <i class="fas fa-plus"></i>
+                    Agregar Primera Actividad
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de vista detallada -->
+    <div id="image-modal" class="image-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <!-- Header del modal -->
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h3 id="modal-activity-name">Nombre de la Actividad</h3>
+                    <p id="modal-activity-date">Fecha</p>
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-btn favorite-btn" id="toggle-favorite" title="Marcar como favorita">
+                        <i class="far fa-heart"></i>
+                    </button>
+                    <button class="modal-btn download-btn" id="download-image" title="Descargar imagen">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="modal-btn close-btn" id="close-modal" title="Cerrar">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenido del modal -->
+            <div class="modal-body">
+                <div class="image-container">
+                    <button class="nav-btn prev-btn" id="prev-image" title="Imagen anterior">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    
+                    <div class="image-wrapper">
+                        <img id="modal-image" src="" alt="Imagen de actividad">
+                        <div class="image-info">
+                            <div class="zoom-controls">
+                                <button class="zoom-btn" id="zoom-out" title="Alejar">
+                                    <i class="fas fa-search-minus"></i>
+                                </button>
+                                <button class="zoom-btn" id="zoom-reset" title="Tamaño original">
+                                    <i class="fas fa-expand-arrows-alt"></i>
+                                </button>
+                                <button class="zoom-btn" id="zoom-in" title="Acercar">
+                                    <i class="fas fa-search-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="nav-btn next-btn" id="next-image" title="Siguiente imagen">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <!-- Información adicional -->
+                <div class="image-details">
+                    <div class="detail-tabs">
+                        <button class="tab-btn active" data-tab="info">
+                            <i class="fas fa-info-circle"></i>
+                            Información
+                        </button>
+                        <button class="tab-btn" data-tab="metadata">
+                            <i class="fas fa-camera"></i>
+                            Detalles
+                        </button>
+                    </div>
+                    
+                    <div class="tab-content">
+                        <div class="tab-panel active" id="info-panel">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <i class="fas fa-tag"></i>
+                                    <span class="info-label">Actividad:</span>
+                                    <span class="info-value" id="info-activity">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-calendar-day"></i>
+                                    <span class="info-label">Fecha:</span>
+                                    <span class="info-value" id="info-date">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-users"></i>
+                                    <span class="info-label">Participantes:</span>
+                                    <span class="info-value" id="info-participants">-</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-panel" id="metadata-panel">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <i class="fas fa-file-image"></i>
+                                    <span class="info-label">Formato:</span>
+                                    <span class="info-value" id="meta-format">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-expand-arrows-alt"></i>
+                                    <span class="info-label">Dimensiones:</span>
+                                    <span class="info-value" id="meta-dimensions">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-weight-hanging"></i>
+                                    <span class="info-label">Tamaño:</span>
+                                    <span class="info-value" id="meta-size">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Miniaturas de navegación -->
+            <div class="thumbnail-strip">
+                <div class="thumbnails-container" id="thumbnails-container">
+                    <!-- Las miniaturas se generarán dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de presentación -->
+    <div id="slideshow-modal" class="slideshow-modal">
+        <div class="slideshow-content">
+            <div class="slideshow-header">
+                <div class="slideshow-info">
+                    <h3 id="slideshow-title">Presentación de Actividades</h3>
+                    <p id="slideshow-progress">1 de 10</p>
+                </div>
+                <div class="slideshow-controls">
+                    <button class="slideshow-btn" id="pause-slideshow" title="Pausar">
+                        <i class="fas fa-pause"></i>
+                    </button>
+                    <button class="slideshow-btn" id="stop-slideshow" title="Detener">
+                        <i class="fas fa-stop"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="slideshow-image">
+                <img id="slideshow-img" src="" alt="Imagen de presentación">
+                <div class="slideshow-caption">
+                    <h4 id="slideshow-activity">Nombre de Actividad</h4>
+                    <p id="slideshow-date">Fecha</p>
+                </div>
+            </div>
+            
+            <div class="slideshow-progress-bar">
+                <div class="progress-fill" id="slideshow-progress-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module">
+        // Firebase imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAC2DxR63utzR1tmnHCqzApYTraxMsH79M",
+            authDomain: "horita-feliz-system.firebaseapp.com",
+            projectId: "horita-feliz-system",
+            storageBucket: "horita-feliz-system.firebasestorage.app",
+            messagingSenderId: "469162449559",
+            appId: "1:469162449559:web:734e8756fd03b1388ce7d2",
+            measurementId: "G-6645JXJBD6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        window.auth = auth;
+        window.db = db;
+
+        // Verificar autenticación
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+            } else {
+                loadGallery();
+            }
+        });
+    </script>
+    <script src="src/assets/js/gallery.js"></script>
+</body>
+</html>

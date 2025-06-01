@@ -595,6 +595,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+    
+    // Actualizar estadísticas rápidas
+    updateQuickStudentStats();
+    
+    // Actualizar cuando cambie la autenticación
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            updateQuickStudentStats();
+        }
+    });
 }); // Cierre del DOMContentLoaded que faltaba
 
 function setupEventListeners() {
@@ -623,12 +633,7 @@ function setupEventListeners() {
     if (galleryButton) {
         galleryButton.addEventListener('click', (e) => {
             e.preventDefault();
-            openGallery();
-            // Cerrar el menú dropdown después de abrir la galería
-            const menuDropdown = document.querySelector('.menu-dropdown');
-            if (menuDropdown) {
-                menuDropdown.classList.remove('active');
-            }
+            window.location.href = 'gallery.html';
         });
     }
 
@@ -636,6 +641,11 @@ function setupEventListeners() {
     document.getElementById('profile').addEventListener('click', (e) => {
         e.preventDefault();
         window.location.href = 'profile.html';
+    });
+
+    document.getElementById('students-list').addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = 'alumnos.html';
     });
 }
 
@@ -1306,6 +1316,40 @@ function migrateTemporaryData() {
     }
 }
 
+// AGREGAR esta función a app.js:
+
+function updateQuickStudentStats() {
+    try {
+        const user = window.auth?.currentUser;
+        if (!user) return;
+        
+        const savedStudents = getUserData('students');
+        const students = savedStudents ? JSON.parse(savedStudents) : [];
+        
+        const quickTotalElement = document.getElementById('quick-total-students');
+        if (quickTotalElement) {
+            quickTotalElement.textContent = students.length;
+        }
+    } catch (error) {
+        console.error('Error actualizando estadísticas rápidas:', error);
+    }
+}
+
+// AGREGAR esta llamada al DOMContentLoaded:
+document.addEventListener('DOMContentLoaded', () => {
+    // ... código existente ...
+    
+    // Actualizar estadísticas rápidas
+    updateQuickStudentStats();
+    
+    // Actualizar cuando cambie la autenticación
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            updateQuickStudentStats();
+        }
+    });
+});
+
 // Agregar esta función para limpiar datos mezclados (ejecutar una vez):
 
 function cleanMixedUserData() {
@@ -1324,5 +1368,76 @@ function cleanMixedUserData() {
     }
 }
 
-// Hacer disponible globalmente para debugging
-window.cleanMixedUserData = cleanMixedUserData;
+// Función para mejorar la experiencia móvil
+function setupMobileEnhancements() {
+    // Detectar si es móvil
+    const isMobile = window.innerWidth <= 768;
+    
+    if (isMobile) {
+        // Prevenir zoom en inputs
+        const metaViewport = document.querySelector('meta[name="viewport"]');
+        if (metaViewport) {
+            metaViewport.setAttribute('content', 
+                'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
+            );
+        }
+        
+        // Mejorar el comportamiento del menu dropdown
+        const menuDropdown = document.querySelector('.menu-dropdown');
+        const profileButton = document.querySelector('.profile-button');
+        
+        if (menuDropdown && profileButton) {
+            profileButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if (menuDropdown.style.display === 'block') {
+                    menuDropdown.style.display = 'none';
+                    document.body.style.overflow = '';
+                } else {
+                    menuDropdown.style.display = 'block';
+                    document.body.style.overflow = 'hidden'; // Prevenir scroll del body
+                }
+            });
+            
+            // Cerrar menu al hacer clic en overlay
+            menuDropdown.addEventListener('click', (e) => {
+                if (e.target === menuDropdown) {
+                    menuDropdown.style.display = 'none';
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+        
+        // Mejorar inputs de fecha en móviles
+        const dateInputs = document.querySelectorAll('input[type="date"]');
+        dateInputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.setAttribute('type', 'date');
+            });
+        });
+        
+        // Mejorar modales en móvil
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            const modalContent = modal.querySelector('.modal-content');
+            if (modalContent) {
+                modalContent.style.maxHeight = '95vh';
+                modalContent.style.overflow = 'auto';
+            }
+        });
+    }
+}
+
+// AGREGAR esta función al DOMContentLoaded existente:
+document.addEventListener('DOMContentLoaded', () => {
+    // ... código existente ...
+    
+    // Agregar mejoras móviles
+    setupMobileEnhancements();
+    
+    // Recargar mejoras al redimensionar
+    window.addEventListener('resize', () => {
+        setupMobileEnhancements();
+    });
+});
