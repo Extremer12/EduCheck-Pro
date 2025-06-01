@@ -26,71 +26,87 @@
                     <i class="fas fa-chevron-down" aria-hidden="true"></i>
                 </button>
                 <div class="menu-dropdown">
+                    <!-- NUEVO: Botón de cierre en el header -->
                     <div class="menu-header">
+                        <button class="menu-close-btn" id="menu-close-btn" aria-label="Cerrar menú">
+                            <i class="fas fa-times"></i>
+                        </button>
                         <img src="https://img.freepik.com/vector-gratis/circulo-azul-usuario-blanco_78370-4707.jpg?semt=ais_hybrid&w=740" alt="Profile" class="large-profile-img">
                         <h3>Nombre de la Docente</h3>
                         <p>Docente</p>
                     </div>
                     
-                    <!-- Botón de modo oscuro -->
-                    <div class="dark-mode-toggle">
-                        <span>Modo Oscuro</span>
-                        <label class="toggle-switch" for="darkModeToggle">
-                            <input type="checkbox" id="darkModeToggle" aria-label="Activar modo oscuro" title="Activar/desactivar modo oscuro">
-                            <span class="toggle-slider"></span>
-                        </label>
+                    <!-- NUEVO: Contenedor para el contenido del menú -->
+                    <div class="menu-content">
+                        <!-- Botón de modo oscuro -->
+                        <div class="dark-mode-toggle">
+                            <span>Modo Oscuro</span>
+                            <label class="toggle-switch" for="darkModeToggle">
+                                <input type="checkbox" id="darkModeToggle" aria-label="Activar modo oscuro" title="Activar/desactivar modo oscuro">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="menu-divider"></div>
+                        
+                        <a href="#" id="students-list" class="menu-item">
+                            <i class="fas fa-users"></i>
+                            <div class="menu-item-content">
+                                <span>Mis Alumnos</span>
+                                <p>Gestionar lista de alumnos</p>
+                            </div>
+                        </a>
+                        
+                        <a href="#" id="profile" class="menu-item">
+                            <i class="fas fa-user-circle"></i>
+                            <div class="menu-item-content">
+                                <span>Perfil</span>
+                                <p>Ver y editar perfil</p>
+                            </div>
+                        </a>
+                        
+                        <div class="menu-divider"></div>
+                        
+                        <a href="#" id="gallery" class="menu-item">
+                            <i class="fas fa-images"></i>
+                            <div class="menu-item-content">
+                                <span>Galería</span>
+                                <p>Ver fotos de actividades</p>
+                            </div>
+                        </a>
+                        
+                        <div class="menu-divider"></div>
+                        
+                        <a href="#" id="installApp" class="menu-item">
+                            <i class="fas fa-download"></i>
+                            <div class="menu-item-content">
+                                <span>Instalar App</span>
+                                <p>Instalar como aplicación</p>
+                            </div>
+                        </a>
+                        
+                        <div class="menu-divider"></div>
+                        
+                        <a href="#" id="logout" class="menu-item">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <div class="menu-item-content">
+                                <span>Cerrar Sesión</span>
+                            </div>
+                        </a>
+                        
+                        <a href="#" id="deleteAccount" class="menu-item">
+                            <i class="fas fa-user-times"></i>
+                            <div class="menu-item-content">
+                                <span>Eliminar Cuenta</span>
+                                <p>Esta acción no se puede deshacer</p>
+                            </div>
+                        </a>
+                        
+                        <!-- Botón de donación -->
+                        <button id="donationBtn" class="donation-btn">
+                            <i class="fas fa-heart"></i> Realizar Donación
+                        </button>
                     </div>
-                    
-                    <div class="menu-divider"></div>
-                    <a href="#" id="students-list" class="menu-item">
-                        <i class="fas fa-users"></i>
-                        <div class="menu-item-content">
-                            <span>Mis Alumnos</span>
-                            <p>Gestionar lista de alumnos</p>
-                        </div>
-                    </a>
-                    <a href="#" id="profile" class="menu-item">
-                        <i class="fas fa-user-circle"></i>
-                        <div class="menu-item-content">
-                            <span>Perfil</span>
-                            <p>Ver y editar perfil</p>
-                        </div>
-                    </a>
-                    <div class="menu-divider"></div>
-                    <a href="#" id="gallery" class="menu-item">
-                        <i class="fas fa-images"></i>
-                        <div class="menu-item-content">
-                            <span>Galería</span>
-                            <p>Ver fotos de actividades</p>
-                        </div>
-                    </a>
-                    <div class="menu-divider"></div>
-                    <a href="#" id="installApp" class="menu-item">
-                        <i class="fas fa-download"></i>
-                        <div class="menu-item-content">
-                            <span>Instalar App</span>
-                            <p>Instalar como aplicación</p>
-                        </div>
-                    </a>
-                    <div class="menu-divider"></div>
-                    <a href="#" id="logout" class="menu-item">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <div class="menu-item-content">
-                            <span>Cerrar Sesión</span>
-                        </div>
-                    </a>
-                    <a href="#" id="deleteAccount" class="menu-item">
-                        <i class="fas fa-user-times"></i>
-                        <div class="menu-item-content">
-                            <span>Eliminar Cuenta</span>
-                            <p>Esta acción no se puede deshacer</p>
-                        </div>
-                    </a>
-                    
-                    <!-- Botón de donación -->
-                    <button id="donationBtn" class="donation-btn">
-                        <i class="fas fa-heart"></i> Realizar Donación
-                    </button>
                 </div>
             </div>
             <h1>Horita Feliz</h1>

@@ -18,25 +18,112 @@ function updateUserInfo(user) {
 function setupToggleMenu() {
     const profileButton = document.querySelector('.profile-button');
     const menuDropdown = document.querySelector('.menu-dropdown');
+    const menuCloseBtn = document.getElementById('menu-close-btn');
+    const body = document.body;
     
     if (profileButton && menuDropdown) {
-        // Toggle del menú
+        // Función para abrir el menú
+        function openMenu() {
+            menuDropdown.classList.add('active');
+            body.classList.add('menu-open');
+            
+            // Enfocar el botón de cierre para accesibilidad
+            setTimeout(() => {
+                if (menuCloseBtn) {
+                    menuCloseBtn.focus();
+                }
+            }, 100);
+        }
+        
+        // Función para cerrar el menú
+        function closeMenu() {
+            menuDropdown.classList.remove('active');
+            body.classList.remove('menu-open');
+            
+            // Devolver el foco al botón de perfil
+            setTimeout(() => {
+                profileButton.focus();
+            }, 100);
+        }
+        
+        // Toggle del menú al hacer clic en el botón de perfil
         profileButton.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
-            menuDropdown.classList.toggle('active');
-        });
-
-        // Cerrar el menú si se hace clic fuera
-        document.addEventListener('click', (e) => {
-            if (!menuDropdown.contains(e.target) && !profileButton.contains(e.target)) {
-                menuDropdown.classList.remove('active');
+            
+            if (menuDropdown.classList.contains('active')) {
+                closeMenu();
+            } else {
+                openMenu();
             }
         });
-
-        // Evitar que el menú se cierre al hacer clic dentro
+        
+        // Cerrar menú con el botón X
+        if (menuCloseBtn) {
+            menuCloseBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                closeMenu();
+            });
+        }
+        
+        // Cerrar menú con tecla Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && menuDropdown.classList.contains('active')) {
+                closeMenu();
+            }
+        });
+        
+        // Cerrar menú al hacer clic en los enlaces del menú
+        const menuItems = menuDropdown.querySelectorAll('.menu-item');
+        menuItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                // Solo cerrar si no es el toggle de modo oscuro
+                if (!item.closest('.dark-mode-toggle')) {
+                    setTimeout(() => {
+                        closeMenu();
+                    }, 100);
+                }
+            });
+        });
+        
+        // Evitar que el menú se cierre al interactuar con elementos internos
         menuDropdown.addEventListener('click', (e) => {
             e.stopPropagation();
         });
+        
+        // Gestión específica para elementos que deben cerrar el menú
+        const elementsToClose = [
+            '#students-list',
+            '#profile', 
+            '#gallery',
+            '#installApp',
+            '#logout',
+            '#deleteAccount',
+            '#donationBtn'
+        ];
+        
+        elementsToClose.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                element.addEventListener('click', (e) => {
+                    setTimeout(() => {
+                        closeMenu();
+                    }, 150);
+                });
+            }
+        });
+        
+        // Evitar el scroll del body cuando el menú está abierto
+        menuDropdown.addEventListener('scroll', (e) => {
+            e.stopPropagation();
+        });
+        
+        // Función global para cerrar el menú (para debugging)
+        window.closeMenu = closeMenu;
+        window.openMenu = openMenu;
+        
+        console.log('✅ Menú toggle fullscreen configurado correctamente');
     }
 }
 
