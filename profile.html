@@ -66,7 +66,6 @@
                             <i class="fas fa-pencil-alt"></i>
                         </button>
                     </div>
-                    <p class="role">Educadora Infantil Cristiana</p>
                     <p class="join-date">
                         <i class="fas fa-calendar-alt"></i>
                         Miembro desde <span id="joinDate">Enero 2024</span>
@@ -89,6 +88,83 @@
                 </div>
             </div>
         </section>
+
+        <!-- Mis Establecimientos -->
+        <div class="establishments-section">
+            <div class="section-header">
+                <h3><i class="fas fa-school"></i> Mis Establecimientos</h3>
+                <button class="add-establishment-btn" id="addEstablishmentBtn">
+                    <i class="fas fa-plus"></i>
+                    Agregar Establecimiento
+                </button>
+            </div>
+            
+            <div class="establishments-grid" id="establishmentsGrid">
+                <!-- Los establecimientos se cargarán dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Modal para agregar establecimiento -->
+        <div id="establishment-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-school"></i> Gestionar Establecimiento</h3>
+                    <button class="close-modal" id="close-establishment-modal" title="Cerrar modal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="establishment-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="establishmentName">
+                                    <i class="fas fa-building"></i>
+                                    Nombre del Establecimiento
+                                </label>
+                                <input type="text" id="establishmentName" required 
+                                       placeholder="Ej: Escuela Dominical Central">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="establishmentType">
+                                    <i class="fas fa-graduation-cap"></i>
+                                    Tipo de Establecimiento
+                                </label>
+                                <select id="establishmentType" required>
+                                    <option value="">Seleccionar tipo</option>
+                                    <option value="escuela-dominical">Escuela Dominical</option>
+                                    <option value="jardin">Jardín de Infantes</option>
+                                    <option value="primaria">Escuela Primaria</option>
+                                    <option value="secundaria">Escuela Secundaria</option>
+                                    <option value="instituto">Instituto</option>
+                                    <option value="universidad">Universidad</option>
+                                    <option value="capacitacion">Centro de Capacitación</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="establishmentAddress">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Dirección
+                            </label>
+                            <input type="text" id="establishmentAddress" 
+                                   placeholder="Dirección del establecimiento">
+                        </div>
+                        
+                        <div class="modal-actions">
+                            <button type="button" class="cancel-btn" onclick="closeEstablishmentModal()">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="save-btn">
+                                <i class="fas fa-save"></i>
+                                Guardar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
         <!-- Dashboard de estadísticas -->
         <section class="stats-dashboard">
@@ -185,17 +261,8 @@
                         </button>
                     </div>
                     <div class="chart-container">
-                        <div class="pie-chart" id="activitiesDistribution">
-                            <!-- Simulación de gráfico circular -->
-                            <div class="pie-segment" style="--percentage: 60%; --color: var(--primary-color);">
-                                <span class="pie-label">Biblicas 60%</span>
-                            </div>
-                            <div class="pie-segment" style="--percentage: 25%; --color: var(--secondary-color);">
-                                <span class="pie-label">Creatividad 25%</span>
-                            </div>
-                            <div class="pie-segment" style="--percentage: 15%; --color: var(--accent-color);">
-                                <span class="pie-label">Juegos 15%</span>
-                            </div>
+                        <div id="activitiesDistribution">
+                            <!-- El gráfico se generará dinámicamente -->
                         </div>
                     </div>
                 </div>
@@ -295,5 +362,6 @@
         });
     </script>
     <script src="src/assets/js/profile.js"></script>
+    <script src="src/assets/js/establishments.js"></script>
 </body>
 </html>

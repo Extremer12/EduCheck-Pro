@@ -163,11 +163,76 @@ async function getAttendanceData() {
     }
 }
 
+// Función para guardar datos de establecimientos
+async function saveEstablishmentData(establishment) {
+    try {
+        const user = auth.currentUser;
+        if (!user) return false;
+        
+        // Guardar en Firestore
+        const establishmentRef = doc(db, `users/${user.uid}/establishments/${establishment.id}`);
+        await setDoc(establishmentRef, establishment);
+        
+        // También guardar en localStorage como respaldo
+        let establishments = [];
+        const storedEstablishments = getUserData('establishments');
+        
+        if (storedEstablishments) {
+            establishments = typeof storedEstablishments === 'string' 
+                ? JSON.parse(storedEstablishments) 
+                : storedEstablishments;
+        }
+        
+        const existingIndex = establishments.findIndex(e => e.id === establishment.id);
+        
+        if (existingIndex >= 0) {
+            establishments[existingIndex] = establishment;
+        } else {
+            establishments.push(establishment);
+        }
+        
+        setUserData('establishments', JSON.stringify(establishments));
+        return true;
+    } catch (error) {
+        console.error("Error al guardar datos del establecimiento:", error);
+        return false;
+    }
+}
+
+// Función para obtener datos de establecimientos
+async function getEstablishmentData() {
+    try {
+        const user = auth.currentUser;
+        if (!user) return [];
+        
+        // Intentar obtener de Firestore
+        const establishmentsRef = collection(db, `users/${user.uid}/establishments`);
+        const querySnapshot = await getDocs(establishmentsRef);
+        
+        const establishments = [];
+        querySnapshot.forEach((doc) => {
+            establishments.push(doc.data());
+        });
+        
+        // Actualizar localStorage con los datos más recientes
+        setUserData('establishments', JSON.stringify(establishments));
+        
+        return establishments;
+    } catch (error) {
+        console.error("Error al obtener datos de establecimientos:", error);
+        
+        // Si falla Firestore, intentar obtener del localStorage
+        return JSON.parse(getUserData('establishments') || '[]');
+    }
+}
+
 // Exportar las funciones
 export {
     connectToDatabase,
     saveStudentData,
     getStudentData,
     saveAttendanceData,
-    getAttendanceData
+    getAttendanceData,
+    saveEstablishmentData,
+    getEstablishmentData
 };
