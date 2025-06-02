@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gestión de Instituciones Educativas - EduCheck Pro">
+    <meta name="keywords" content="instituciones, escuelas, colegios, universidades, gestión educativa">
+    <meta name="author" content="EduCheck Pro Team">
+    <meta name="theme-color" content="#FFB6C1">
+    <link rel="icon" href="src/assets/icons/icon-192x192.png" type="image/png">
+    <title>Instituciones - EduCheck Pro</title>
+    
+    <!-- CSS específico para instituciones -->
+    <link rel="stylesheet" href="src/assets/css/instituciones.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="institutions-page">
+    <!-- Header profesional -->
+    <header class="institutions-header">
+        <div class="header-content">
+            <button class="back-btn" onclick="window.location.href='index.html'" title="Volver al inicio">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="header-title">
+                <h1><i class="fas fa-university"></i> Mis Instituciones</h1>
+                <p>Gestiona tus instituciones educativas y centros de trabajo</p>
+            </div>
+            <div class="header-actions">
+                <div class="dark-mode-toggle">
+                    <label class="toggle-switch" for="darkModeToggle" title="Activar/desactivar modo oscuro">
+                        <input type="checkbox" id="darkModeToggle" aria-label="Activar/desactivar modo oscuro">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <button class="global-stats-btn" id="globalStats" title="Ver estadísticas globales">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Estadísticas</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="institutions-main">
+        <!-- Dashboard General -->
+        <section class="dashboard-overview">
+            <div class="overview-card">
+                <div class="overview-header">
+                    <div class="overview-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="overview-title">
+                        <h2>Dashboard General</h2>
+                        <p>Resumen de todas tus actividades académicas</p>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-icon institutions">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-number" id="total-institutions">0</span>
+                            <span class="stat-label">Instituciones</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-icon courses">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-number" id="total-courses">0</span>
+                            <span class="stat-label">Cursos Total</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-icon students">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-number" id="total-students">0</span>
+                            <span class="stat-label">Alumnos Total</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-icon attendance">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-number" id="global-attendance">0%</span>
+                            <span class="stat-label">Asistencia Promedio</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navegación rápida -->
+        <section class="quick-navigation">
+            <div class="nav-card">
+                <h3><i class="fas fa-rocket"></i> Acceso Rápido</h3>
+                <div class="quick-actions">
+                    <button class="quick-btn" onclick="scrollToInstitutions()">
+                        <i class="fas fa-university"></i>
+                        <span>Ver Instituciones</span>
+                    </button>
+                    <button class="quick-btn" onclick="openAddInstitutionModal()">
+                        <i class="fas fa-plus"></i>
+                        <span>Nueva Institución</span>
+                    </button>
+                    <button class="quick-btn" onclick="showTodaySchedule()">
+                        <i class="fas fa-calendar-day"></i>
+                        <span>Clases de Hoy</span>
+                    </button>
+                    <button class="quick-btn" onclick="exportGlobalData()">
+                        <i class="fas fa-download"></i>
+                        <span>Exportar Todo</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Lista de Instituciones -->
+        <section class="institutions-section" id="institutions-section">
+            <div class="section-header">
+                <h3>
+                    <i class="fas fa-building"></i>
+                    Mis Instituciones
+                    <span class="institution-count" id="institution-count">(0 instituciones)</span>
+                </h3>
+                <button class="add-institution-btn" onclick="openAddInstitutionModal()">
+                    <i class="fas fa-plus"></i>
+                    Agregar Institución
+                </button>
+            </div>
+
+            <!-- Grid de instituciones -->
+            <div id="institutions-container" class="institutions-grid">
+                <!-- Las instituciones se cargarán dinámicamente aquí -->
+            </div>
+
+            <!-- Estado vacío -->
+            <div class="empty-institutions" id="empty-institutions" style="display: none;">
+                <div class="empty-icon">
+                    <i class="fas fa-university"></i>
+                </div>
+                <h3>No hay instituciones registradas</h3>
+                <p>Comienza agregando tu primera institución educativa para organizar tus cursos y alumnos.</p>
+                <button onclick="openAddInstitutionModal()" class="add-first-institution-btn">
+                    <i class="fas fa-plus"></i>
+                    Agregar Primera Institución
+                </button>
+            </div>
+        </section>
+
+        <!-- Actividad reciente -->
+        <section class="recent-activity">
+            <div class="activity-card">
+                <h3><i class="fas fa-clock"></i> Actividad Reciente</h3>
+                <div id="recent-activity-list" class="activity-list">
+                    <!-- La actividad reciente se cargará aquí -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal para agregar/editar institución -->
+    <div id="institution-modal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-university"></i> <span id="modal-title">Agregar Institución</span></h3>
+                <button class="close-modal" id="close-institution-modal" title="Cerrar modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="institution-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="institutionName">
+                                <i class="fas fa-building"></i>
+                                Nombre de la Institución
+                            </label>
+                            <input 
+                                type="text" 
+                                id="institutionName" 
+                                placeholder="Ej: Universidad Nacional de San Juan"
+                                required
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="institutionType">
+                                <i class="fas fa-graduation-cap"></i>
+                                Tipo de Institución
+                            </label>
+                            <select id="institutionType" required>
+                                <option value="">Seleccionar tipo</option>
+                                <option value="universidad">Universidad</option>
+                                <option value="instituto">Instituto</option>
+                                <option value="escuela">Escuela</option>
+                                <option value="colegio">Colegio</option>
+                                <option value="jardin">Jardín de Infantes</option>
+                                <option value="capacitacion">Centro de Capacitación</option>
+                                <option value="iglesia">Iglesia/Centro Religioso</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="institutionAddress">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Dirección
+                            </label>
+                            <input 
+                                type="text" 
+                                id="institutionAddress" 
+                                placeholder="Dirección de la institución (opcional)"
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="institutionPhone">
+                                <i class="fas fa-phone"></i>
+                                Teléfono
+                            </label>
+                            <input 
+                                type="tel" 
+                                id="institutionPhone" 
+                                placeholder="Teléfono de contacto (opcional)"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="institutionNotes">
+                            <i class="fas fa-sticky-note"></i>
+                            Notas Adicionales
+                        </label>
+                        <textarea 
+                            id="institutionNotes" 
+                            placeholder="Información adicional sobre la institución (horarios, contactos, etc.)"
+                            rows="3"
+                        ></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="setAsDefault">
+                            <label for="setAsDefault">
+                                <i class="fas fa-star"></i>
+                                Establecer como institución principal
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="cancel-btn" onclick="closeInstitutionModal()">
+                            <i class="fas fa-times"></i>
+                            Cancelar
+                        </button>
+                        <button type="submit" class="save-btn">
+                            <i class="fas fa-save"></i>
+                            <span id="save-btn-text">Guardar Institución</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación para eliminar -->
+    <div id="delete-institution-modal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content confirm-modal-content">
+            <div class="modal-header danger">
+                <h3><i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación</h3>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-content">
+                    <div class="confirm-icon">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <h4>¿Estás seguro de eliminar esta institución?</h4>
+                    <p id="delete-institution-name">Nombre de la institución</p>
+                    <p class="warning-text">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Esta acción eliminará también todos los cursos y alumnos asociados. Esta operación no se puede deshacer.
+                    </p>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="cancel-btn" onclick="closeDeleteModal()">
+                        <i class="fas fa-times"></i>
+                        Cancelar
+                    </button>
+                    <button type="button" class="delete-btn" id="confirm-delete-institution">
+                        <i class="fas fa-trash"></i>
+                        Eliminar Institución
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module">
+        // Firebase imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAC2DxR63utzR1tmnHCqzApYTraxMsH79M",
+            authDomain: "horita-feliz-system.firebaseapp.com",
+            projectId: "horita-feliz-system",
+            storageBucket: "horita-feliz-system.firebasestorage.app",
+            messagingSenderId: "469162449559",
+            appId: "1:469162449559:web:734e8756fd03b1388ce7d2",
+            measurementId: "G-6645JXJBD6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        window.auth = auth;
+        window.db = db;
+
+        // Verificar autenticación
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+    <script src="src/assets/js/instituciones.js"></script>
+</body>
+</html>

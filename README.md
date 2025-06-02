@@ -1,56 +1,63 @@
-# Horita Feliz Attendance System
+# 📚 EduCheck Pro
 
-## Overview
-The "Horita Feliz" Attendance System is a web application designed for teachers of Christian classes for children. This application allows teachers to manage student information, log activities, track attendance, and maintain a points system in a user-friendly and interactive environment.
+## Sistema Profesional de Gestión Educativa
 
-## Features
-- **Responsive Design**: The application is fully responsive, ensuring a seamless experience on mobile devices and tablets.
-- **Student Management**: Teachers can easily add and manage student names and ages.
-- **Activity Logging**: Teachers can log activities along with the date for each class session.
-- **Attendance Tracking**: The system allows teachers to mark students as present or absent and manage their points.
-- **User Authentication**: Secure login for teachers to access their profiles and manage their classes.
+EduCheck Pro es una plataforma integral diseñada para instituciones educativas que necesitan gestionar de manera eficiente la asistencia de estudiantes, administrar múltiples cursos y obtener reportes detallados.
 
-## Project Structure
-```
-horita-feliz-system
-├── src
-│   ├── assets
-│   │   ├── css
-│   │   │   ├── styles.css
-│   │   │   └── responsive.css
-│   │   ├── js
-│   │   │   ├── app.js
-│   │   │   ├── auth.js
-│   │   │   ├── students.js
-│   │   │   └── attendance.js
-│   │   └── icons
-│   │       └── index.js
-│   ├── components
-│   │   ├── Header
-│   │   ├── StudentForm
-│   │   ├── ActivityLog
-│   │   └── AttendanceTable
-│   ├── pages
-│   │   ├── login.html
-│   │   ├── dashboard.html
-│   │   └── profile.html
-│   └── utils
-│       ├── database.js
-│       └── helpers.js
-├── index.html
-└── README.md
-```
+## 🌟 Características Principales
 
-## Setup Instructions
-1. Clone the repository to your local machine.
-2. Open the project folder in your preferred code editor.
-3. Open `index.html` in a web browser to view the application.
-4. Ensure you have a local server running if you are using features that require server-side processing.
+### 🏛️ Gestión de Instituciones
+- Administración de múltiples instituciones educativas
+- Configuración específica por institución
+- Dashboard estadístico global
 
-## Technologies Used
-- HTML
-- CSS
-- JavaScript
+### 📚 Gestión de Cursos
+- Creación y administración de cursos por institución
+- Asignación de estudiantes a cursos específicos
+- Control de capacidad y horarios
 
-## License
-This project is licensed under the MIT License.
+### 👥 Gestión de Estudiantes
+- Registro individual y masivo de estudiantes
+- Asignación automática a cursos
+- Historial detallado por estudiante
+
+### ✅ Sistema de Asistencia
+- Toma de asistencia por actividad
+- Estados: Presente, Ausente, Tardanza
+- Notas y observaciones por estudiante
+
+### 📊 Reportes y Estadísticas
+- Dashboard con métricas en tiempo real
+- Reportes de asistencia por curso/institución
+- Exportación de datos
+
+### 🌙 Experiencia de Usuario
+- Modo oscuro/claro
+- PWA instalable
+- Responsive design
+- Offline capability
+
+## 🚀 Tecnologías
+
+- **Frontend**: HTML5, CSS3, JavaScript (Vanilla)
+- **Backend**: Firebase (Auth + Firestore)
+- **PWA**: Service Workers, Manifest
+- **UI/UX**: CSS Grid, Flexbox, Font Awesome
+
+## 📱 Instalación
+
+1. Clona el repositorio
+2. Configura Firebase en `firebase-config.js`
+3. Despliega en Firebase Hosting o cualquier servidor web
+
+## 👨‍💻 Contribuir
+
+EduCheck Pro es un proyecto en constante evolución. Las contribuciones son bienvenidas.
+
+## 📄 Licencia
+
+MIT License - Ver archivo LICENSE para más detalles.
+
+---
+
+**EduCheck Pro** - *Transformando la gestión educativa*

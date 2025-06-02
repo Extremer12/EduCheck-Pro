@@ -1,21 +1,43 @@
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('📄 Profile.js - DOM cargado');
+    
     // Esperar a que Firebase esté listo
     if (window.auth) {
         window.auth.onAuthStateChanged((user) => {
             if (user) {
-                initializeProfile();
-                // IMPORTANTE: Inicializar establecimientos después de que el usuario esté autenticado
-                if (window.initializeEstablishments && window.location.pathname.includes('profile.html')) {
-                    setTimeout(() => {
-                        window.initializeEstablishments();
-                    }, 500); // Pequeño delay para asegurar que todo esté listo
-                }
+                console.log(`👤 Usuario autenticado: ${user.uid} (${user.email})`);
+                
+                // Pequeño delay para asegurar que todo esté listo
+                setTimeout(() => {
+                    initializeProfile();
+                    
+                    // Inicializar establecimientos después de que el usuario esté autenticado
+                    if (window.initializeEstablishments && window.location.pathname.includes('profile.html')) {
+                        setTimeout(() => {
+                            window.initializeEstablishments();
+                        }, 500);
+                    }
+                }, 100);
+                
+            } else {
+                console.log('❌ Usuario no autenticado, redirigiendo...');
+                window.location.href = 'login.html';
             }
         });
+    } else {
+        console.error('❌ Firebase Auth no disponible');
     }
 });
 
 function initializeProfile() {
+    const user = window.auth?.currentUser;
+    if (!user) {
+        console.log('❌ Usuario no autenticado en initializeProfile');
+        return;
+    }
+    
+    console.log(`🚀 Inicializando perfil para usuario: ${user.uid}`);
+    
     const profileBtn = document.getElementById('profile');
     if (profileBtn) {
         profileBtn.addEventListener('click', (e) => {
@@ -31,10 +53,7 @@ function initializeProfile() {
     // Actualizar nombre del docente en el perfil
     const teacherNameElement = document.querySelector('.teacher-name');
     if (teacherNameElement) {
-        const user = window.auth.currentUser;
-        if (user) {
-            teacherNameElement.textContent = user.displayName || user.email.split('@')[0];
-        }
+        teacherNameElement.textContent = user.displayName || user.email.split('@')[0];
     }
     
     // Cargar datos del perfil
@@ -42,6 +61,8 @@ function initializeProfile() {
     
     // Inicializar modo oscuro
     initializeDarkMode();
+    
+    console.log(`✅ Perfil inicializado correctamente para: ${user.uid}`);
 }
 
 function updateProfileStats() {
@@ -110,8 +131,15 @@ async function updateProfile(newDisplayName) {
 function initializeDarkMode() {
     const darkModeToggle = document.getElementById('darkModeToggle');
     
-    // Cargar preferencia guardada
-    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+    // CORREGIDO: Usar datos específicos del usuario
+    const user = window.auth?.currentUser;
+    if (!user) {
+        console.log('⚠️ Usuario no autenticado, no se puede cargar modo oscuro');
+        return;
+    }
+    
+    // Cargar preferencia guardada específica del usuario
+    const savedDarkMode = localStorage.getItem(`${user.uid}_darkMode`) === 'true';
     if (savedDarkMode) {
         document.body.classList.add('dark-mode');
         if (darkModeToggle) darkModeToggle.checked = true;
@@ -122,19 +150,26 @@ function initializeDarkMode() {
         darkModeToggle.addEventListener('change', function() {
             if (this.checked) {
                 document.body.classList.add('dark-mode');
-                localStorage.setItem('darkMode', 'true');
+                localStorage.setItem(`${user.uid}_darkMode`, 'true');
             } else {
                 document.body.classList.remove('dark-mode');
-                localStorage.setItem('darkMode', 'false');
+                localStorage.setItem(`${user.uid}_darkMode`, 'false');
             }
         });
     }
+    
+    console.log(`✅ Modo oscuro inicializado para usuario: ${user.uid}`);
 }
 
 async function loadProfileData() {
     try {
         const user = window.auth?.currentUser;
-        if (!user) return;
+        if (!user) {
+            console.log('❌ Usuario no autenticado');
+            return;
+        }
+        
+        console.log(`📊 Cargando datos del perfil para usuario: ${user.uid}`);
         
         // Actualizar nombre del docente
         const teacherNameElement = document.getElementById('teacherName');
@@ -170,10 +205,246 @@ async function loadProfileData() {
         // Inicializar botón volver arriba
         initializeBackToTop();
         
+        console.log(`✅ Datos del perfil cargados correctamente para: ${user.uid}`);
+        
     } catch (error) {
-        console.error('Error cargando datos del perfil:', error);
+        console.error('❌ Error cargando datos del perfil:', error);
     }
 }
+
+// === CORREGIR FUNCIÓN DE ESTADÍSTICAS ===
+async function updateProfileStatistics() {
+    try {
+        const user = window.auth?.currentUser;
+        if (!user) {
+            console.log('❌ Usuario no autenticado, no se pueden actualizar estadísticas');
+            return;
+        }
+        
+        console.log(`📊 Actualizando estadísticas del perfil para usuario: ${user.uid}`);
+        
+        // Obtener datos específicos del usuario
+        const students = JSON.parse(getUserData('students') || '[]');
+        const activities = JSON.parse(getUserData('activities') || '[]');
+        const attendance = JSON.parse(getUserData('attendance') || '[]');
+        
+        console.log(`📊 Datos obtenidos para ${user.uid}:`, { 
+            students: students.length, 
+            activities: activities.length, 
+            attendance: attendance.length 
+        });
+        
+        // Actualizar estadísticas principales
+        updateElement('totalStudents', students.length);
+        updateElement('totalStudentsQuick', `${students.length} Alumnos`);
+        updateElement('totalActivities', activities.length);
+        updateElement('totalActivitiesQuick', `${activities.length} Actividades`);
+        
+        // Calcular tasa de asistencia
+        const attendanceRate = calculateAttendanceRate(attendance, students.length);
+        updateElement('attendanceRate', `${attendanceRate}%`);
+        
+        // Calcular tasa de finalización
+        const completionRate = calculateCompletionRate(activities);
+        updateElement('completionRate', `${completionRate}%`);
+        
+        // Actualizar cambios mensuales (simulados por ahora)
+        updateElement('studentsChange', `+${Math.floor(students.length * 0.1)} este mes`);
+        updateElement('activitiesChange', `+${Math.floor(activities.length * 0.15)} este mes`);
+        updateElement('attendanceChange', `+${Math.floor(attendanceRate * 0.05)}% este mes`);
+        updateElement('completionChange', `+${Math.floor(completionRate * 0.02)}% este mes`);
+        
+        console.log(`✅ Estadísticas actualizadas correctamente para: ${user.uid}`);
+        
+    } catch (error) {
+        console.error('❌ Error actualizando estadísticas:', error);
+    }
+}
+
+// === CORREGIR FUNCIÓN DE GRÁFICO DE DISTRIBUCIÓN ===
+function initializeActivityDistributionChart() {
+    const user = window.auth?.currentUser;
+    if (!user) {
+        console.log('❌ Usuario no autenticado, no se puede inicializar gráfico');
+        return;
+    }
+    
+    console.log(`📊 Inicializando gráfico de distribución para usuario: ${user.uid}`);
+    
+    const activities = JSON.parse(getUserData('activities') || '[]');
+    console.log(`📊 Actividades encontradas para ${user.uid}:`, activities.length);
+    
+    // Contar tipos de actividades
+    const activityTypes = {
+        'biblicas': 0,
+        'creatividad': 0,
+        'juegos': 0,
+        'musica': 0,
+        'otros': 0
+    };
+    
+    activities.forEach(activity => {
+        const type = activity.type?.toLowerCase() || 'otros';
+        if (activityTypes.hasOwnProperty(type)) {
+            activityTypes[type]++;
+        } else {
+            activityTypes.otros++;
+        }
+    });
+    
+    console.log(`📊 Distribución de tipos para ${user.uid}:`, activityTypes);
+    
+    const total = Object.values(activityTypes).reduce((sum, count) => sum + count, 0);
+    
+    if (total === 0) {
+        console.log(`📊 No hay actividades para ${user.uid}, mostrando gráfico vacío`);
+        updatePieChart({
+            'Sin actividades': 100
+        });
+        return;
+    }
+    
+    // Calcular porcentajes - solo incluir tipos que tienen actividades
+    const percentages = {};
+    Object.entries(activityTypes).forEach(([type, count]) => {
+        if (count > 0) {
+            percentages[type] = Math.round((count / total) * 100);
+        }
+    });
+    
+    console.log(`📊 Porcentajes calculados para ${user.uid}:`, percentages);
+    updatePieChart(percentages);
+}
+
+// === CORREGIR FUNCIÓN DE LOGROS ===
+function calculateAchievements() {
+    const user = window.auth?.currentUser;
+    if (!user) {
+        console.log('❌ Usuario no autenticado, no se pueden calcular logros');
+        return [];
+    }
+    
+    console.log(`🏆 Calculando logros para usuario: ${user.uid}`);
+    
+    const students = JSON.parse(getUserData('students') || '[]');
+    const activities = JSON.parse(getUserData('activities') || '[]');
+    const attendance = JSON.parse(getUserData('attendance') || '[]');
+    
+    console.log(`🏆 Datos para logros de ${user.uid}:`, {
+        students: students.length,
+        activities: activities.length,
+        attendance: attendance.length
+    });
+    
+    const achievements = [
+        {
+            id: 'first-activity',
+            title: 'Primera Actividad',
+            description: 'Registraste tu primera actividad',
+            icon: 'fas fa-star',
+            earned: activities.length > 0,
+            date: activities.length > 0 ? new Date(activities[0].date || Date.now()).toLocaleDateString('es-ES', { year: 'numeric', month: 'long' }) : null
+        },
+        {
+            id: 'five-students',
+            title: '5 Alumnos',
+            description: 'Tienes 5 alumnos registrados',
+            icon: 'fas fa-users',
+            earned: students.length >= 5,
+            date: students.length >= 5 ? new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long' }) : null
+        },
+        {
+            id: 'ten-activities',
+            title: '10 Actividades',
+            description: 'Has realizado 10 actividades',
+            icon: 'fas fa-clipboard-check',
+            earned: activities.length >= 10,
+            date: activities.length >= 10 ? new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long' }) : null
+        },
+        {
+            id: 'attendance-master',
+            title: 'Maestro de Asistencia',
+            description: 'Registro perfecto de asistencia',
+            icon: 'fas fa-calendar-check',
+            earned: attendance.length >= 5,
+            date: attendance.length >= 5 ? new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long' }) : null
+        },
+        {
+            id: 'dedication',
+            title: 'Dedicación Total',
+            description: '25 actividades registradas',
+            icon: 'fas fa-heart',
+            earned: activities.length >= 25,
+            date: activities.length >= 25 ? new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long' }) : null
+        },
+        {
+            id: 'community-builder',
+            title: 'Constructor de Comunidad',
+            description: '15 alumnos activos',
+            icon: 'fas fa-hands-helping',
+            earned: students.length >= 15,
+            date: students.length >= 15 ? new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long' }) : null
+        }
+    ];
+    
+    const earnedCount = achievements.filter(a => a.earned).length;
+    console.log(`🏆 Logros ganados para ${user.uid}: ${earnedCount}/${achievements.length}`);
+    
+    return achievements;
+}
+
+// === AGREGAR FUNCIÓN PARA LIMPIAR DATOS AL CERRAR SESIÓN ===
+function clearUserData() {
+    const user = window.auth?.currentUser;
+    if (!user) return;
+    
+    // Limpiar datos específicos del usuario al cerrar sesión
+    const keysToRemove = [
+        'students', 'activities', 'attendance', 'establishments',
+        'profilePhoto', 'darkMode', 'defaultEstablishmentCreated'
+    ];
+    
+    keysToRemove.forEach(key => {
+        localStorage.removeItem(`${user.uid}_${key}`);
+    });
+    
+    console.log(`🧹 Datos limpiados para usuario: ${user.uid}`);
+}
+
+// === FUNCIÓN PARA DEBUGGING - Ver todos los datos del usuario ===
+function debugUserData() {
+    const user = window.auth?.currentUser;
+    if (!user) {
+        console.log('❌ Usuario no autenticado');
+        return;
+    }
+    
+    console.log(`🔍 DEBUGGING - Datos del usuario: ${user.uid}`);
+    console.log('📧 Email:', user.email);
+    console.log('👤 Display Name:', user.displayName);
+    
+    // Mostrar todos los datos guardados
+    const userData = {};
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith(user.uid + '_')) {
+            const cleanKey = key.replace(user.uid + '_', '');
+            userData[cleanKey] = localStorage.getItem(key);
+        }
+    }
+    
+    console.log('💾 Datos guardados:', userData);
+    
+    return userData;
+}
+
+// Exportar funciones para debugging
+window.debugUserData = debugUserData;
+window.clearUserData = clearUserData;
+window.setUserData = setUserData;
+window.removeUserData = removeUserData;
+
+console.log('✅ Funciones auxiliares agregadas - datos por usuario separados correctamente');
 
 // FUNCIÓN FALTANTE: updateProfileStatistics
 async function updateProfileStatistics() {
@@ -377,15 +648,16 @@ function loadProfilePhoto() {
         return;
     }
     
+    // CORREGIDO: Ya estaba bien, pero agregar más logging
     const savedPhoto = localStorage.getItem(`${user.uid}_profilePhoto`);
     if (savedPhoto) {
         const profileAvatar = document.getElementById('profileAvatar');
         if (profileAvatar) {
             profileAvatar.src = savedPhoto;
-            console.log('✅ Foto de perfil cargada desde localStorage');
+            console.log(`✅ Foto de perfil cargada para usuario: ${user.uid}`);
         }
     } else {
-        console.log('ℹ️ No hay foto guardada, usando imagen por defecto');
+        console.log(`ℹ️ No hay foto guardada para usuario: ${user.uid}, usando imagen por defecto`);
     }
 }
 

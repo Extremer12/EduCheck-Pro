@@ -1,3 +1,14 @@
+/**
+ * EduCheck Pro - Sistema Profesional de Gestión Educativa
+ * Archivo principal de la aplicación
+ * 
+ * @description Sistema integral para la gestión de asistencia, 
+ *              instituciones educativas y administración académica
+ * @version 2.0.0
+ * @author EduCheck Pro Team
+ * @created 2024
+ */
+
 // ===== VARIABLES GLOBALES =====
 let deferredPrompt = null;
 let currentAttendanceActivity = null;
@@ -26,6 +37,9 @@ function setupToggleMenu() {
         function openMenu() {
             menuDropdown.classList.add('active');
             body.classList.add('menu-open');
+            
+            // Actualizar visibilidad del menú al abrir
+            updateMenuVisibility();
             
             // Enfocar el botón de cierre para accesibilidad
             setTimeout(() => {
@@ -80,9 +94,7 @@ function setupToggleMenu() {
             item.addEventListener('click', (e) => {
                 // Solo cerrar si no es el toggle de modo oscuro
                 if (!item.closest('.dark-mode-toggle')) {
-                    setTimeout(() => {
-                        closeMenu();
-                    }, 100);
+                    setTimeout(closeMenu, 100); // Pequeño delay para que la navegación funcione
                 }
             });
         });
@@ -94,9 +106,12 @@ function setupToggleMenu() {
         
         // Gestión específica para elementos que deben cerrar el menú
         const elementsToClose = [
-            '#students-list',
+            '#institutions-list',   // ACTUALIZADO: cambiar de students-list
+            '#quick-courses',       // NUEVO
             '#profile', 
             '#gallery',
+            '#attendance-reports',  // NUEVO
+            '#global-stats',        // NUEVO
             '#installApp',
             '#logout',
             '#deleteAccount',
@@ -107,9 +122,7 @@ function setupToggleMenu() {
             const element = document.querySelector(selector);
             if (element) {
                 element.addEventListener('click', (e) => {
-                    setTimeout(() => {
-                        closeMenu();
-                    }, 150);
+                    setTimeout(closeMenu, 100);
                 });
             }
         });
@@ -123,7 +136,7 @@ function setupToggleMenu() {
         window.closeMenu = closeMenu;
         window.openMenu = openMenu;
         
-        console.log('✅ Menú toggle fullscreen configurado correctamente');
+        console.log('✅ Menú toggle fullscreen configurado correctamente con nueva arquitectura');
     }
 }
 
@@ -581,23 +594,135 @@ function addNotificationStyles() {
 
 // ===== GESTIÓN DE DATOS POR USUARIO =====
 function getUserData(key) {
-    const user = window.auth?.currentUser;
-    if (!user) return null;
-    
-    return localStorage.getItem(`${user.uid}_${key}`);
+    try {
+        const user = window.auth?.currentUser;
+        if (!user) {
+            console.warn('⚠️ getUserData: Usuario no autenticado');
+            return null;
+        }
+        
+        const data = localStorage.getItem(`${user.uid}_${key}`);
+        console.log(`📥 getUserData(${key}):`, data ? 'datos encontrados' : 'sin datos');
+        return data;
+    } catch (error) {
+        console.error(`❌ Error getUserData(${key}):`, error);
+        return null;
+    }
 }
 
 function setUserData(key, value) {
+    try {
+        const user = window.auth?.currentUser;
+        if (!user) {
+            console.warn('⚠️ setUserData: Usuario no autenticado');
+            return false;
+        }
+        
+        localStorage.setItem(`${user.uid}_${key}`, value);
+        console.log(`📤 setUserData(${key}): guardado correctamente`);
+        return true;
+    } catch (error) {
+        console.error(`❌ Error setUserData(${key}):`, error);
+        return false;
+    }
+}
+
+// NUEVA FUNCIÓN: Migración de datos antiguos al nuevo sistema
+function migrateToNewArchitecture() {
     const user = window.auth?.currentUser;
     if (!user) return;
     
-    localStorage.setItem(`${user.uid}_${key}`, value);
+    console.log('🔄 EduCheck Pro - Verificando migración...');
+    
+    const establishments = JSON.parse(getUserData('establishments') || '[]');
+    const oldStudents = JSON.parse(getUserData('students') || '[]');
+    
+    if (oldStudents.length > 0 && establishments.length === 0) {
+        console.log('📦 EduCheck Pro - Migrando datos del sistema anterior...');
+        
+        const defaultEstablishment = {
+            id: 'migrated-default',
+            name: 'Institución Principal',
+            type: 'escuela',
+            address: '',
+            phone: '',
+            notes: 'Institución creada automáticamente durante la migración a EduCheck Pro',
+            isDefault: true,
+            createdAt: new Date().toISOString(),
+            createdBy: user.uid
+        };
+        
+        const defaultCourse = {
+            id: 'migrated-course',
+            institutionId: 'migrated-default',
+            name: 'Curso General',
+            level: 'mixto',
+            notes: 'Curso creado automáticamente durante la migración a EduCheck Pro',
+            createdAt: new Date().toISOString(),
+            students: oldStudents.map(student => ({
+                ...student,
+                institutionId: 'migrated-default',
+                courseId: 'migrated-course'
+            }))
+        };
+        
+        setUserData('establishments', JSON.stringify([defaultEstablishment]));
+        setUserData('courses', JSON.stringify([defaultCourse]));
+        setUserData('migrationCompleted', 'true');
+        
+        console.log('✅ EduCheck Pro - Migración completada exitosamente');
+        showNotification('¡Bienvenido a EduCheck Pro! Sistema actualizado correctamente', 'success');
+    }
 }
 
+// NUEVA FUNCIÓN: Obtener estadísticas globales para el menú
+function getGlobalStats() {
+    const user = window.auth?.currentUser;
+    if (!user) return null;
+    
+    const establishments = JSON.parse(getUserData('establishments') || '[]');
+    const courses = JSON.parse(getUserData('courses') || '[]');
+    const students = JSON.parse(getUserData('students') || '[]');
+    
+    return {
+        institutions: establishments.length,
+        courses: courses.length,
+        students: students.length,
+        hasDefault: establishments.some(e => e.isDefault)
+    };
+}
+
+// NUEVA FUNCIÓN: Actualizar información en tiempo real del menú
+function updateMenuInfo() {
+    const stats = getGlobalStats();
+    if (!stats) return;
+    
+    // Actualizar texto dinámico en el menú
+    const institutionsItem = document.querySelector('#institutions-list .menu-item-content p');
+    if (institutionsItem) {
+        if (stats.institutions === 0) {
+            institutionsItem.textContent = 'Agregar tu primera institución';
+        } else {
+            institutionsItem.textContent = `${stats.institutions} instituciones • ${stats.courses} cursos`;
+        }
+    }
+    
+    const quickCoursesItem = document.querySelector('#quick-courses .menu-item-content p');
+    if (quickCoursesItem && stats.hasDefault) {
+        const defaultInstitution = getDefaultInstitution();
+        const institutionCourses = JSON.parse(getUserData('courses') || '[]')
+            .filter(c => c.establishmentId === defaultInstitution?.id);
+        
+        quickCoursesItem.textContent = `${institutionCourses.length} cursos disponibles`;
+    }
+}
+
+// ACTUALIZAR función migrateTemporaryData existente
 function migrateTemporaryData() {
     const user = window.auth?.currentUser;
     if (!user) return;
     
+    // Migración de datos temporales existente
     const tempActivities = localStorage.getItem('activities');
     if (tempActivities && !getUserData('activities')) {
         setUserData('activities', tempActivities);
@@ -611,6 +736,12 @@ function migrateTemporaryData() {
         localStorage.removeItem('students');
         console.log('👥 Datos de estudiantes migrados al usuario');
     }
+    
+    // NUEVA: Migración a la nueva arquitectura
+    migrateToNewArchitecture();
+    
+    // Actualizar información del menú
+    updateMenuInfo();
 }
 
 // ===== FUNCIONES AUXILIARES =====
@@ -1253,12 +1384,74 @@ function setupEventListeners() {
         });
     }
 
-    const studentsButton = document.getElementById('students-list');
-    if (studentsButton) {
-        studentsButton.addEventListener('click', (e) => {
+    // ACTUALIZADO: Cambiar de "students-list" a "institutions-list"
+    const institutionsButton = document.getElementById('institutions-list');
+    if (institutionsButton) {
+        institutionsButton.addEventListener('click', (e) => {
             e.preventDefault();
-            window.location.href = 'alumnos.html';
+            window.location.href = 'instituciones.html'; // Cambiar de alumnos.html a instituciones.html
         });
+    }
+
+    // NUEVO: Botón de cursos rápidos
+    const quickCoursesButton = document.getElementById('quick-courses');
+    if (quickCoursesButton) {
+        quickCoursesButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            const defaultInstitution = getDefaultInstitution();
+            if (defaultInstitution) {
+                window.location.href = `cursos.html?institution=${defaultInstitution.id}`;
+            } else {
+                window.location.href = 'instituciones.html';
+            }
+        });
+    }
+
+    // NUEVO: Botón de planillas de asistencia
+    const attendanceReportsButton = document.getElementById('attendance-reports');
+    if (attendanceReportsButton) {
+        attendanceReportsButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Por ahora redirigir a instituciones, más adelante será una página específica
+            showNotification('🚧 Sistema de planillas en desarrollo', 'info');
+        });
+    }
+
+    // NUEVO: Botón de estadísticas globales
+    const globalStatsButton = document.getElementById('global-stats');
+    if (globalStatsButton) {
+        globalStatsButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'instituciones.html#stats';
+        });
+    }
+}
+
+// NUEVA FUNCIÓN: Obtener institución por defecto
+function getDefaultInstitution() {
+    const user = window.auth?.currentUser;
+    if (!user) return null;
+    
+    const establishments = JSON.parse(getUserData('establishments') || '[]');
+    return establishments.find(e => e.isDefault) || establishments[0] || null;
+}
+
+// NUEVA FUNCIÓN: Actualizar visibilidad del menú dinámico
+function updateMenuVisibility() {
+    const user = window.auth?.currentUser;
+    if (!user) return;
+    
+    const quickCoursesBtn = document.getElementById('quick-courses');
+    const defaultInstitution = getDefaultInstitution();
+    
+    if (quickCoursesBtn) {
+        if (defaultInstitution) {
+            quickCoursesBtn.style.display = 'flex';
+            quickCoursesBtn.querySelector('.menu-item-content span').textContent = 
+                `Cursos de ${defaultInstitution.name}`;
+        } else {
+            quickCoursesBtn.style.display = 'none';
+        }
     }
 }
 
@@ -1312,8 +1505,10 @@ document.addEventListener('DOMContentLoaded', () => {
             updateUserInfo(user);
             migrateTemporaryData();
             
+            // NUEVO: Actualizar visibilidad del menú después de cargar datos
             setTimeout(() => {
                 loadActivities();
+                updateMenuVisibility(); // Actualizar menú según instituciones disponibles
             }, 100);
         } else {
             if (!window.location.pathname.includes('login.html')) {
@@ -1336,5 +1531,31 @@ window.handleImage = handleImage;
 window.openGallery = openGallery;
 window.editField = editField;
 window.saveEdit = saveEdit;
+window.migrateToNewArchitecture = migrateToNewArchitecture;
+window.getGlobalStats = getGlobalStats;
+window.updateMenuInfo = updateMenuInfo;
+window.getDefaultInstitution = getDefaultInstitution;
+
+// Agregar función de diagnóstico
+function diagnoseFirabase() {
+    console.log('🔍 EduCheck Pro - Diagnóstico Firebase:');
+    console.log('Firebase disponible:', typeof firebase !== 'undefined');
+    console.log('Apps inicializadas:', firebase?.apps?.length || 0);
+    console.log('Auth disponible:', !!window.auth);
+    console.log('DB disponible:', !!window.db);
+    console.log('Usuario actual:', window.auth?.currentUser?.uid || 'No autenticado');
+    
+    // Verificar conectividad
+    if (window.db) {
+        window.db.enableNetwork().then(() => {
+            console.log('🌐 Firestore online');
+        }).catch(error => {
+            console.error('❌ Error conectividad Firestore:', error);
+        });
+    }
+}
+
+// Hacer disponible globalmente para debug
+window.diagnoseFirabase = diagnoseFirabase;
 
 console.log('✅ App.js limpio y funcionando correctamente');

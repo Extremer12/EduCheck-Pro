@@ -1,0 +1,1269 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
+
+/* Variables específicas para instituciones */
+:root {
+    --institutions-primary: #FFB6C1;
+    --institutions-primary-rgb: 255, 182, 193;
+    --institutions-secondary: #B0E0E6;
+    --institutions-accent: #98FB98;
+    --institutions-gradient-1: #FF8DA1;
+    --institutions-gradient-2: #FFE4E1;
+    --institutions-text: #2C3E50;
+    --institutions-text-light: #7F8C8D;
+    --institutions-white: #FFFFFF;
+    --institutions-bg: #F8F9FA;
+    --institutions-shadow: rgba(0, 0, 0, 0.1);
+    --institutions-shadow-hover: rgba(0, 0, 0, 0.15);
+    --institutions-border: #E9ECEF;
+    --institutions-success: #28A745;
+    --institutions-danger: #DC3545;
+    --institutions-warning: #FFC107;
+    --institutions-info: #17A2B8;
+}
+
+/* Variables para modo oscuro */
+:root {
+    --dark-bg: #1a1a1a;
+    --dark-surface: #2d2d2d;
+    --dark-surface-hover: #3a3a3a;
+    --dark-border: #404040;
+    --dark-text: #e0e0e0;
+    --dark-text-light: #a0a0a0;
+    --dark-shadow: rgba(0, 0, 0, 0.3);
+    --dark-shadow-hover: rgba(0, 0, 0, 0.4);
+}
+
+/* Reset y configuración base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body.institutions-page {
+    font-family: 'Quicksand', sans-serif;
+    background: linear-gradient(135deg, var(--institutions-bg) 0%, #E3F2FD 100%);
+    min-height: 100vh;
+    color: var(--institutions-text);
+    line-height: 1.6;
+    transition: all 0.3s ease;
+}
+
+/* Header de instituciones */
+.institutions-header {
+    background: linear-gradient(135deg, var(--institutions-primary) 0%, var(--institutions-secondary) 100%);
+    color: white;
+    padding: 1.5rem 0;
+    box-shadow: 0 4px 20px var(--institutions-shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.back-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    flex-shrink: 0;
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(-3px);
+}
+
+.header-title {
+    flex: 1;
+    text-align: center;
+}
+
+.header-title h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-title p {
+    opacity: 0.9;
+    font-size: 0.95rem;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.global-stats-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 0.7rem 1.2rem;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.global-stats-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Main content */
+.institutions-main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+/* Dashboard Overview - CORREGIDO */
+.dashboard-overview {
+    margin-bottom: 2.5rem;
+}
+
+.overview-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px var(--institutions-shadow);
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.overview-header {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--institutions-border);
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+.overview-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--institutions-primary), var(--institutions-secondary));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.8rem;
+    box-shadow: 0 4px 15px rgba(var(--institutions-primary-rgb), 0.3);
+    flex-shrink: 0;
+}
+
+.overview-title h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--institutions-text);
+    margin-bottom: 0.3rem;
+}
+
+.overview-title p {
+    color: var(--institutions-text-light);
+    font-size: 0.95rem;
+}
+
+/* Stats Grid - CORREGIDO PARA QUE NO SE SALGAN */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem 2rem 2rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.2rem;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    border: 1px solid var(--institutions-border);
+    min-height: 85px;
+}
+
+.stat-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--institutions-shadow-hover);
+    background: white;
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.stat-icon.institutions {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.stat-icon.courses {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+}
+
+.stat-icon.students {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+}
+
+.stat-icon.attendance {
+    background: linear-gradient(135deg, #43e97b, #38f9d7);
+}
+
+.stat-content {
+    flex: 1;
+    min-width: 0; /* Permite que el texto se contraiga */
+}
+
+.stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--institutions-text);
+    line-height: 1;
+    margin-bottom: 0.2rem;
+}
+
+.stat-label {
+    color: var(--institutions-text-light);
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+}
+
+/* Navegación rápida - CORREGIDO */
+.quick-navigation {
+    margin-bottom: 2.5rem;
+}
+
+.nav-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.8rem;
+    box-shadow: 0 5px 20px var(--institutions-shadow);
+}
+
+.nav-card h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--institutions-text);
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+}
+
+.quick-btn {
+    background: linear-gradient(135deg, var(--institutions-primary), var(--institutions-secondary));
+    color: white;
+    border: none;
+    padding: 0.9rem 1.2rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-weight: 600;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.quick-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(var(--institutions-primary-rgb), 0.4);
+}
+
+/* Sección de instituciones - CORREGIDO LAYOUT */
+.institutions-section {
+    margin-bottom: 2.5rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.section-header h3 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--institutions-text);
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex: 1;
+    min-width: 200px;
+}
+
+.section-header h3 .main-title {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.institution-count {
+    color: var(--institutions-text-light);
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-left: 2rem; /* Alineado con el icono */
+}
+
+.add-institution-btn {
+    background: linear-gradient(135deg, var(--institutions-primary), var(--institutions-secondary));
+    color: white;
+    border: none;
+    padding: 0.9rem 1.8rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(var(--institutions-primary-rgb), 0.3);
+    flex-shrink: 0;
+}
+
+.add-institution-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(var(--institutions-primary-rgb), 0.4);
+}
+
+/* Grid de instituciones */
+.institutions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.8rem;
+}
+
+/* Tarjetas de institución - MEJORADAS */
+.institution-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.8rem;
+    box-shadow: 0 6px 25px var(--institutions-shadow);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid rgba(0,0,0,0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.institution-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 35px var(--institutions-shadow-hover);
+}
+
+.institution-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--institutions-primary), var(--institutions-secondary), var(--institutions-accent));
+}
+
+.institution-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 1.2rem;
+    gap: 1rem;
+}
+
+.institution-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.institution-name {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--institutions-text);
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+    word-wrap: break-word;
+}
+
+.institution-type {
+    color: var(--institutions-text-light);
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(var(--institutions-primary-rgb), 0.1);
+    padding: 0.3rem 0.7rem;
+    border-radius: 15px;
+    display: inline-block;
+}
+
+.institution-badge {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: white;
+    padding: 0.4rem;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    box-shadow: 0 3px 12px rgba(255, 215, 0, 0.3);
+    flex-shrink: 0;
+}
+
+.institution-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
+    padding: 1.2rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+}
+
+.stat-mini {
+    text-align: center;
+}
+
+.stat-mini-number {
+    display: block;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--institutions-primary);
+    line-height: 1;
+}
+
+.stat-mini-label {
+    font-size: 0.75rem;
+    color: var(--institutions-text-light);
+    font-weight: 500;
+    margin-top: 0.2rem;
+}
+
+.institution-details {
+    margin-bottom: 1.2rem;
+}
+
+.detail-row {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 0.6rem;
+    font-size: 0.85rem;
+    color: var(--institutions-text-light);
+}
+
+.detail-row i {
+    color: var(--institutions-primary);
+    width: 14px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.institution-actions {
+    display: flex;
+    gap: 0.6rem;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 0.7rem 0.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+}
+
+.view-courses-btn {
+    background: var(--institutions-primary);
+    color: white;
+}
+
+.view-courses-btn:hover {
+    background: var(--institutions-gradient-1);
+    transform: translateY(-1px);
+}
+
+.edit-institution-btn {
+    background: var(--institutions-info);
+    color: white;
+}
+
+.edit-institution-btn:hover {
+    background: #138496;
+    transform: translateY(-1px);
+}
+
+.delete-institution-btn {
+    background: var(--institutions-danger);
+    color: white;
+    flex: 0.4;
+}
+
+.delete-institution-btn:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+}
+
+/* Estado vacío */
+.empty-institutions {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 6px 25px var(--institutions-shadow);
+}
+
+.empty-icon {
+    font-size: 3.5rem;
+    color: var(--institutions-primary);
+    opacity: 0.6;
+    margin-bottom: 1.2rem;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+}
+
+.empty-institutions h3 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--institutions-text);
+    margin-bottom: 0.5rem;
+}
+
+.empty-institutions p {
+    max-width: 450px;
+    margin: 0 auto 1.8rem;
+    line-height: 1.6;
+    color: var(--institutions-text-light);
+}
+
+.add-first-institution-btn {
+    background: var(--institutions-primary);
+    color: white;
+    border: none;
+    padding: 0.9rem 1.8rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    box-shadow: 0 4px 15px rgba(var(--institutions-primary-rgb), 0.3);
+}
+
+.add-first-institution-btn:hover {
+    background: var(--institutions-gradient-1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(var(--institutions-primary-rgb), 0.4);
+}
+
+/* Actividad reciente */
+.recent-activity {
+    margin-bottom: 2rem;
+}
+
+.activity-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.8rem;
+    box-shadow: 0 5px 20px var(--institutions-shadow);
+}
+
+.activity-card h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--institutions-text);
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--institutions-bg);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.activity-item:hover {
+    background: rgba(var(--institutions-primary-rgb), 0.1);
+}
+
+.activity-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    background: var(--institutions-primary);
+    flex-shrink: 0;
+}
+
+.activity-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.activity-description {
+    font-weight: 600;
+    color: var(--institutions-text);
+    margin-bottom: 0.2rem;
+}
+
+.activity-time {
+    font-size: 0.8rem;
+    color: var(--institutions-text-light);
+}
+
+/* Modales */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2000;
+    display: none;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    position: relative;
+    width: 95%;
+    max-width: 550px;
+    margin: 3% auto;
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--institutions-primary), var(--institutions-secondary));
+    color: white;
+    padding: 1.3rem 1.8rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header.danger {
+    background: linear-gradient(135deg, var(--institutions-danger), #e74c3c);
+}
+
+.modal-header h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.close-modal {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-modal:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.modal-body {
+    padding: 1.8rem;
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Formulario del modal */
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 1.2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 0.6rem;
+    font-weight: 600;
+    color: var(--institutions-text);
+    font-size: 0.9rem;
+}
+
+.form-group label i {
+    color: var(--institutions-primary);
+    font-size: 0.9rem;
+    width: 14px;
+    text-align: center;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 0.9rem;
+    border: 2px solid var(--institutions-border);
+    border-radius: 10px;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--institutions-primary);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(var(--institutions-primary-rgb), 0.15);
+    transform: translateY(-1px);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 75px;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.9rem;
+    background: rgba(var(--institutions-primary-rgb), 0.1);
+    border-radius: 8px;
+    border: 2px solid rgba(var(--institutions-primary-rgb), 0.2);
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 0.8rem;
+    margin-top: 1.5rem;
+}
+
+.cancel-btn,
+.save-btn,
+.delete-btn {
+    flex: 1;
+    padding: 0.9rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.cancel-btn {
+    background: var(--institutions-bg);
+    color: var(--institutions-text);
+    border: 2px solid var(--institutions-border);
+}
+
+.cancel-btn:hover {
+    background: var(--institutions-border);
+}
+
+.save-btn {
+    background: var(--institutions-success);
+    color: white;
+}
+
+.save-btn:hover {
+    background: #218838;
+    transform: translateY(-1px);
+}
+
+.delete-btn {
+    background: var(--institutions-danger);
+    color: white;
+}
+
+.delete-btn:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+}
+
+/* Modal de confirmación */
+.confirm-modal-content {
+    max-width: 450px;
+}
+
+.confirm-content {
+    text-align: center;
+}
+
+.confirm-icon {
+    font-size: 3.5rem;
+    color: var(--institutions-danger);
+    margin-bottom: 1rem;
+}
+
+.confirm-content h4 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--institutions-text);
+    margin-bottom: 1rem;
+}
+
+.confirm-content p {
+    color: var(--institutions-text-light);
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+.warning-text {
+    background: rgba(220, 53, 69, 0.1);
+    border-left: 4px solid var(--institutions-danger);
+    padding: 1rem;
+    border-radius: 0 6px 6px 0;
+    margin: 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: var(--institutions-danger) !important;
+    font-weight: 500;
+    text-align: left;
+}
+
+/* Toggle de modo oscuro */
+.dark-mode-toggle {
+    display: flex;
+    align-items: center;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 55px;
+    height: 28px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.3);
+    transition: .4s;
+    border-radius: 28px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+input:checked + .toggle-slider {
+    background-color: rgba(255, 255, 255, 0.6);
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(27px);
+}
+
+/* ===== MODO OSCURO PROFESIONAL ===== */
+body.dark-mode.institutions-page {
+    background: linear-gradient(135deg, var(--dark-bg) 0%, #2a2a2a 100%);
+    color: var(--dark-text);
+}
+
+/* Header en modo oscuro */
+body.dark-mode .institutions-header {
+    background: linear-gradient(135deg, #3a3a3a 0%, #4a4a4a 100%);
+    box-shadow: 0 4px 20px var(--dark-shadow);
+}
+
+/* Cards principales en modo oscuro */
+body.dark-mode .overview-card,
+body.dark-mode .nav-card,
+body.dark-mode .activity-card,
+body.dark-mode .institution-card,
+body.dark-mode .empty-institutions {
+    background: var(--dark-surface);
+    border-color: var(--dark-border);
+    box-shadow: 0 6px 25px var(--dark-shadow);
+}
+
+body.dark-mode .overview-header {
+    background: linear-gradient(135deg, var(--dark-surface) 0%, var(--dark-surface-hover) 100%);
+    border-bottom-color: var(--dark-border);
+}
+
+/* Stats items en modo oscuro */
+body.dark-mode .stat-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--dark-border);
+}
+
+body.dark-mode .stat-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 6px 20px var(--dark-shadow-hover);
+}
+
+/* Textos en modo oscuro */
+body.dark-mode .overview-title h2,
+body.dark-mode .section-header h3,
+body.dark-mode .institution-name,
+body.dark-mode .empty-institutions h3,
+body.dark-mode .activity-card h3,
+body.dark-mode .nav-card h3,
+body.dark-mode .stat-number {
+    color: var(--dark-text);
+}
+
+body.dark-mode .overview-title p,
+body.dark-mode .institution-count,
+body.dark-mode .empty-institutions p,
+body.dark-mode .activity-time,
+body.dark-mode .stat-label,
+body.dark-mode .institution-type,
+body.dark-mode .detail-row,
+body.dark-mode .activity-description {
+    color: var(--dark-text-light);
+}
+
+/* Formularios en modo oscuro */
+body.dark-mode .form-group input,
+body.dark-mode .form-group select,
+body.dark-mode .form-group textarea {
+    background: var(--dark-surface-hover);
+    border-color: var(--dark-border);
+    color: var(--dark-text);
+}
+
+body.dark-mode .form-group input:focus,
+body.dark-mode .form-group select:focus,
+body.dark-mode .form-group textarea:focus {
+    background: var(--dark-surface);
+    border-color: var(--institutions-primary);
+    box-shadow: 0 0 0 3px rgba(var(--institutions-primary-rgb), 0.2);
+}
+
+body.dark-mode .form-group label {
+    color: var(--dark-text);
+}
+
+/* Modal en modo oscuro */
+body.dark-mode .modal-content {
+    background: var(--dark-surface);
+}
+
+body.dark-mode .modal-body {
+    background: var(--dark-surface);
+}
+
+/* Checkbox en modo oscuro */
+body.dark-mode .checkbox-group {
+    background: rgba(255, 182, 193, 0.15);
+    border-color: rgba(255, 182, 193, 0.25);
+}
+
+/* Activity items en modo oscuro */
+body.dark-mode .activity-item {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+body.dark-mode .activity-item:hover {
+    background: rgba(255, 182, 193, 0.1);
+}
+
+/* Institution stats en modo oscuro */
+body.dark-mode .institution-stats {
+    background: linear-gradient(135deg, var(--dark-surface-hover) 0%, #404040 100%);
+}
+
+/* Botones en modo oscuro */
+body.dark-mode .cancel-btn {
+    background: var(--dark-surface-hover);
+    color: var(--dark-text);
+    border-color: var(--dark-border);
+}
+
+body.dark-mode .cancel-btn:hover {
+    background: #505050;
+}
+
+/* Warning text en modo oscuro */
+body.dark-mode .warning-text {
+    background: rgba(220, 53, 69, 0.15);
+    color: #ff6b6b !important;
+}
+
+/* Animaciones */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.institution-card.new {
+    animation: slideInUp 0.5s ease-out;
+}
+
+.modal.show {
+    display: flex;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Responsive Design - MEJORADO */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        padding: 0 1rem;
+    }
+
+    .header-actions {
+        order: -1;
+        justify-content: center;
+    }
+
+    .header-title h1 {
+        font-size: 1.8rem;
+    }
+
+    .institutions-main {
+        padding: 1rem;
+    }
+
+    .institutions-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .institution-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .section-header h3 {
+        text-align: center;
+    }
+
+    .institution-count {
+        margin-left: 0;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid,
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-content {
+        width: 100%;
+        margin: 0.5rem;
+        max-height: 98vh;
+    }
+
+    .institution-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .action-btn {
+        padding: 0.8rem;
+    }
+
+    .overview-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .header-title h1 {
+        font-size: 1.6rem;
+    }
+
+    .global-stats-btn span {
+        display: none;
+    }
+}
+
+/* Mejoras adicionales para accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Focus styles mejorados */
+.add-institution-btn:focus,
+.quick-btn:focus,
+.action-btn:focus,
+.back-btn:focus,
+.global-stats-btn:focus {
+    outline: 2px solid var(--institutions-primary);
+    outline-offset: 2px;
+}
+
+body.dark-mode .add-institution-btn:focus,
+body.dark-mode .quick-btn:focus,
+body.dark-mode .action-btn:focus,
+body.dark-mode .back-btn:focus,
+body.dark-mode .global-stats-btn:focus {
+    outline-color: #FFB6C1;
+}

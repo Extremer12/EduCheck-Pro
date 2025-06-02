@@ -18,8 +18,19 @@
 </head>
 <body>
     <div id="app">
-        <header>
-            <div class="teacher-toggle">
+        <!-- En el header principal -->
+<header class="app-header">
+    <div class="header-content">
+        <div class="app-logo">
+            <div class="logo-icon">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div class="app-info">
+                <h1>EduCheck Pro</h1>
+                <p>Sistema de Gestión Educativa</p>
+            </div>
+        </div>
+        <div class="teacher-toggle">
                 <button class="profile-button" aria-label="Menú de perfil">
                     <img src="https://img.freepik.com/vector-gratis/circulo-azul-usuario-blanco_78370-4707.jpg?semt=ais_hybrid&w=740" alt="Profile" class="profile-img">
                     <span id="teacher-name">Nombre de la Docente</span>
@@ -49,11 +60,21 @@
                         
                         <div class="menu-divider"></div>
                         
-                        <a href="#" id="students-list" class="menu-item">
-                            <i class="fas fa-users"></i>
+                        <!-- ACTUALIZADO: Cambiar "Mis Alumnos" por "Mis Instituciones" -->
+                        <a href="#" id="institutions-list" class="menu-item">
+                            <i class="fas fa-university"></i>
                             <div class="menu-item-content">
-                                <span>Mis Alumnos</span>
-                                <p>Gestionar lista de alumnos</p>
+                                <span>Mis Instituciones</span>
+                                <p>Gestionar instituciones y cursos</p>
+                            </div>
+                        </a>
+                        
+                        <!-- NUEVO: Acceso directo a cursos si hay una institución por defecto -->
+                        <a href="#" id="quick-courses" class="menu-item" style="display: none;">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <div class="menu-item-content">
+                                <span>Mis Cursos</span>
+                                <p>Ver cursos de la institución principal</p>
                             </div>
                         </a>
                         
@@ -67,11 +88,31 @@
                         
                         <div class="menu-divider"></div>
                         
+                        <!-- NUEVO: Acceso directo a planillas -->
+                        <a href="#" id="attendance-reports" class="menu-item">
+                            <i class="fas fa-clipboard-list"></i>
+                            <div class="menu-item-content">
+                                <span>Planillas de Asistencia</span>
+                                <p>Ver y exportar planillas</p>
+                            </div>
+                        </a>
+                        
                         <a href="#" id="gallery" class="menu-item">
                             <i class="fas fa-images"></i>
                             <div class="menu-item-content">
                                 <span>Galería</span>
                                 <p>Ver fotos de actividades</p>
+                            </div>
+                        </a>
+                        
+                        <div class="menu-divider"></div>
+                        
+                        <!-- NUEVO: Estadísticas globales -->
+                        <a href="#" id="global-stats" class="menu-item">
+                            <i class="fas fa-chart-bar"></i>
+                            <div class="menu-item-content">
+                                <span>Estadísticas</span>
+                                <p>Resumen de todas las instituciones</p>
                             </div>
                         </a>
                         
@@ -109,8 +150,10 @@
                     </div>
                 </div>
             </div>
-            <h1>Horita Feliz</h1>
-        </header>
+        </div>
+        <!-- resto del header -->
+    </div>
+</header>
         <main>
             <!-- MANTENER: Solo la sección de actividades como principal -->
             <section id="activity-log">
@@ -201,36 +244,16 @@
     </button>
 
     <!-- Scripts -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-        import { connectToDatabase } from "./src/utils/database.js";
+    <!-- Firebase SDK v8 (legacy) - CARGAR PRIMERO -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAC2DxR63utzR1tmnHCqzApYTraxMsH79M",
-            authDomain: "horita-feliz-system.firebaseapp.com",
-            projectId: "horita-feliz-system",
-            storageBucket: "horita-feliz-system.firebasestorage.app",
-            messagingSenderId: "469162449559",
-            appId: "1:469162449559:web:734e8756fd03b1388ce7d2",
-            measurementId: "G-6645JXJBD6"
-        };
+<!-- DESPUÉS cargar configuración -->
+<script src="src/config/firebase.js"></script>
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        window.auth = auth;
-        window.db = db;
-        
-        // Conectar a la base de datos cuando el usuario inicie sesión
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                await connectToDatabase();
-            }
-        });
-    </script>
-    <script src="src/assets/js/app.js"></script>
+<!-- FINALMENTE cargar app -->
+<script src="src/assets/js/app.js"></script>
 
     <!-- Modal de confirmación para eliminar cuenta -->
     <div id="deleteConfirmModal" class="confirm-modal">

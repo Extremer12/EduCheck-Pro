@@ -1,5 +1,68 @@
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
 
+/* EduCheck Pro - Sistema Profesional de Gestión Educativa */
+/* Estilos principales de la aplicación */
+
+:root {
+    /* Colores de marca EduCheck Pro */
+    --educheck-primary: #4A90E2;
+    --educheck-secondary: #7B68EE;
+    --educheck-accent: #50C878;
+    --educheck-gradient: linear-gradient(135deg, #4A90E2 0%, #7B68EE 100%);
+    
+    /* Variables existentes */
+    --primary-color: #FFB6C1;
+    --primary-dark: #FF69B4;
+    --secondary-color: #FFF0F5;
+    --accent-color: #FF1493;
+    --text-color: #2C3E50;
+    --success-color: #28A745;
+    --warning-color: #FFC107;
+    --danger-color: #DC3545;
+    --info-color: #17A2B8;
+}
+
+/* Logo y branding */
+.app-logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo-icon {
+    width: 50px;
+    height: 50px;
+    background: var(--educheck-gradient);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+}
+
+.app-info h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.app-info p {
+    font-size: 0.85rem;
+    color: var(--text-color);
+    opacity: 0.8;
+    margin: 0;
+}
+
+/* Modo oscuro para el logo */
+body.dark-mode .app-info h1,
+body.dark-mode .app-info p {
+    color: var(--dark-text);
+}
+
 /* Variables globales */
 :root {
     --primary-color: #FFB6C1;
