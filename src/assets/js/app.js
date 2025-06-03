@@ -593,36 +593,47 @@ function addNotificationStyles() {
 }
 
 // ===== GESTIÓN DE DATOS POR USUARIO =====
+// ===== FUNCIONES AUXILIARES MEJORADAS =====
 function getUserData(key) {
+    const user = firebase.auth()?.currentUser;
+    if (!user) {
+        console.warn('❌ No hay usuario autenticado para obtener datos');
+        return null;
+    }
+    
     try {
-        const user = window.auth?.currentUser;
-        if (!user) {
-            console.warn('⚠️ getUserData: Usuario no autenticado');
-            return null;
+        // Intentar usar la función global del sistema principal si existe
+        if (typeof window.getUserDataFromApp === 'function') {
+            return window.getUserDataFromApp(key);
         }
         
+        // Fallback a localStorage directo
         const data = localStorage.getItem(`${user.uid}_${key}`);
-        console.log(`📥 getUserData(${key}):`, data ? 'datos encontrados' : 'sin datos');
         return data;
     } catch (error) {
-        console.error(`❌ Error getUserData(${key}):`, error);
+        console.error(`❌ Error obteniendo datos para ${key}:`, error);
         return null;
     }
 }
 
 function setUserData(key, value) {
+    const user = firebase.auth()?.currentUser;
+    if (!user) {
+        console.warn('❌ No hay usuario autenticado para guardar datos');
+        return false;
+    }
+    
     try {
-        const user = window.auth?.currentUser;
-        if (!user) {
-            console.warn('⚠️ setUserData: Usuario no autenticado');
-            return false;
+        // Intentar usar la función global del sistema principal si existe
+        if (typeof window.setUserDataFromApp === 'function') {
+            return window.setUserDataFromApp(key, value);
         }
         
+        // Fallback a localStorage directo
         localStorage.setItem(`${user.uid}_${key}`, value);
-        console.log(`📤 setUserData(${key}): guardado correctamente`);
         return true;
     } catch (error) {
-        console.error(`❌ Error setUserData(${key}):`, error);
+        console.error(`❌ Error guardando datos para ${key}:`, error);
         return false;
     }
 }
@@ -682,12 +693,12 @@ function getGlobalStats() {
     
     const establishments = JSON.parse(getUserData('establishments') || '[]');
     const courses = JSON.parse(getUserData('courses') || '[]');
-    const students = JSON.parse(getUserData('students') || '[]');
+    const students = JSON.parse(getUserData('students') || '[]'); // NUEVO: obtener estudiantes reales
     
     return {
         institutions: establishments.length,
         courses: courses.length,
-        students: students.length,
+        students: students.length, // ACTUALIZADO: usar datos reales
         hasDefault: establishments.some(e => e.isDefault)
     };
 }
@@ -704,6 +715,16 @@ function updateMenuInfo() {
             institutionsItem.textContent = 'Agregar tu primera institución';
         } else {
             institutionsItem.textContent = `${stats.institutions} instituciones • ${stats.courses} cursos`;
+        }
+    }
+    
+    // NUEVO: Actualizar información de estudiantes
+    const studentsItem = document.querySelector('#students-list .menu-item-content p');
+    if (studentsItem) {
+        if (stats.students === 0) {
+            studentsItem.textContent = 'Agregar tus primeros estudiantes';
+        } else {
+            studentsItem.textContent = `${stats.students} estudiantes registrados`;
         }
     }
     
@@ -1115,7 +1136,17 @@ function loadStudentsForAttendance() {
     const user = window.auth?.currentUser;
     if (!user) return;
 
-    const students = JSON.parse(getUserData('students') || '[]');
+    // NUEVO: Intentar obtener estudiantes del nuevo sistema
+    let students = [];
+    
+    if (window.getStudentsForAttendance && typeof window.getStudentsForAttendance === 'function') {
+        // Usar el nuevo sistema de estudiantes si está disponible
+        students = window.getStudentsForAttendance();
+    } else {
+        // Fallback al sistema anterior
+        students = JSON.parse(getUserData('students') || '[]');
+    }
+    
     const attendanceList = document.getElementById('students-attendance-list');
     const noStudentsMessage = document.getElementById('no-students-message');
     
@@ -1141,11 +1172,11 @@ function loadStudentsForAttendance() {
             <div class="student-attendance-item" data-student-id="${student.id}">
                 <div class="student-info">
                     <div class="student-avatar">
-                        ${student.name.charAt(0).toUpperCase()}
+                        ${(student.name || student.fullName || 'A').charAt(0).toUpperCase()}
                     </div>
                     <div class="student-details">
-                        <h6>${student.name}</h6>
-                        <p>${student.age} años</p>
+                        <h6>${student.fullName || `${student.name} ${student.lastname}`}</h6>
+                        <p>${student.grade || student.courseName || 'Sin curso'}</p>
                     </div>
                 </div>
                 
@@ -1423,6 +1454,15 @@ function setupEventListeners() {
         globalStatsButton.addEventListener('click', (e) => {
             e.preventDefault();
             window.location.href = 'instituciones.html#stats';
+        });
+    }
+
+    // NUEVO: Botón de estudiantes
+    const studentsButton = document.getElementById('students-list');
+    if (studentsButton) {
+        studentsButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'estudiantes.html';
         });
     }
 }

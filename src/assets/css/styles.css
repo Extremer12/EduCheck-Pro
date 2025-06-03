@@ -20,59 +20,33 @@
     --warning-color: #FFC107;
     --danger-color: #DC3545;
     --info-color: #17A2B8;
-}
-
-/* Logo y branding */
-.app-logo {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.logo-icon {
-    width: 50px;
-    height: 50px;
-    background: var(--educheck-gradient);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.5rem;
-    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
-}
-
-.app-info h1 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-color);
-    margin: 0;
-    line-height: 1.2;
-}
-
-.app-info p {
-    font-size: 0.85rem;
-    color: var(--text-color);
-    opacity: 0.8;
-    margin: 0;
-}
-
-/* Modo oscuro para el logo */
-body.dark-mode .app-info h1,
-body.dark-mode .app-info p {
-    color: var(--dark-text);
-}
-
-/* Variables globales */
-:root {
-    --primary-color: #FFB6C1;
-    --primary-color-rgb: 255, 182, 193;
-    --secondary-color: #B0E0E6;
-    --accent-color: #98FB98;
-    --background-color: #FFF5EE;
-    --text-color: #696969;
-    --card-bg: #ffffff;
-    --border-color: #f0f0f0;
+    
+    /* NUEVAS: Variables para estudiantes */
+    --students-primary: #3498db;
+    --students-secondary: #2ecc71;
+    --students-accent: #e74c3c;
+    --students-warning: #f39c12;
+    --students-info: #9b59b6;
+    --students-gradient: linear-gradient(135deg, #3498db 0%, #2ecc71 100%);
+    
+    /* Colores de estado para estudiantes */
+    --student-active: #27ae60;
+    --student-inactive: #95a5a6;
+    --student-pending: #f39c12;
+    --student-graduated: #8e44ad;
+    
+    /* Espaciados específicos */
+    --students-card-padding: 1.25rem;
+    --students-gap: 1.5rem;
+    --students-border-radius: 12px;
+    
+    /* Sombras */
+    --students-shadow: 0 4px 6px rgba(52, 152, 219, 0.1);
+    --students-shadow-hover: 0 8px 25px rgba(52, 152, 219, 0.15);
+    --students-shadow-active: 0 2px 4px rgba(52, 152, 219, 0.2);
+    
+    /* Variables de header height si no existe */
+    --header-height: 80px;
 }
 
 /* Variables para modo oscuro */
@@ -98,6 +72,14 @@ body.dark-mode .app-info p {
     --shadow-color: rgba(0, 0, 0, 0.1);
     --notification-bg: #ffffff;
     --notification-text: #333333;
+    
+    /* NUEVAS: Variables oscuras para estudiantes */
+    --students-bg: #1a202c;
+    --students-surface: #2d3748;
+    --students-card-bg: #2d3748;
+    --students-border: #4a5568;
+    --students-text: #e2e8f0;
+    --students-text-muted: #a0aec0;
 }
 
 /* Modo oscuro */
@@ -1758,4 +1740,64 @@ body.dark-mode ::-webkit-scrollbar-thumb {
 
 body.dark-mode ::-webkit-scrollbar-thumb:hover {
     background: var(--primary-color);
+}
+
+/* ===== NAVEGACIÓN CONTEXTUAL ===== */
+.page-navigation {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    color: var(--text-color);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.nav-link.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.nav-link i {
+    font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .page-navigation {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .nav-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Modo oscuro */
+body.dark-mode .nav-link {
+    color: var(--dark-text);
+}
+
+body.dark-mode .nav-link:hover,
+body.dark-mode .nav-link.active {
+    background: var(--primary-color);
+    color: white;
 }

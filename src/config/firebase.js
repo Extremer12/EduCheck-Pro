@@ -24,6 +24,15 @@ if (typeof firebase !== 'undefined' && !firebase.apps.length) {
     console.log('🔥 Firebase ya estaba inicializado');
 }
 
+// En src/config/firebase.js
+firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(() => {
+        console.log('✅ Persistencia de autenticación configurada');
+    })
+    .catch((error) => {
+        console.error('❌ Error configurando persistencia:', error);
+    });
+
 // Referencias globales
 const auth = firebase.auth();
 const db = firebase.firestore();

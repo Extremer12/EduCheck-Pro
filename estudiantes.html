@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- Meta tags primero -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gestión de Estudiantes - EduCheck Pro">
+    <meta name="keywords" content="estudiantes, alumnos, gestión académica, educación">
+    <meta name="author" content="EduCheck Pro Team">
+    <meta name="theme-color" content="#FFB6C1">
+    <link rel="icon" href="src/assets/icons/icon-192x192.png" type="image/png">
+    <title>Gestión de Estudiantes - EduCheck Pro</title>
+    
+    <!-- CSS en orden: GENERAL → ESPECÍFICO -->
+    <link rel="stylesheet" href="src/assets/css/styles.css">
+    <link rel="stylesheet" href="src/assets/css/responsive.css">
+    <link rel="stylesheet" href="src/assets/css/estudiantes.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body class="students-page">
+    <div id="app">
+        <!-- Header con navegación contextual -->
+        <header class="app-header">
+            <div class="header-content">
+                <!-- Logo y branding -->
+                <div class="app-logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="app-info">
+                        <h1>EduCheck Pro</h1>
+                        <p>Gestión de Estudiantes</p>
+                    </div>
+                </div>
+
+                <!-- Navegación contextual -->
+                <nav class="breadcrumb-nav">
+                    <a href="index.html" class="breadcrumb-item">
+                        <i class="fas fa-home"></i>
+                        Inicio
+                    </a>
+                    <span class="breadcrumb-separator">
+                        <i class="fas fa-chevron-right"></i>
+                    </span>
+                    <span class="breadcrumb-current">
+                        <i class="fas fa-users"></i>
+                        Estudiantes
+                    </span>
+                </nav>
+
+                <!-- Menú de perfil -->
+                <div class="header-actions">
+                    <button class="theme-toggle" id="theme-toggle" title="Cambiar tema">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <div class="teacher-toggle">
+                        <button class="profile-button" id="profile-menu" aria-label="Menú de perfil">
+                            <i class="fas fa-user-circle"></i>
+                            <span class="profile-name" id="user-name">Usuario</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="menu-dropdown" id="menu-dropdown">
+                            <!-- NUEVO: Botón de cierre en el header -->
+                            <div class="menu-header">
+                                <button class="menu-close-btn" id="menu-close-btn" aria-label="Cerrar menú">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                <div class="profile-placeholder">
+                                    <i class="fas fa-user-circle"></i>
+                                </div>
+                                <h3 id="menu-user-name">Usuario</h3>
+                                <p>Docente</p>
+                            </div>
+                            
+                            <!-- NUEVO: Contenedor para el contenido del menú -->
+                            <div class="menu-content">
+                                <a href="index.html" class="menu-item">
+                                    <i class="fas fa-home"></i>
+                                    <div class="menu-item-content">
+                                        <span>Inicio</span>
+                                        <p>Volver al dashboard principal</p>
+                                    </div>
+                                </a>
+                                
+                                <a href="estudiantes.html" class="menu-item active">
+                                    <i class="fas fa-users"></i>
+                                    <div class="menu-item-content">
+                                        <span>Mis Estudiantes</span>
+                                        <p>Gestionar estudiantes globalmente</p>
+                                    </div>
+                                </a>
+                                
+                                <a href="#" id="profile" class="menu-item">
+                                    <i class="fas fa-user-circle"></i>
+                                    <div class="menu-item-content">
+                                        <span>Perfil</span>
+                                        <p>Ver y editar perfil</p>
+                                    </div>
+                                </a>
+                                
+                                <div class="menu-divider"></div>
+                                
+                                <a href="#" id="attendance-reports" class="menu-item">
+                                    <i class="fas fa-clipboard-list"></i>
+                                    <div class="menu-item-content">
+                                        <span>Planillas de Asistencia</span>
+                                        <p>Ver y exportar planillas</p>
+                                    </div>
+                                </a>
+                                
+                                <a href="#" id="gallery" class="menu-item">
+                                    <i class="fas fa-images"></i>
+                                    <div class="menu-item-content">
+                                        <span>Galería</span>
+                                        <p>Ver fotos de actividades</p>
+                                    </div>
+                                </a>
+                                
+                                <div class="menu-divider"></div>
+                                
+                                <a href="#" id="global-stats" class="menu-item">
+                                    <i class="fas fa-chart-bar"></i>
+                                    <div class="menu-item-content">
+                                        <span>Estadísticas</span>
+                                        <p>Resumen de todas las instituciones</p>
+                                    </div>
+                                </a>
+                                
+                                <div class="menu-divider"></div>
+                                
+                                <a href="#" id="logout" class="menu-item">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <div class="menu-item-content">
+                                        <span>Cerrar Sesión</span>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Dashboard de estadísticas -->
+            <section class="students-dashboard">
+                <div class="dashboard-grid">
+                    <div class="stat-card total-students">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="total-students-count">0</h3>
+                            <p>Total Estudiantes</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card by-institution">
+                        <div class="stat-icon">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="institutions-count">0</h3>
+                            <p>Instituciones</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card by-courses">
+                        <div class="stat-icon">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="courses-count">0</h3>
+                            <p>Cursos Activos</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card recent-activity">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="recent-additions">0</h3>
+                            <p>Agregados Hoy</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Controles principales -->
+            <section class="students-controls">
+                <div class="controls-header">
+                    <div class="controls-title">
+                        <h2>
+                            <i class="fas fa-users"></i>
+                            Gestión de Estudiantes
+                        </h2>
+                        <p>Administra todos los estudiantes de tus instituciones</p>
+                    </div>
+                    
+                    <div class="controls-actions">
+                        <button class="action-btn primary" id="add-student-btn">
+                            <i class="fas fa-user-plus"></i>
+                            Agregar Estudiante
+                        </button>
+                        
+                        <button class="action-btn secondary" id="bulk-import-btn">
+                            <i class="fas fa-upload"></i>
+                            Importación Masiva
+                        </button>
+                        
+                        <button class="action-btn tertiary" id="export-students-btn">
+                            <i class="fas fa-download"></i>
+                            Exportar Lista
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Filtros avanzados -->
+            <section class="students-filters">
+                <div class="filters-container">
+                    <div class="filter-group">
+                        <label for="search-students">
+                            <i class="fas fa-search"></i>
+                            Buscar estudiante
+                        </label>
+                        <input type="text" id="search-students" placeholder="Nombre, apellido o documento...">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filter-institution">
+                            <i class="fas fa-university"></i>
+                            Institución
+                        </label>
+                        <select id="filter-institution">
+                            <option value="">Todas las instituciones</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filter-course">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            Curso
+                        </label>
+                        <select id="filter-course">
+                            <option value="">Todos los cursos</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filter-status">
+                            <i class="fas fa-toggle-on"></i>
+                            Estado
+                        </label>
+                        <select id="filter-status">
+                            <option value="">Todos</option>
+                            <option value="active">Activos</option>
+                            <option value="inactive">Inactivos</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-actions">
+                        <button class="filter-btn clear" id="clear-filters">
+                            <i class="fas fa-times"></i>
+                            Limpiar
+                        </button>
+                        <button class="filter-btn apply" id="apply-filters">
+                            <i class="fas fa-filter"></i>
+                            Filtrar
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección de estudiantes actualizada -->
+            <section class="students-list">
+                <div class="list-header">
+                    <div class="list-info">
+                        <h3 id="students-count">0 estudiantes</h3>
+                        <div class="view-toggles">
+                            <button class="view-toggle active" id="grid-view" title="Vista de tarjetas">
+                                <i class="fas fa-th-large"></i>
+                            </button>
+                            <button class="view-toggle" id="list-view" title="Vista de lista">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="list-actions">
+                        <button class="bulk-action-btn" id="select-all-students" style="display: none;">
+                            <i class="fas fa-check-square"></i>
+                            Seleccionar Todo
+                        </button>
+                        <button class="bulk-btn delete" id="bulk-delete" style="display: none;">
+                            <i class="fas fa-trash"></i>
+                            Eliminar
+                        </button>
+                        <button class="bulk-btn export" id="bulk-export" style="display: none;">
+                            <i class="fas fa-download"></i>
+                            Exportar
+                        </button>
+                    </div>
+                </div>
+
+                <div id="students-grid" class="students-grid">
+                    <!-- Estudiantes se cargan dinámicamente -->
+                </div>
+                
+                <div id="empty-state" class="empty-state" style="display: none;">
+                    <div class="empty-icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h3>No hay estudiantes registrados</h3>
+                    <p>Comienza agregando tu primer estudiante o importa una lista existente</p>
+                    <button class="empty-action-btn" onclick="openStudentModal()">
+                        <i class="fas fa-plus"></i>
+                        Agregar Primer Estudiante
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal: Agregar/Editar Estudiante -->
+    <div class="modal" id="student-modal">
+        <div class="modal-content student-modal-content">
+            <div class="modal-header">
+                <h3 id="student-modal-title">
+                    <i class="fas fa-user-plus"></i>
+                    Agregar Estudiante
+                </h3>
+                <buttonbutton class="close-modal" id="close-student-modal" title="Cerrar modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="student-form" class="student-form">
+                    <!-- Información personal -->
+                    <div class="form-section">
+                        <h4>
+                            <i class="fas fa-user"></i>
+                            Información Personal
+                        </h4>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="student-name">Nombre *</label>
+                                <input type="text" id="student-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="student-lastname">Apellido *</label>
+                                <input type="text" id="student-lastname" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="student-document">Documento</label>
+                                <input type="text" id="student-document" placeholder="DNI, Cédula, etc.">
+                            </div>
+                            <div class="form-group">
+                                <label for="student-birthdate">Fecha de Nacimiento</label>
+                                <input type="date" id="student-birthdate">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="student-gender">Género</label>
+                                <select id="student-gender">
+                                    <option value="">Seleccionar</option>
+                                    <option value="masculino">Masculino</option>
+                                    <option value="femenino">Femenino</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="student-phone">Teléfono</label>
+                                <input type="tel" id="student-phone" placeholder="+1234567890">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información académica -->
+                    <div class="form-section">
+                        <h4>
+                            <i class="fas fa-graduation-cap"></i>
+                            Información Académica
+                        </h4>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="student-institution">Institución *</label>
+                                <select id="student-institution" required>
+                                    <option value="">Seleccionar institución</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="student-course">Curso *</label>
+                                <select id="student-course" required>
+                                    <option value="">Primero selecciona una institución</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="student-grade">Grado/Nivel</label>
+                                <input type="text" id="student-grade" placeholder="Ej: 5to grado">
+                            </div>
+                            <div class="form-group">
+                                <label for="student-status">Estado</label>
+                                <select id="student-status">
+                                    <option value="active">Activo</option>
+                                    <option value="inactive">Inactivo</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información adicional -->
+                    <div class="form-section">
+                        <h4>
+                            <i class="fas fa-info-circle"></i>
+                            Información Adicional
+                        </h4>
+                        
+                        <div class="form-group">
+                            <label for="student-address">Dirección</label>
+                            <textarea id="student-address" rows="2" placeholder="Dirección completa"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="student-notes">Notas</label>
+                            <textarea id="student-notes" rows="3" placeholder="Observaciones, alergias, información relevante..."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" class="cancel-btn" id="cancel-student">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button type="submit" form="student-form" class="save-btn" id="save-student">
+                    <i class="fas fa-save"></i>
+                    <span id="save-student-text">Guardar Estudiante</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Importación Masiva -->
+    <div class="modal" id="bulk-import-modal">
+        <div class="modal-content import-modal-content">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-upload"></i>
+                    Importación Masiva de Estudiantes
+                </h3>
+                <buttonbutton class="close-modal" id="close-import-modal" title="Cerrar modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="import-tabs">
+                    <button class="import-tab active" data-tab="paste">
+                        <i class="fas fa-paste"></i>
+                        Pegar Lista
+                    </button>
+                    <button class="import-tab" data-tab="file">
+                        <i class="fas fa-file-csv"></i>
+                        Subir Archivo
+                    </button>
+                </div>
+                
+                <div class="import-content">
+                    <!-- Tab: Pegar lista -->
+                    <div class="import-panel active" id="paste-panel">
+                        <div class="panel-header">
+                            <h4>Pegar lista de estudiantes</h4>
+                            <p>Pega tu lista de estudiantes. Un estudiante por línea.</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bulk-institution">Institución de destino *</label>
+                            <select id="bulk-institution" required>
+                                <option value="">Seleccionar institución</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bulk-course">Curso de destino *</label>
+                            <select id="bulk-course" required>
+                                <option value="">Primero selecciona una institución</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="students-text">Lista de estudiantes *</label>
+                            <textarea id="students-text" rows="10" placeholder="Ejemplo:&#10;Juan Pérez&#10;María García&#10;Carlos López&#10;&#10;O con más datos:&#10;Juan Pérez | 12345678 | 15/03/2010&#10;María García | 87654321 | 22/07/2009"></textarea>
+                        </div>
+                        
+                        <div class="format-help">
+                            <h5>Formatos soportados:</h5>
+                            <ul>
+                                <li><strong>Simple:</strong> Solo nombres (Juan Pérez)</li>
+                                <li><strong>Con documento:</strong> Nombre | Documento (Juan Pérez | 12345678)</li>
+                                <li><strong>Completo:</strong> Nombre | Documento | Fecha nacimiento (Juan Pérez | 12345678 | 15/03/2010)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Tab: Subir archivo -->
+                    <div class="import-panel" id="file-panel">
+                        <div class="panel-header">
+                            <h4>Subir archivo CSV/Excel</h4>
+                            <p>Sube un archivo con la lista de estudiantes</p>
+                        </div>
+                        
+                        <div class="file-upload-area">
+                            <input type="file" id="students-file" accept=".csv,.xlsx,.xls" hidden>
+                            <label for="students-file" class="file-upload-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Seleccionar archivo o arrastrar aquí</span>
+                                <small>Formatos: CSV, Excel (.xlsx, .xls)</small>
+                            </label>
+                        </div>
+                        
+                        <div class="file-preview" id="file-preview" style="display: none;">
+                            <h5>Vista previa del archivo:</h5>
+                            <div class="preview-table" id="preview-table">
+                                <!-- Tabla de vista previa -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Vista previa de estudiantes -->
+                <div class="import-preview" id="import-preview" style="display: none;">
+                    <h4>Vista previa - <span id="preview-count">0</span> estudiantes detectados</h4>
+                    <div class="preview-list" id="preview-list">
+                        <!-- Lista de estudiantes a importar -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" class="cancel-btn" id="cancel-import">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button type="button" class="preview-btn" id="preview-import">
+                    <i class="fas fa-eye"></i>
+                    Vista Previa
+                </button>
+                <button type="button" class="save-btn" id="confirm-import" style="display: none;">
+                    <i class="fas fa-upload"></i>
+                    Importar Estudiantes
+                </button>
+            </div>
+        </div>
+    </div>
+    <script src="src/config/firebase.js"></script>
+    <script src="src/assets/js/estudiantes.js"></script>
+</body>
+</html>
