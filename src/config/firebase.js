@@ -6,9 +6,9 @@
 // MANTENER configuración original que funciona
 const firebaseConfig = {
     apiKey: "AIzaSyAC2DxR63utzR1tmnHCqzApYTraxMsH79M",
-    authDomain: "horita-feliz-system.firebaseapp.com",  // ✅ ORIGINAL
-    projectId: "horita-feliz-system",                   // ✅ ORIGINAL  
-    storageBucket: "horita-feliz-system.firebasestorage.app", // ✅ ORIGINAL
+    authDomain: "horita-feliz-system.firebaseapp.com",
+    projectId: "horita-feliz-system",
+    storageBucket: "horita-feliz-system.firebasestorage.app",
     messagingSenderId: "469162449559",
     appId: "1:469162449559:web:734e8756fd03b1388ce7d2",
     measurementId: "G-6645JXJBD6"
@@ -34,3 +34,16 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 // Hacer disponibles globalmente
 window.auth = auth;
 window.db = db;
+
+// Función de diagnóstico
+function diagnoseFirabase() {
+    console.log('🔍 EduCheck Pro - Diagnóstico Firebase:');
+    console.log('Firebase disponible:', typeof firebase !== 'undefined');
+    console.log('Apps inicializadas:', firebase?.apps?.length || 0);
+    console.log('Auth disponible:', !!window.auth);
+    console.log('DB disponible:', !!window.db);
+    console.log('Usuario actual:', window.auth?.currentUser?.uid || 'No autenticado');
+}
+
+// Hacer disponible globalmente para debug
+window.diagnoseFirabase = diagnoseFirabase;
