@@ -14,23 +14,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="login-page">
-    <!-- Corazones flotantes decorativos -->
-    <div class="floating-heart" style="left: 10%; animation-delay: 0s;">💖</div>
-    <div class="floating-heart" style="left: 20%; animation-delay: 3s;">💕</div>
-    <div class="floating-heart" style="left: 30%; animation-delay: 6s;">💝</div>
-    <div class="floating-heart" style="left: 40%; animation-delay: 9s;">💗</div>
-    <div class="floating-heart" style="left: 50%; animation-delay: 12s;">💖</div>
-    <div class="floating-heart" style="left: 60%; animation-delay: 2s;">💕</div>
-    <div class="floating-heart" style="left: 70%; animation-delay: 5s;">💝</div>
-    <div class="floating-heart" style="left: 80%; animation-delay: 8s;">💗</div>
-    <div class="floating-heart" style="left: 90%; animation-delay: 11s;">💖</div>
+    <!-- Elementos decorativos sutiles -->
+    <div class="floating-elements">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div> <!-- NUEVO ELEMENTO ROSADO -->
+    </div>
 
     <div class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
-                <i class="fas fa-heart auth-icon"></i>
-                <h1>Horita Feliz</h1>
-                <p id="authDescription">Inicia sesión para continuar</p>
+                <div class="auth-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h1>EduCheck Pro</h1>
+                <p id="authDescription">Sistema de Gestión Educativa</p>
             </div>
 
             <!-- Formulario de login -->
@@ -274,19 +273,27 @@
 
     <!-- Script para mejorar la experiencia visual -->
     <script>
-        // Crear efectos de sparkle al hacer hover
+        // Crear efectos de sparkle al hacer hover con colores rosados
         document.querySelector('.auth-card').addEventListener('mouseenter', function() {
             createSparkles(this);
         });
 
         function createSparkles(element) {
-            for (let i = 0; i < 6; i++) {
+            const colors = [
+                'var(--edu-primary)',
+                'var(--edu-pink)',
+                'var(--edu-secondary)',
+                'var(--edu-pink-light)'
+            ];
+            
+            for (let i = 0; i < 8; i++) {
                 setTimeout(() => {
                     const sparkle = document.createElement('div');
                     sparkle.className = 'sparkle';
                     sparkle.style.left = Math.random() * 100 + '%';
                     sparkle.style.top = Math.random() * 100 + '%';
-                    sparkle.style.animationDelay = Math.random() * 2 + 's';
+                    sparkle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    sparkle.style.animationDelay = Math.random() * 1 + 's';
                     element.appendChild(sparkle);
                     
                     setTimeout(() => sparkle.remove(), 2000);
