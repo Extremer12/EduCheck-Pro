@@ -3,7 +3,7 @@
  * Sistema de administración de instituciones educativas
  * 
  * @description Módulo para crear, editar y gestionar instituciones educativas
- * @version 2.0.0
+ * @version 2.1.0
  * @author EduCheck Pro Team
  */
 
@@ -22,9 +22,12 @@ let globalStats = {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🏛️ Inicializando sistema de instituciones...');
     
-    // Verificar autenticación
+    // Verificar Firebase
     if (!window.auth) {
         console.error('❌ Firebase Auth no disponible');
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 2000);
         return;
     }
     
@@ -45,22 +48,21 @@ function initializeInstitutionsSystem() {
     console.log('🎯 Inicializando sistema completo...');
     
     try {
-        // Inicializar menú toggle
+        // Inicializar componentes
         initializeMenuToggle();
+        initializeDarkMode();
+        updateUserInfo();
         
-        // Cargar datos del usuario actual
+        // Cargar datos
         loadInstitutions();
         calculateGlobalStats();
         
         // Configurar interfaz
         setupEventListeners();
-        initializeDarkMode();
-        updateUserInfo();
         
         // Actualizar interfaz
         updateDashboard();
         displayInstitutions();
-        updateRecentActivity();
         
         console.log('✅ Sistema de instituciones inicializado correctamente');
         
@@ -70,107 +72,7 @@ function initializeInstitutionsSystem() {
     }
 }
 
-// ===== FUNCIONES DEL MENÚ TOGGLE =====
-function initializeMenuToggle() {
-    console.log('🔧 Instituciones: Inicializando menú toggle...');
-    
-    const profileButton = document.getElementById('profileButton');
-    const menuDropdown = document.getElementById('menuDropdown');
-    const menuCloseBtn = document.getElementById('menu-close-btn');
-    
-    if (!profileButton || !menuDropdown) {
-        console.error('❌ Elementos del menú no encontrados');
-        return;
-    }
-    
-    // Función para abrir menú
-    function openMenu() {
-        menuDropdown.classList.add('show');
-        menuDropdown.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-    
-    // Función para cerrar menú
-    function closeMenu() {
-        menuDropdown.classList.remove('show');
-        menuDropdown.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-    
-    // Event listeners
-    profileButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        openMenu();
-    });
-    
-    if (menuCloseBtn) {
-        menuCloseBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            closeMenu();
-        });
-    }
-    
-    // Cerrar con click fuera
-    document.addEventListener('click', function(e) {
-        if (menuDropdown.classList.contains('show') && 
-            !menuDropdown.contains(e.target) && 
-            !profileButton.contains(e.target)) {
-            closeMenu();
-        }
-    });
-    
-    // Cerrar con Escape
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && menuDropdown.classList.contains('show')) {
-            closeMenu();
-        }
-    });
-    
-    // Configurar logout
-    const logoutBtn = document.getElementById('logout');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-                window.auth.signOut().then(() => {
-                    window.location.href = 'login.html';
-                }).catch((error) => {
-                    console.error('Error al cerrar sesión:', error);
-                    showNotification('Error al cerrar sesión', 'error');
-                });
-            }
-        });
-    }
-    
-    console.log('✅ Menú toggle inicializado');
-}
-
-// ===== ACTUALIZAR INFO DEL USUARIO =====
-function updateUserInfo() {
-    if (!currentUser) return;
-    
-    const displayName = currentUser.displayName || currentUser.email.split('@')[0];
-    
-    // Actualizar nombre en todos los elementos
-    const nameElements = [
-        document.getElementById('headerTeacherName'),
-        document.getElementById('menuTeacherName')
-    ];
-    
-    nameElements.forEach(element => {
-        if (element) {
-            element.textContent = displayName;
-        }
-    });
-    
-    console.log(`👤 Info de usuario actualizada: ${displayName}`);
-}
-
 // ===== GESTIÓN DE DATOS CON SEPARACIÓN POR USUARIO =====
-
-// Obtener datos específicos del usuario
 function getUserData(key) {
     if (!currentUser) {
         console.error('❌ No hay usuario autenticado');
@@ -183,7 +85,6 @@ function getUserData(key) {
     return data;
 }
 
-// Guardar datos específicos del usuario
 function setUserData(key, data) {
     if (!currentUser) {
         console.error('❌ No hay usuario autenticado');
@@ -196,7 +97,7 @@ function setUserData(key, data) {
     return true;
 }
 
-// Cargar instituciones del usuario actual
+// ===== CARGAR Y GUARDAR INSTITUCIONES =====
 function loadInstitutions() {
     try {
         if (!currentUser) {
@@ -208,7 +109,7 @@ function loadInstitutions() {
         const savedInstitutions = getUserData('institutions');
         allInstitutions = savedInstitutions ? JSON.parse(savedInstitutions) : [];
         
-        // Filtrar solo las instituciones del usuario actual (seguridad adicional)
+        // Filtrar solo las instituciones del usuario actual
         allInstitutions = allInstitutions.filter(inst => 
             inst.createdBy === currentUser.uid
         );
@@ -224,7 +125,18 @@ function loadInstitutions() {
     }
 }
 
-// Migrar establecimientos antiguos
+function saveInstitutions() {
+    if (!currentUser) {
+        console.error('❌ No hay usuario para guardar instituciones');
+        return;
+    }
+    
+    const userInstitutions = allInstitutions.filter(i => i.createdBy === currentUser.uid);
+    setUserData('institutions', JSON.stringify(userInstitutions));
+    console.log(`💾 ${userInstitutions.length} instituciones guardadas para usuario ${currentUser.uid}`);
+}
+
+// ===== MIGRAR DATOS ANTIGUOS =====
 function migrateOldEstablishments() {
     const oldEstablishments = getUserData('establishments');
     
@@ -242,7 +154,7 @@ function migrateOldEstablishments() {
                 notes: est.notes || '',
                 isDefault: est.isDefault || false,
                 createdAt: est.createdAt || new Date().toISOString(),
-                createdBy: currentUser.uid, // IMPORTANTE: Asignar al usuario actual
+                createdBy: currentUser.uid,
                 courses: [],
                 students: [],
                 settings: {
@@ -270,7 +182,7 @@ function migrateOldEstablishments() {
     }
 }
 
-// Calcular estadísticas globales del usuario actual
+// ===== CALCULAR ESTADÍSTICAS =====
 function calculateGlobalStats() {
     try {
         const courses = JSON.parse(getUserData('courses') || '[]')
@@ -285,7 +197,7 @@ function calculateGlobalStats() {
             attendance: calculateGlobalAttendance(students)
         };
         
-        console.log('📊 Estadísticas calculadas para usuario actual:', globalStats);
+        console.log('📊 Estadísticas calculadas:', globalStats);
         
     } catch (error) {
         console.error('❌ Error calculando estadísticas:', error);
@@ -293,7 +205,6 @@ function calculateGlobalStats() {
     }
 }
 
-// Calcular asistencia global
 function calculateGlobalAttendance(students) {
     if (students.length === 0) return 0;
     
@@ -309,9 +220,318 @@ function calculateGlobalAttendance(students) {
     return Math.round(totalAttendance / students.length);
 }
 
-// ===== FUNCIONES DE MODAL CORREGIDAS =====
+// ===== ACTUALIZAR DASHBOARD =====
+function updateDashboard() {
+    // Actualizar estadísticas compactas
+    updateElement('total-institutions', globalStats.institutions);
+    updateElement('total-courses', globalStats.courses);
+    updateElement('total-students', globalStats.students);
+    
+    // Actualizar contador de instituciones
+    const institutionCount = document.getElementById('institution-count');
+    if (institutionCount) {
+        const count = allInstitutions.length;
+        institutionCount.textContent = `(${count} institución${count !== 1 ? 'es' : ''})`;
+    }
+}
 
-// Abrir modal de confirmación de eliminación
+// ===== MOSTRAR INSTITUCIONES =====
+function displayInstitutions() {
+    const container = document.getElementById('institutions-container');
+    const emptyState = document.getElementById('empty-institutions');
+    
+    if (!container || !emptyState) {
+        console.error('❌ Elementos de contenedor no encontrados');
+        return;
+    }
+    
+    if (allInstitutions.length === 0) {
+        container.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+    }
+    
+    container.style.display = 'grid';
+    emptyState.style.display = 'none';
+    
+    container.innerHTML = allInstitutions.map(institution => 
+        createInstitutionCard(institution)
+    ).join('');
+    
+    console.log(`📋 ${allInstitutions.length} instituciones renderizadas`);
+}
+
+// ===== CREAR TARJETA DE INSTITUCIÓN =====
+function createInstitutionCard(institution) {
+    const typeLabel = getTypeLabel(institution.type);
+    
+    return `
+        <div class="institution-card ${institution.isDefault ? 'default' : ''}" data-institution-id="${institution.id}">
+            ${institution.isDefault ? '<div class="default-badge"><i class="fas fa-star"></i></div>' : ''}
+            
+            <div class="institution-header">
+                <div class="institution-info">
+                    <h3 class="institution-name">${institution.name}</h3>
+                    <span class="institution-type">${typeLabel}</span>
+                </div>
+                ${institution.isDefault ? '<div class="institution-badge"><i class="fas fa-star"></i></div>' : ''}
+            </div>
+            
+            <div class="institution-stats">
+                <div class="stat-mini">
+                    <span class="stat-mini-number">${institution.stats?.totalCourses || 0}</span>
+                    <span class="stat-mini-label">Cursos</span>
+                </div>
+                <div class="stat-mini">
+                    <span class="stat-mini-number">${institution.stats?.totalStudents || 0}</span>
+                    <span class="stat-mini-label">Estudiantes</span>
+                </div>
+                <div class="stat-mini">
+                    <span class="stat-mini-number">${institution.stats?.averageAttendance || 0}%</span>
+                    <span class="stat-mini-label">Asistencia</span>
+                </div>
+            </div>
+            
+            ${institution.address || institution.phone ? `
+                <div class="institution-details">
+                    ${institution.address ? `
+                        <div class="detail-row">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>${institution.address}</span>
+                        </div>
+                    ` : ''}
+                    ${institution.phone ? `
+                        <div class="detail-row">
+                            <i class="fas fa-phone"></i>
+                            <span>${institution.phone}</span>
+                        </div>
+                    ` : ''}
+                </div>
+            ` : ''}
+            
+            <div class="institution-actions">
+                <button class="action-btn view-courses-btn" onclick="viewInstitutionCourses('${institution.id}')">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    Cursos
+                </button>
+                <button class="action-btn edit-institution-btn" onclick="editInstitution('${institution.id}')">
+                    <i class="fas fa-edit"></i>
+                    Editar
+                </button>
+                <button class="action-btn delete-institution-btn" onclick="deleteInstitution('${institution.id}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function getTypeLabel(type) {
+    const types = {
+        universidad: 'Universidad',
+        instituto: 'Instituto',
+        escuela: 'Escuela',
+        colegio: 'Colegio',
+        jardin: 'Jardín',
+        capacitacion: 'Capacitación',
+        iglesia: 'Iglesia',
+        otro: 'Otro'
+    };
+    return types[type] || 'Institución';
+}
+
+// ===== MODAL DE INSTITUCIÓN =====
+function openInstitutionModal(institutionId = null) {
+    const modal = document.getElementById('institution-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const saveButtonText = document.getElementById('save-btn-text');
+    const form = document.getElementById('institution-form');
+    
+    if (!modal || !form) {
+        console.error('❌ Modal o formulario no encontrado');
+        return;
+    }
+    
+    // Limpiar formulario
+    form.reset();
+    
+    if (institutionId) {
+        // Modo edición
+        const institution = allInstitutions.find(i => i.id === institutionId);
+        if (!institution) {
+            showNotification('Institución no encontrada', 'error');
+            return;
+        }
+        
+        currentEditingInstitution = institution;
+        modalTitle.textContent = 'Editar Institución';
+        saveButtonText.textContent = 'Actualizar Institución';
+        
+        // Llenar formulario con datos existentes
+        fillForm(institution);
+        
+    } else {
+        // Modo creación
+        currentEditingInstitution = null;
+        modalTitle.textContent = 'Agregar Institución';
+        saveButtonText.textContent = 'Guardar Institución';
+    }
+    
+    modal.classList.add('show');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    console.log(`📝 Modal abierto: ${institutionId ? 'Editar' : 'Crear'}`);
+}
+
+function fillForm(institution) {
+    document.getElementById('institutionName').value = institution.name || '';
+    document.getElementById('institutionType').value = institution.type || '';
+    document.getElementById('institutionAddress').value = institution.address || '';
+    document.getElementById('institutionPhone').value = institution.phone || '';
+    document.getElementById('institutionNotes').value = institution.notes || '';
+    document.getElementById('setAsDefault').checked = institution.isDefault || false;
+}
+
+function closeInstitutionModal() {
+    const modal = document.getElementById('institution-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+    currentEditingInstitution = null;
+    console.log('📝 Modal cerrado');
+}
+
+// ===== MANEJAR GUARDADO - FUNCIÓN FALTANTE CORREGIDA =====
+function handleSaveInstitution(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const institutionData = {
+        name: formData.get('name')?.trim(),
+        type: formData.get('type'),
+        address: formData.get('address')?.trim() || '',
+        phone: formData.get('phone')?.trim() || '',
+        notes: formData.get('notes')?.trim() || '',
+        isDefault: formData.has('isDefault')
+    };
+    
+    // Validaciones
+    if (!institutionData.name) {
+        showNotification('El nombre de la institución es obligatorio', 'error');
+        return;
+    }
+    
+    if (!institutionData.type) {
+        showNotification('Debe seleccionar un tipo de institución', 'error');
+        return;
+    }
+    
+    try {
+        if (currentEditingInstitution) {
+            updateInstitution(currentEditingInstitution.id, institutionData);
+        } else {
+            createInstitution(institutionData, currentUser);
+        }
+        
+        closeInstitutionModal();
+        
+    } catch (error) {
+        console.error('❌ Error guardando institución:', error);
+        showNotification('Error al guardar la institución', 'error');
+    }
+}
+
+// ===== CREAR INSTITUCIÓN =====
+function createInstitution(formData, user) {
+    // Si se marca como default, quitar default de las demás
+    if (formData.isDefault) {
+        allInstitutions.forEach(i => {
+            if (i.createdBy === user.uid) {
+                i.isDefault = false;
+            }
+        });
+    }
+    
+    const newInstitution = {
+        id: generateId(),
+        ...formData,
+        createdAt: new Date().toISOString(),
+        createdBy: user.uid,
+        courses: [],
+        students: [],
+        settings: {
+            allowMultipleCourses: true,
+            requireAttendance: true,
+            academicYearStart: 'march'
+        },
+        stats: {
+            totalCourses: 0,
+            totalStudents: 0,
+            averageAttendance: 0,
+            lastActivity: new Date().toISOString()
+        }
+    };
+    
+    allInstitutions.push(newInstitution);
+    saveInstitutions();
+    
+    // Actualizar interfaz
+    calculateGlobalStats();
+    updateDashboard();
+    displayInstitutions();
+    
+    showNotification(`✅ Institución "${newInstitution.name}" creada correctamente`, 'success');
+    console.log(`🏛️ Institución creada: ${newInstitution.name} (ID: ${newInstitution.id})`);
+}
+
+// ===== ACTUALIZAR INSTITUCIÓN =====
+function updateInstitution(institutionId, formData) {
+    const institutionIndex = allInstitutions.findIndex(i => i.id === institutionId);
+    
+    if (institutionIndex === -1) {
+        showNotification('Institución no encontrada', 'error');
+        return;
+    }
+    
+    const institution = allInstitutions[institutionIndex];
+    
+    // Verificar permisos
+    if (institution.createdBy !== currentUser.uid) {
+        showNotification('No tienes permisos para editar esta institución', 'error');
+        return;
+    }
+    
+    // Si se marca como default, quitar default de las demás
+    if (formData.isDefault) {
+        allInstitutions.forEach(i => {
+            if (i.createdBy === currentUser.uid && i.id !== institutionId) {
+                i.isDefault = false;
+            }
+        });
+    }
+    
+    // Actualizar datos
+    allInstitutions[institutionIndex] = {
+        ...institution,
+        ...formData,
+        lastModified: new Date().toISOString()
+    };
+    
+    saveInstitutions();
+    
+    // Actualizar interfaz
+    calculateGlobalStats();
+    updateDashboard();
+    displayInstitutions();
+    
+    showNotification(`✅ Institución "${formData.name}" actualizada correctamente`, 'success');
+    console.log(`🏛️ Institución actualizada: ${formData.name} (ID: ${institutionId})`);
+}
+
+// ===== ELIMINAR INSTITUCIÓN =====
 function deleteInstitution(institutionId) {
     const institution = allInstitutions.find(i => i.id === institutionId);
     if (!institution) {
@@ -320,7 +540,7 @@ function deleteInstitution(institutionId) {
         return;
     }
     
-    // Verificar que pertenece al usuario actual
+    // Verificar permisos
     if (institution.createdBy !== currentUser.uid) {
         console.error(`❌ Usuario no autorizado para eliminar institución: ${institutionId}`);
         showNotification('No tienes permisos para eliminar esta institución', 'error');
@@ -331,23 +551,22 @@ function deleteInstitution(institutionId) {
     
     document.getElementById('delete-institution-name').textContent = institution.name;
     
-    // Importante: Almacenar el ID en el modal
     const modal = document.getElementById('delete-institution-modal');
     modal.dataset.institutionId = institutionId;
-    
     modal.classList.add('show');
     modal.style.display = 'flex';
 }
 
-// Cerrar modal de eliminación
 function closeDeleteModal() {
     const modal = document.getElementById('delete-institution-modal');
-    modal.classList.remove('show');
-    modal.style.display = 'none';
-    delete modal.dataset.institutionId;
+    if (modal) {
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+        delete modal.dataset.institutionId;
+    }
+    console.log('🗑️ Modal de eliminación cerrado');
 }
 
-// Confirmar eliminación - CORREGIDO
 function confirmDeleteInstitution() {
     const modal = document.getElementById('delete-institution-modal');
     const institutionId = modal.dataset.institutionId;
@@ -394,7 +613,6 @@ function confirmDeleteInstitution() {
         calculateGlobalStats();
         updateDashboard();
         displayInstitutions();
-        addRecentActivity('delete', institutionName);
         
         showNotification(`✅ Institución "${institutionName}" eliminada correctamente`, 'success');
         console.log(`🗑️ Institución eliminada: ${institutionName} (${institutionId})`);
@@ -405,16 +623,15 @@ function confirmDeleteInstitution() {
     }
 }
 
-// Eliminar datos relacionados del usuario actual
 function deleteRelatedData(institutionId) {
-    // Eliminar cursos del usuario actual
+    // Eliminar cursos relacionados
     const courses = JSON.parse(getUserData('courses') || '[]');
     const filteredCourses = courses.filter(c => 
         c.institutionId !== institutionId || c.createdBy !== currentUser.uid
     );
     setUserData('courses', JSON.stringify(filteredCourses));
     
-    // Eliminar estudiantes del usuario actual
+    // Eliminar estudiantes relacionados
     const students = JSON.parse(getUserData('students') || '[]');
     const filteredStudents = students.filter(s => 
         s.institutionId !== institutionId || s.createdBy !== currentUser.uid
@@ -424,187 +641,81 @@ function deleteRelatedData(institutionId) {
     console.log(`🧹 Datos relacionados eliminados para institución: ${institutionId}`);
 }
 
-// ===== RESTO DE FUNCIONES EXISTENTES =====
-// (Mantener todas las demás funciones como están, pero agregar las correcciones de separación de datos)
-
-// Crear nueva institución - CORREGIDO
-function createInstitution(formData, user) {
-    // Si se marca como default, quitar default de las demás del usuario actual
-    if (formData.isDefault) {
-        allInstitutions.forEach(i => {
-            if (i.createdBy === user.uid) {
-                i.isDefault = false;
-            }
-        });
-    }
+// ===== MENÚ TOGGLE =====
+function initializeMenuToggle() {
+    console.log('🔧 Instituciones: Inicializando menú toggle...');
     
-    const newInstitution = {
-        id: generateId(),
-        ...formData,
-        createdAt: new Date().toISOString(),
-        createdBy: user.uid, // IMPORTANTE: Asignar al usuario actual
-        courses: [],
-        students: [],
-        settings: {
-            allowMultipleCourses: true,
-            requireAttendance: true,
-            academicYearStart: 'march'
-        },
-        stats: {
-            totalCourses: 0,
-            totalStudents: 0,
-            averageAttendance: 0,
-            lastActivity: new Date().toISOString()
-        }
-    };
+    const profileButton = document.getElementById('profileButton');
+    const menuDropdown = document.getElementById('menuDropdown');
+    const menuCloseBtn = document.getElementById('menu-close-btn');
     
-    allInstitutions.push(newInstitution);
-    saveInstitutions();
-    
-    // Actualizar interfaz
-    calculateGlobalStats();
-    updateDashboard();
-    displayInstitutions();
-    addRecentActivity('create', newInstitution.name);
-    
-    showNotification(`✅ Institución "${newInstitution.name}" creada correctamente`, 'success');
-    console.log(`🏛️ Institución creada: ${newInstitution.name} (ID: ${newInstitution.id})`);
-}
-
-// Guardar instituciones del usuario actual
-function saveInstitutions() {
-    if (!currentUser) {
-        console.error('❌ No hay usuario para guardar instituciones');
+    if (!profileButton || !menuDropdown) {
+        console.error('❌ Elementos del menú no encontrados');
         return;
     }
     
-    // Filtrar solo las instituciones del usuario actual antes de guardar
-    const userInstitutions = allInstitutions.filter(i => i.createdBy === currentUser.uid);
-    setUserData('institutions', JSON.stringify(userInstitutions));
-    console.log(`💾 ${userInstitutions.length} instituciones guardadas para usuario ${currentUser.uid}`);
-}
-
-// ===== MANTENER TODAS LAS DEMÁS FUNCIONES EXISTENTES =====
-// (setupEventListeners, displayInstitutions, createInstitutionCard, etc.)
-// Solo agregar las validaciones de currentUser.uid donde sea necesario
-
-// Configurar event listeners
-function setupEventListeners() {
-    // Formulario de institución
-    const institutionForm = document.getElementById('institution-form');
-    if (institutionForm) {
-        institutionForm.addEventListener('submit', handleSaveInstitution);
+    function openMenu() {
+        menuDropdown.classList.add('show', 'active');
+        document.body.style.overflow = 'hidden';
     }
     
-    // Botones de cierre de modal
-    const closeButtons = document.querySelectorAll('.close-modal');
-    closeButtons.forEach(btn => {
-        btn.addEventListener('click', closeAllModals);
+    function closeMenu() {
+        menuDropdown.classList.remove('show', 'active');
+        document.body.style.overflow = '';
+    }
+    
+    profileButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openMenu();
     });
     
-    // Click en overlay para cerrar modales
-    const modals = document.querySelectorAll('.modal');
-    modals.forEach(modal => {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeAllModals();
+    if (menuCloseBtn) {
+        menuCloseBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeMenu();
+        });
+    }
+    
+    document.addEventListener('click', function(e) {
+        if (menuDropdown.classList.contains('show') && 
+            !menuDropdown.contains(e.target) && 
+            !profileButton.contains(e.target)) {
+            closeMenu();
+        }
+    });
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && menuDropdown.classList.contains('show')) {
+            closeMenu();
+        }
+    });
+    
+    // Configurar logout
+    const logoutBtn = document.getElementById('logout');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                window.auth.signOut().then(() => {
+                    window.location.href = 'login.html';
+                }).catch((error) => {
+                    console.error('Error al cerrar sesión:', error);
+                    showNotification('Error al cerrar sesión', 'error');
+                });
             }
         });
-    });
-    
-    // Botones de navegación rápida
-    setupQuickNavigationButtons();
-    
-    console.log('🎛️ Event listeners configurados');
-}
-
-// Configurar botones de navegación rápida
-function setupQuickNavigationButtons() {
-    // Scroll a instituciones
-    window.scrollToInstitutions = function() {
-        document.getElementById('institutions-section').scrollIntoView({ 
-            behavior: 'smooth' 
-        });
-    };
-    
-    // Mostrar horario de hoy
-    window.showTodaySchedule = function() {
-        console.log('📅 Mostrando horario de hoy...');
-        showNotification('🚧 Función de horarios en desarrollo', 'info');
-    };
-    
-    // Exportar datos globales
-    window.exportGlobalData = function() {
-        exportAllData();
-    };
-    
-    // Abrir modal de agregar institución
-    window.openAddInstitutionModal = function() {
-        openInstitutionModal();
-    };
-    
-    // Cerrar modal de institución
-    window.closeInstitutionModal = function() {
-        closeInstitutionModal();
-    };
-    
-    // Cerrar modal de eliminación
-    window.closeDeleteModal = function() {
-        closeDeleteModal();
-    };
-}
-
-// ===== CONTINUAR CON EL RESTO DE FUNCIONES... =====
-// (Por brevedad, incluyo solo las funciones clave corregidas)
-
-// Generar ID único
-function generateId() {
-    return 'inst_' + Date.now().toString(36) + Math.random().toString(36).substr(2);
-}
-
-// Mostrar notificación
-function showNotification(message, type = 'success') {
-    console.log(`📢 ${type.toUpperCase()}: ${message}`);
-    
-    // Crear elemento de notificación si no existe
-    let notification = document.querySelector('.notification');
-    
-    if (!notification) {
-        notification = document.createElement('div');
-        notification.className = 'notification';
-        document.body.appendChild(notification);
     }
     
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
-            <span>${message}</span>
-        </div>
-        <button class="close-notification">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-    
-    notification.classList.add('show');
-    
-    const closeBtn = notification.querySelector('.close-notification');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            notification.classList.remove('show');
-        });
-    }
-    
-    setTimeout(() => {
-        notification.classList.remove('show');
-    }, 5000);
+    console.log('✅ Menú toggle inicializado');
 }
 
 // ===== MODO OSCURO =====
 function initializeDarkMode() {
     const darkModeToggle = document.getElementById('darkModeToggle');
     
-    // Cargar preferencia guardada del usuario actual
+    // Cargar preferencia guardada
     const savedDarkMode = getUserData('darkMode') === 'true';
     if (savedDarkMode) {
         document.body.classList.add('dark-mode');
@@ -627,7 +738,58 @@ function initializeDarkMode() {
     }
 }
 
+// ===== ACTUALIZAR INFO DEL USUARIO =====
+function updateUserInfo() {
+    if (!currentUser) return;
+    
+    const displayName = currentUser.displayName || currentUser.email.split('@')[0];
+    
+    const nameElements = [
+        document.getElementById('headerTeacherName'),
+        document.getElementById('menuTeacherName')
+    ];
+    
+    nameElements.forEach(element => {
+        if (element) {
+            element.textContent = displayName;
+        }
+    });
+    
+    console.log(`👤 Info de usuario actualizada: ${displayName}`);
+}
+
+// ===== CONFIGURAR EVENT LISTENERS =====
+function setupEventListeners() {
+    // Formulario de institución - CORREGIDO
+    const institutionForm = document.getElementById('institution-form');
+    if (institutionForm) {
+        institutionForm.addEventListener('submit', handleSaveInstitution);
+    }
+    
+    // Botones de cierre de modal
+    const closeButtons = document.querySelectorAll('.close-modal');
+    closeButtons.forEach(btn => {
+        btn.addEventListener('click', closeAllModals);
+    });
+    
+    // Click en overlay para cerrar modales
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal || e.target.classList.contains('modal-overlay')) {
+                closeAllModals();
+            }
+        });
+    });
+    
+    console.log('🎛️ Event listeners configurados');
+}
+
 // ===== FUNCIONES AUXILIARES =====
+function generateId() {
+    return 'inst_' + Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
 function updateElement(id, value) {
     const element = document.getElementById(id);
     if (element) {
@@ -642,9 +804,94 @@ function closeAllModals() {
         modal.style.display = 'none';
     });
     currentEditingInstitution = null;
+    document.body.style.overflow = '';
+    console.log('📝 Todos los modales cerrados');
 }
 
-// Hacer funciones disponibles globalmente
+// ===== NOTIFICACIONES =====
+function showNotification(message, type = 'success') {
+    console.log(`📢 ${type.toUpperCase()}: ${message}`);
+    
+    let notification = document.querySelector('.notification');
+    
+    if (!notification) {
+        notification = document.createElement('div');
+        notification.className = 'notification';
+        document.body.appendChild(notification);
+        
+        // Agregar estilos CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            .notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: white;
+                border-radius: 8px;
+                padding: 1rem;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                z-index: 3000;
+                max-width: 350px;
+                transform: translateX(120%);
+                transition: transform 0.3s ease;
+            }
+            .notification.show { transform: translateX(0); }
+            .notification-content { display: flex; align-items: center; gap: 0.8rem; }
+            .notification i { font-size: 1.5rem; }
+            .notification.success i { color: #28a745; }
+            .notification.error i { color: #dc3545; }
+            .notification.info i { color: #17a2b8; }
+            .close-notification { background: none; border: none; color: #888; cursor: pointer; padding: 0.5rem; }
+            .close-notification:hover { color: #333; }
+            body.dark-mode .notification { background: #2d2d2d; color: #e0e0e0; }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-times-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+    };
+    
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas ${icons[type] || icons.info}"></i>
+            <span>${message}</span>
+        </div>
+        <button class="close-notification">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    notification.classList.add('show');
+    
+    const closeBtn = notification.querySelector('.close-notification');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            notification.classList.remove('show');
+        });
+    }
+    
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 5000);
+}
+
+// ===== FUNCIONES GLOBALES CORREGIDAS - SIN RECURSIÓN =====
+window.openAddInstitutionModal = function() {
+    openInstitutionModal();
+};
+
+window.editInstitution = function(institutionId) {
+    openInstitutionModal(institutionId);
+};
+
 window.viewInstitutionCourses = function(institutionId) {
     const institution = allInstitutions.find(i => i.id === institutionId);
     if (!institution) return;
@@ -653,11 +900,17 @@ window.viewInstitutionCourses = function(institutionId) {
     window.location.href = `cursos.html?institution=${institutionId}`;
 };
 
-window.editInstitution = function(institutionId) {
-    openInstitutionModal(institutionId);
+window.scrollToInstitutions = function() {
+    const element = document.getElementById('institutions-section');
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+    }
 };
 
+// ===== SOLO UNA DEFINICIÓN DE CADA FUNCIÓN =====
+window.closeInstitutionModal = closeInstitutionModal;
 window.deleteInstitution = deleteInstitution;
 window.confirmDeleteInstitution = confirmDeleteInstitution;
+window.closeDeleteModal = closeDeleteModal;
 
-console.log('🏛️ instituciones.js cargado correctamente con separación de datos por usuario');
+console.log('✅ instituciones.js cargado correctamente - SIN RECURSIÓN');

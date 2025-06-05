@@ -31,6 +31,11 @@ EduCheck Pro es una plataforma integral diseñada para instituciones educativas 
 - Reportes de asistencia por curso/institución
 - Exportación de datos
 
+## 🎨 Diseño
+- **Paleta**: #FFB6C1 (Rosa pastel) + #B0E0E6 (Azul claro)
+- **Tipografía**: Quicksand
+- **Framework**: Vanilla JavaScript + Firebase
+
 ### 🌙 Experiencia de Usuario
 - Modo oscuro/claro
 - PWA instalable
