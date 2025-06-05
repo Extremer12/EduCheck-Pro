@@ -55,17 +55,19 @@
 
                 <!-- Menú de perfil -->
                 <div class="header-actions">
-                    <button class="theme-toggle" id="theme-toggle" title="Cambiar tema">
+                    <button class="theme-toggle" id="darkModeToggle" title="Cambiar tema">
                         <i class="fas fa-moon"></i>
                     </button>
                     <div class="teacher-toggle">
-                        <button class="profile-button" id="profile-menu" aria-label="Menú de perfil">
+                        <button class="profile-button" id="profileButton" aria-label="Menú de perfil">
                             <i class="fas fa-user-circle"></i>
-                            <span class="profile-name" id="user-name">Usuario</span>
+                            <span class="profile-name" id="headerTeacherName">Usuario</span>
                             <i class="fas fa-chevron-down"></i>
                         </button>
-                        <div class="menu-dropdown" id="menu-dropdown">
-                            <!-- NUEVO: Botón de cierre en el header -->
+                        
+                        <!-- MENÚ DROPDOWN CORREGIDO -->
+                        <div class="menu-dropdown" id="menuDropdown">
+                            <!-- Header del menú -->
                             <div class="menu-header">
                                 <button class="menu-close-btn" id="menu-close-btn" aria-label="Cerrar menú">
                                     <i class="fas fa-times"></i>
@@ -73,11 +75,11 @@
                                 <div class="profile-placeholder">
                                     <i class="fas fa-user-circle"></i>
                                 </div>
-                                <h3 id="menu-user-name">Usuario</h3>
+                                <h3 id="menuTeacherName">Usuario</h3>
                                 <p>Docente</p>
                             </div>
                             
-                            <!-- NUEVO: Contenedor para el contenido del menú -->
+                            <!-- Contenido del menú -->
                             <div class="menu-content">
                                 <a href="index.html" class="menu-item">
                                     <i class="fas fa-home"></i>
@@ -92,6 +94,14 @@
                                     <div class="menu-item-content">
                                         <span>Mis Estudiantes</span>
                                         <p>Gestionar estudiantes globalmente</p>
+                                    </div>
+                                </a>
+                                
+                                <a href="instituciones.html" class="menu-item">
+                                    <i class="fas fa-university"></i>
+                                    <div class="menu-item-content">
+                                        <span>Instituciones</span>
+                                        <p>Gestionar instituciones educativas</p>
                                     </div>
                                 </a>
                                 
@@ -123,16 +133,6 @@
                                 
                                 <div class="menu-divider"></div>
                                 
-                                <a href="#" id="global-stats" class="menu-item">
-                                    <i class="fas fa-chart-bar"></i>
-                                    <div class="menu-item-content">
-                                        <span>Estadísticas</span>
-                                        <p>Resumen de todas las instituciones</p>
-                                    </div>
-                                </a>
-                                
-                                <div class="menu-divider"></div>
-                                
                                 <a href="#" id="logout" class="menu-item">
                                     <i class="fas fa-sign-out-alt"></i>
                                     <div class="menu-item-content">
@@ -147,7 +147,6 @@
         </header>
 
         <main class="main-content">
-
             <!-- Controles principales -->
             <section class="students-controls">
                 <div class="controls-header">
@@ -220,21 +219,21 @@
                             <option value="inactive">Inactivos</option>
                         </select>
                     </div>
-                    
-                    <div class="filter-actions">
-                        <button class="filter-btn clear" id="clear-filters">
-                            <i class="fas fa-times"></i>
-                            Limpiar
-                        </button>
-                        <button class="filter-btn apply" id="apply-filters">
-                            <i class="fas fa-filter"></i>
-                            Filtrar
-                        </button>
-                    </div>
+                </div>
+                
+                <div class="filter-actions">
+                    <button class="filter-btn clear" id="clear-filters">
+                        <i class="fas fa-times"></i>
+                        Limpiar
+                    </button>
+                    <button class="filter-btn apply" id="apply-filters">
+                        <i class="fas fa-filter"></i>
+                        Filtrar
+                    </button>
                 </div>
             </section>
 
-            <!-- Sección de estudiantes actualizada -->
+            <!-- Sección de estudiantes -->
             <section class="students-list">
                 <div class="list-header">
                     <div class="list-info">
@@ -248,21 +247,6 @@
                             </button>
                         </div>
                     </div>
-                    
-                    <div class="list-actions">
-                        <button class="bulk-action-btn" id="select-all-students" style="display: none;">
-                            <i class="fas fa-check-square"></i>
-                            Seleccionar Todo
-                        </button>
-                        <button class="bulk-btn delete" id="bulk-delete" style="display: none;">
-                            <i class="fas fa-trash"></i>
-                            Eliminar
-                        </button>
-                        <button class="bulk-btn export" id="bulk-export" style="display: none;">
-                            <i class="fas fa-download"></i>
-                            Exportar
-                        </button>
-                    </div>
                 </div>
 
                 <div id="students-grid" class="students-grid">
@@ -275,7 +259,7 @@
                     </div>
                     <h3>No hay estudiantes registrados</h3>
                     <p>Comienza agregando tu primer estudiante o importa una lista existente</p>
-                    <button class="empty-action-btn" onclick="openStudentModal()">
+                    <button class="empty-action-btn" onclick="openAddStudentModal()">
                         <i class="fas fa-plus"></i>
                         Agregar Primer Estudiante
                     </button>
@@ -292,7 +276,7 @@
                     <i class="fas fa-user-plus"></i>
                     Agregar Estudiante
                 </h3>
-                <buttonbutton class="close-modal" id="close-student-modal" title="Cerrar modal">
+                <button class="close-modal" id="close-student-modal" title="Cerrar modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -308,39 +292,19 @@
                         
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="student-name">Nombre *</label>
-                                <input type="text" id="student-name" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="student-lastname">Apellido *</label>
-                                <input type="text" id="student-lastname" required>
+                                <label for="student-name">Nombre Completo *</label>
+                                <input type="text" id="student-name" name="studentName" required placeholder="Nombre y apellido">
                             </div>
                         </div>
                         
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="student-document">Documento</label>
-                                <input type="text" id="student-document" placeholder="DNI, Cédula, etc.">
-                            </div>
-                            <div class="form-group">
-                                <label for="student-birthdate">Fecha de Nacimiento</label>
-                                <input type="date" id="student-birthdate">
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="student-gender">Género</label>
-                                <select id="student-gender">
-                                    <option value="">Seleccionar</option>
-                                    <option value="masculino">Masculino</option>
-                                    <option value="femenino">Femenino</option>
-                                    <option value="otro">Otro</option>
-                                </select>
+                                <label for="student-email">Email</label>
+                                <input type="email" id="student-email" name="studentEmail" placeholder="estudiante@email.com">
                             </div>
                             <div class="form-group">
                                 <label for="student-phone">Teléfono</label>
-                                <input type="tel" id="student-phone" placeholder="+1234567890">
+                                <input type="tel" id="student-phone" name="studentPhone" placeholder="+1234567890">
                             </div>
                         </div>
                     </div>
@@ -355,13 +319,13 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="student-institution">Institución *</label>
-                                <select id="student-institution" required>
+                                <select id="student-institution" name="institutionSelect" required>
                                     <option value="">Seleccionar institución</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="student-course">Curso *</label>
-                                <select id="student-course" required>
+                                <select id="student-course" name="courseSelect" required>
                                     <option value="">Primero selecciona una institución</option>
                                 </select>
                             </div>
@@ -369,12 +333,12 @@
                         
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="student-grade">Grado/Nivel</label>
-                                <input type="text" id="student-grade" placeholder="Ej: 5to grado">
+                                <label for="student-enrollment-date">Fecha de Ingreso</label>
+                                <input type="date" id="student-enrollment-date" name="enrollmentDate">
                             </div>
                             <div class="form-group">
                                 <label for="student-status">Estado</label>
-                                <select id="student-status">
+                                <select id="student-status" name="status">
                                     <option value="active">Activo</option>
                                     <option value="inactive">Inactivo</option>
                                 </select>
@@ -390,13 +354,8 @@
                         </h4>
                         
                         <div class="form-group">
-                            <label for="student-address">Dirección</label>
-                            <textarea id="student-address" rows="2" placeholder="Dirección completa"></textarea>
-                        </div>
-                        
-                        <div class="form-group">
                             <label for="student-notes">Notas</label>
-                            <textarea id="student-notes" rows="3" placeholder="Observaciones, alergias, información relevante..."></textarea>
+                            <textarea id="student-notes" name="studentNotes" rows="3" placeholder="Observaciones, alergias, información relevante..."></textarea>
                         </div>
                     </div>
                 </form>
@@ -415,118 +374,7 @@
         </div>
     </div>
 
-    <!-- Modal: Importación Masiva -->
-    <div class="modal" id="bulk-import-modal">
-        <div class="modal-content import-modal-content">
-            <div class="modal-header">
-                <h3>
-                    <i class="fas fa-upload"></i>
-                    Importación Masiva de Estudiantes
-                </h3>
-                <buttonbutton class="close-modal" id="close-import-modal" title="Cerrar modal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="modal-body">
-                <div class="import-tabs">
-                    <button class="import-tab active" data-tab="paste">
-                        <i class="fas fa-paste"></i>
-                        Pegar Lista
-                    </button>
-                    <button class="import-tab" data-tab="file">
-                        <i class="fas fa-file-csv"></i>
-                        Subir Archivo
-                    </button>
-                </div>
-                
-                <div class="import-content">
-                    <!-- Tab: Pegar lista -->
-                    <div class="import-panel active" id="paste-panel">
-                        <div class="panel-header">
-                            <h4>Pegar lista de estudiantes</h4>
-                            <p>Pega tu lista de estudiantes. Un estudiante por línea.</p>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="bulk-institution">Institución de destino *</label>
-                            <select id="bulk-institution" required>
-                                <option value="">Seleccionar institución</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="bulk-course">Curso de destino *</label>
-                            <select id="bulk-course" required>
-                                <option value="">Primero selecciona una institución</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="students-text">Lista de estudiantes *</label>
-                            <textarea id="students-text" rows="10" placeholder="Ejemplo:&#10;Juan Pérez&#10;María García&#10;Carlos López&#10;&#10;O con más datos:&#10;Juan Pérez | 12345678 | 15/03/2010&#10;María García | 87654321 | 22/07/2009"></textarea>
-                        </div>
-                        
-                        <div class="format-help">
-                            <h5>Formatos soportados:</h5>
-                            <ul>
-                                <li><strong>Simple:</strong> Solo nombres (Juan Pérez)</li>
-                                <li><strong>Con documento:</strong> Nombre | Documento (Juan Pérez | 12345678)</li>
-                                <li><strong>Completo:</strong> Nombre | Documento | Fecha nacimiento (Juan Pérez | 12345678 | 15/03/2010)</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <!-- Tab: Subir archivo -->
-                    <div class="import-panel" id="file-panel">
-                        <div class="panel-header">
-                            <h4>Subir archivo CSV/Excel</h4>
-                            <p>Sube un archivo con la lista de estudiantes</p>
-                        </div>
-                        
-                        <div class="file-upload-area">
-                            <input type="file" id="students-file" accept=".csv,.xlsx,.xls" hidden>
-                            <label for="students-file" class="file-upload-label">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <span>Seleccionar archivo o arrastrar aquí</span>
-                                <small>Formatos: CSV, Excel (.xlsx, .xls)</small>
-                            </label>
-                        </div>
-                        
-                        <div class="file-preview" id="file-preview" style="display: none;">
-                            <h5>Vista previa del archivo:</h5>
-                            <div class="preview-table" id="preview-table">
-                                <!-- Tabla de vista previa -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Vista previa de estudiantes -->
-                <div class="import-preview" id="import-preview" style="display: none;">
-                    <h4>Vista previa - <span id="preview-count">0</span> estudiantes detectados</h4>
-                    <div class="preview-list" id="preview-list">
-                        <!-- Lista de estudiantes a importar -->
-                    </div>
-                </div>
-            </div>
-            
-            <div class="modal-actions">
-                <button type="button" class="cancel-btn" id="cancel-import">
-                    <i class="fas fa-times"></i>
-                    Cancelar
-                </button>
-                <button type="button" class="preview-btn" id="preview-import">
-                    <i class="fas fa-eye"></i>
-                    Vista Previa
-                </button>
-                <button type="button" class="save-btn" id="confirm-import" style="display: none;">
-                    <i class="fas fa-upload"></i>
-                    Importar Estudiantes
-                </button>
-            </div>
-        </div>
-    </div>
+    <!-- Scripts -->
     <script src="src/config/firebase.js"></script>
     <script src="src/assets/js/estudiantes.js"></script>
 </body>

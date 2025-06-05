@@ -36,153 +36,152 @@
 </head>
 <body>
     <div id="app">
-        <!-- En el header principal -->
-<header class="app-header">
-    <div class="header-content">
-        <div class="app-logo">
-            <div class="logo-icon">
-                <i class="fas fa-graduation-cap"></i>
-            </div>
-            <div class="app-info">
-                <h1>EduCheck Pro</h1>
-                <p>Sistema de Gestión Educativa</p>
-            </div>
-        </div>
-        <div class="teacher-toggle">
-                <button class="profile-button" aria-label="Menú de perfil">
-                    <img src="https://img.freepik.com/vector-gratis/circulo-azul-usuario-blanco_78370-4707.jpg?semt=ais_hybrid&w=740" alt="Profile" class="profile-img">
-                    <span id="teacher-name">Nombre de la Docente</span>
-                    <i class="fas fa-chevron-down" aria-hidden="true"></i>
-                </button>
-                <div class="menu-dropdown">
-                    <!-- NUEVO: Botón de cierre en el header -->
-                    <div class="menu-header">
-                        <button class="menu-close-btn" id="menu-close-btn" aria-label="Cerrar menú">
-                            <i class="fas fa-times"></i>
-                        </button>
-                        <img src="https://img.freepik.com/vector-gratis/circulo-azul-usuario-blanco_78370-4707.jpg?semt=ais_hybrid&w=740" alt="Profile" class="large-profile-img">
-                        <h3>Nombre de la Docente</h3>
-                        <p>Docente</p>
+        <!-- Header principal -->
+        <header class="app-header">
+            <div class="header-content">
+                <!-- Logo simplificado -->
+                <div class="app-logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-graduation-cap"></i>
                     </div>
+                </div>
+
+                <!-- Menú de perfil -->
+                <div class="teacher-toggle">
+                    <!-- CORREGIDO: ID coherente con estudiantes.js -->
+                    <button class="profile-button" id="profileButton" aria-label="Menú de perfil">
+                        <img src="https://img.freepik.com/vector-gratis/circulo-azul-usuario-blanco_78370-4707.jpg?semt=ais_hybrid&w=740" alt="Profile" class="profile-img">
+                        <span id="teacher-name">Nombre de la Docente</span>
+                        <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                    </button>
                     
-                    <!-- NUEVO: Contenedor para el contenido del menú -->
-                    <div class="menu-content">
-                        <!-- Botón de modo oscuro -->
-                        <div class="dark-mode-toggle">
-                            <span>Modo Oscuro</span>
-                            <label class="toggle-switch" for="darkModeToggle">
-                                <input type="checkbox" id="darkModeToggle" aria-label="Activar modo oscuro" title="Activar/desactivar modo oscuro">
-                                <span class="toggle-slider"></span>
-                            </label>
+                    <!-- CORREGIDO: ID coherente con estudiantes.js -->
+                    <div class="menu-dropdown" id="menuDropdown">
+                        <!-- Header del menú -->
+                        <div class="menu-header">
+                            <button class="menu-close-btn" id="menu-close-btn" aria-label="Cerrar menú">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <img src="https://img.freepik.com/vector-gratis/circulo-azul-usuario-blanco_78370-4707.jpg?semt=ais_hybrid&w=740" alt="Profile" class="large-profile-img">
+                            <h3 id="menuTeacherName">Nombre de la Docente</h3>
+                            <p>Docente</p>
                         </div>
                         
-                        <div class="menu-divider"></div>
-                        
-                        <!-- ACTUALIZADO: Cambiar "Mis Alumnos" por "Mis Instituciones" -->
-                        <a href="#" id="institutions-list" class="menu-item">
-                            <i class="fas fa-university"></i>
-                            <div class="menu-item-content">
-                                <span>Mis Instituciones</span>
-                                <p>Gestionar instituciones y cursos</p>
+                        <!-- Contenido del menú -->
+                        <div class="menu-content">
+                            <!-- Botón de modo oscuro -->
+                            <div class="dark-mode-toggle">
+                                <span>Modo Oscuro</span>
+                                <label class="toggle-switch" for="darkModeToggle">
+                                    <input type="checkbox" id="darkModeToggle" aria-label="Activar modo oscuro" title="Activar/desactivar modo oscuro">
+                                    <span class="toggle-slider"></span>
+                                </label>
                             </div>
-                        </a>
-                        
-                        <!-- NUEVO: Acceso directo a cursos si hay una institución por defecto -->
-                        <a href="#" id="quick-courses" class="menu-item" style="display: none;">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                            <div class="menu-item-content">
-                                <span>Mis Cursos</span>
-                                <p>Ver cursos de la institución principal</p>
-                            </div>
-                        </a>
-                        
-                        <!-- En el menú dropdown de index.html, AGREGAR después de "Mis Cursos" -->
-<a href="estudiantes.html" id="students-list" class="menu-item">
-    <i class="fas fa-users"></i>
-    <div class="menu-item-content">
-        <span>Mis Estudiantes</span>
-        <p>Gestionar estudiantes globalmente</p>
-    </div>
-</a>
-                        
-                        <a href="#" id="profile" class="menu-item">
-                            <i class="fas fa-user-circle"></i>
-                            <div class="menu-item-content">
-                                <span>Perfil</span>
-                                <p>Ver y editar perfil</p>
-                            </div>
-                        </a>
-                        
-                        <div class="menu-divider"></div>
-                        
-                        <!-- NUEVO: Acceso directo a planillas -->
-                        <a href="#" id="attendance-reports" class="menu-item">
-                            <i class="fas fa-clipboard-list"></i>
-                            <div class="menu-item-content">
-                                <span>Planillas de Asistencia</span>
-                                <p>Ver y exportar planillas</p>
-                            </div>
-                        </a>
-                        
-                        <a href="#" id="gallery" class="menu-item">
-                            <i class="fas fa-images"></i>
-                            <div class="menu-item-content">
-                                <span>Galería</span>
-                                <p>Ver fotos de actividades</p>
-                            </div>
-                        </a>
-                        
-                        <div class="menu-divider"></div>
-                        
-                        <!-- NUEVO: Estadísticas globales -->
-                        <a href="#" id="global-stats" class="menu-item">
-                            <i class="fas fa-chart-bar"></i>
-                            <div class="menu-item-content">
-                                <span>Estadísticas</span>
-                                <p>Resumen de todas las instituciones</p>
-                            </div>
-                        </a>
-                        
-                        <div class="menu-divider"></div>
-                        
-                        <a href="#" id="installApp" class="menu-item">
-                            <i class="fas fa-download"></i>
-                            <div class="menu-item-content">
-                                <span>Instalar App</span>
-                                <p>Instalar como aplicación</p>
-                            </div>
-                        </a>
-                        
-                        <div class="menu-divider"></div>
-                        
-                        <a href="#" id="logout" class="menu-item">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <div class="menu-item-content">
-                                <span>Cerrar Sesión</span>
-                            </div>
-                        </a>
-                        
-                        <a href="#" id="deleteAccount" class="menu-item">
-                            <i class="fas fa-user-times"></i>
-                            <div class="menu-item-content">
-                                <span>Eliminar Cuenta</span>
-                                <p>Esta acción no se puede deshacer</p>
-                            </div>
-                        </a>
-                        
-                        <!-- Botón de donación -->
-                        <button id="donationBtn" class="donation-btn">
-                            <i class="fas fa-heart"></i> Realizar Donación
-                        </button>
+                            
+                            <div class="menu-divider"></div>
+                            
+                            <!-- CORREGIDO: Link a instituciones -->
+                            <a href="instituciones.html" id="institutions-list" class="menu-item">
+                                <i class="fas fa-university"></i>
+                                <div class="menu-item-content">
+                                    <span>Mis Instituciones</span>
+                                    <p>Gestionar instituciones y cursos</p>
+                                </div>
+                            </a>
+                            
+                            <!-- CORREGIDO: Link a estudiantes -->
+                            <a href="estudiantes.html" id="students-list" class="menu-item">
+                                <i class="fas fa-users"></i>
+                                <div class="menu-item-content">
+                                    <span>Mis Estudiantes</span>
+                                    <p>Gestionar estudiantes globalmente</p>
+                                </div>
+                            </a>
+                            
+                            <!-- CORREGIDO: Link a cursos -->
+                            <a href="cursos.html" id="courses-list" class="menu-item">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                <div class="menu-item-content">
+                                    <span>Mis Cursos</span>
+                                    <p>Ver cursos por institución</p>
+                                </div>
+                            </a>
+                            
+                            <a href="profile.html" id="profile" class="menu-item">
+                                <i class="fas fa-user-circle"></i>
+                                <div class="menu-item-content">
+                                    <span>Perfil</span>
+                                    <p>Ver y editar perfil</p>
+                                </div>
+                            </a>
+                            
+                            <div class="menu-divider"></div>
+                            
+                            <!-- Funcionalidades adicionales -->
+                            <a href="#" id="attendance-reports" class="menu-item">
+                                <i class="fas fa-clipboard-list"></i>
+                                <div class="menu-item-content">
+                                    <span>Planillas de Asistencia</span>
+                                    <p>Ver y exportar planillas</p>
+                                </div>
+                            </a>
+                            
+                            <a href="#" id="gallery" class="menu-item">
+                                <i class="fas fa-images"></i>
+                                <div class="menu-item-content">
+                                    <span>Galería</span>
+                                    <p>Ver fotos de actividades</p>
+                                </div>
+                            </a>
+                            
+                            <div class="menu-divider"></div>
+                            
+                            <!-- Configuraciones -->
+                            <a href="#" id="global-stats" class="menu-item">
+                                <i class="fas fa-chart-bar"></i>
+                                <div class="menu-item-content">
+                                    <span>Estadísticas</span>
+                                    <p>Resumen de todas las instituciones</p>
+                                </div>
+                            </a>
+                            
+                            <a href="#" id="installApp" class="menu-item">
+                                <i class="fas fa-download"></i>
+                                <div class="menu-item-content">
+                                    <span>Instalar App</span>
+                                    <p>Instalar como aplicación</p>
+                                </div>
+                            </a>
+                            
+                            <div class="menu-divider"></div>
+                            
+                            <a href="#" id="logout" class="menu-item">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <div class="menu-item-content">
+                                    <span>Cerrar Sesión</span>
+                                </div>
+                            </a>
+                            
+                            <a href="#" id="deleteAccount" class="menu-item">
+                                <i class="fas fa-user-times"></i>
+                                <div class="menu-item-content">
+                                    <span>Eliminar Cuenta</span>
+                                    <p>Esta acción no se puede deshacer</p>
+                                </div>
+                            </a>
+                            
+                            <!-- Botón de donación -->
+                            <button id="donationBtn" class="donation-btn">
+                                <i class="fas fa-heart"></i> Realizar Donación
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <!-- resto del header -->
-    </div>
-</header>
+        </header>
+
         <main>
-            <!-- MANTENER: Solo la sección de actividades como principal -->
+            <!-- Sección de actividades principal -->
             <section id="activity-log">
                 <form class="activity-form">
                     <div class="form-header">
@@ -191,7 +190,7 @@
                         <p class="form-description">
                             Registra las actividades que realizarás en clase. 
                             Esto te ayudará a mantener un historial de las lecciones 
-                            y el progreso de tus alumnos.
+                            y el progreso de tus estudiantes.
                         </p>
                     </div>
                     <div class="form-group">
@@ -213,7 +212,7 @@
                             <i class="fas fa-image"></i> Foto de la Actividad
                         </label>
                         <div class="image-upload-container">
-                            <input type="file" id="activityImage" accept="image/*" hidden aria-label="Imagen de actividad" title="Seleccionar imagen para la actividad" placeholder="Seleccionar imagen">
+                            <input type="file" id="activityImage" accept="image/*" hidden aria-label="Imagen de actividad" title="Seleccionar imagen para la actividad">
                             <div class="image-preview">
                                 <img id="imagePreview" src="#" alt="Vista previa de imagen">
                                 <button type="button" class="remove-image" aria-label="Eliminar imagen" title="Eliminar imagen">
@@ -262,7 +261,6 @@
 
                 <div id="activities-grid"></div>
             </section>
-
         </main>
     </div>
 
@@ -270,22 +268,9 @@
         <i class="fas fa-chevron-up" aria-hidden="true"></i>
     </button>
 
-    <!-- Scripts -->
-    <!-- Firebase SDK v8 (legacy) - CARGAR PRIMERO -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-<!-- DESPUÉS cargar configuración -->
-<script src="src/config/firebase.js"></script>
-
-<!-- FINALMENTE cargar app -->
-<script src="src/assets/js/app.js"></script>
-
     <!-- Modal de confirmación para eliminar cuenta -->
     <div id="deleteConfirmModal" class="confirm-modal">
         <div class="confirm-content">
-            <!-- AGREGAR botón de cierre -->
             <button class="confirm-close" id="closeConfirmModal" aria-label="Cerrar modal">
                 <i class="fas fa-times"></i>
             </button>
@@ -303,85 +288,98 @@
     </div>
 
     <!-- Modal de Asistencia -->
-<div id="attendance-modal" class="modal">
-    <div class="modal-content attendance-modal-content">
-        <div class="modal-header">
-            <h3>
-                <i class="fas fa-clipboard-check"></i>
-                <span id="attendance-title">Tomar Asistencia</span>
-            </h3>
-            <button class="close-modal" id="close-attendance-modal" aria-label="Cerrar modal">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        
-        <div class="modal-body">
-            <div class="attendance-info">
-                <div class="activity-details">
-                    <h4 id="attendance-activity-name">Nombre de la Actividad</h4>
-                    <p id="attendance-activity-date">Fecha de la actividad</p>
-                </div>
-                
-                <div class="attendance-summary">
-                    <div class="summary-item">
-                        <i class="fas fa-users"></i>
-                        <span>Total: <strong id="total-students">0</strong></span>
-                    </div>
-                    <div class="summary-item">
-                        <i class="fas fa-check text-success"></i>
-                        <span>Presentes: <strong id="present-count">0</strong></span>
-                    </div>
-                    <div class="summary-item">
-                        <i class="fas fa-times text-danger"></i>
-                        <span>Ausentes: <strong id="absent-count">0</strong></span>
-                    </div>
-                </div>
+    <div id="attendance-modal" class="modal">
+        <div class="modal-content attendance-modal-content">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-clipboard-check"></i>
+                    <span id="attendance-title">Tomar Asistencia</span>
+                </h3>
+                <button class="close-modal" id="close-attendance-modal" aria-label="Cerrar modal">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             
-            <div class="students-attendance">
-                <div class="attendance-header">
-                    <h5>
-                        <i class="fas fa-list"></i>
-                        Lista de Alumnos
-                    </h5>
-                    <div class="quick-actions">
-                        <button class="quick-btn" id="mark-all-present" title="Marcar todos presentes">
-                            <i class="fas fa-check-double"></i>
-                            Todos Presentes
-                        </button>
-                        <button class="quick-btn" id="mark-all-absent" title="Marcar todos ausentes">
-                            <i class="fas fa-user-times"></i>
-                            Todos Ausentes
-                        </button>
+            <div class="modal-body">
+                <div class="attendance-info">
+                    <div class="activity-details">
+                        <h4 id="attendance-activity-name">Nombre de la Actividad</h4>
+                        <p id="attendance-activity-date">Fecha de la actividad</p>
+                    </div>
+                    
+                    <div class="attendance-summary">
+                        <div class="summary-item">
+                            <i class="fas fa-users"></i>
+                            <span>Total: <strong id="total-students">0</strong></span>
+                        </div>
+                        <div class="summary-item">
+                            <i class="fas fa-check text-success"></i>
+                            <span>Presentes: <strong id="present-count">0</strong></span>
+                        </div>
+                        <div class="summary-item">
+                            <i class="fas fa-times text-danger"></i>
+                            <span>Ausentes: <strong id="absent-count">0</strong></span>
+                        </div>
                     </div>
                 </div>
                 
-                <div id="students-attendance-list" class="students-list">
-                    <!-- Los estudiantes se cargarán dinámicamente aquí -->
+                <div class="students-attendance">
+                    <div class="attendance-header">
+                        <h5>
+                            <i class="fas fa-list"></i>
+                            Lista de Estudiantes
+                        </h5>
+                        <div class="quick-actions">
+                            <button class="quick-btn" id="mark-all-present" title="Marcar todos presentes">
+                                <i class="fas fa-check-double"></i>
+                                Todos Presentes
+                            </button>
+                            <button class="quick-btn" id="mark-all-absent" title="Marcar todos ausentes">
+                                <i class="fas fa-user-times"></i>
+                                Todos Ausentes
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="students-attendance-list" class="students-list">
+                        <!-- Los estudiantes se cargarán dinámicamente aquí -->
+                    </div>
+                    
+                    <!-- CORREGIDO: Mensaje actualizado con link correcto -->
+                    <div id="no-students-message" class="empty-state" style="display: none;">
+                        <i class="fas fa-user-plus"></i>
+                        <p>No tienes estudiantes registrados</p>
+                        <a href="estudiantes.html" class="add-students-btn">
+                            <i class="fas fa-plus"></i>
+                            Agregar Estudiantes
+                        </a>
+                    </div>
                 </div>
                 
-                <div id="no-students-message" class="empty-state" style="display: none;">
-                    <i class="fas fa-user-plus"></i>
-                    <p>No tienes alumnos registrados</p>
-                    <a href="alumnos.html" class="add-students-btn">
-                        <i class="fas fa-plus"></i>
-                        Agregar Alumnos
-                    </a>
+                <div class="attendance-actions">
+                    <button class="save-attendance-btn" id="save-attendance">
+                        <i class="fas fa-save"></i>
+                        Guardar Asistencia
+                    </button>
+                    <button class="cancel-attendance-btn" id="cancel-attendance">
+                        <i class="fas fa-ban"></i>
+                        Cancelar
+                    </button>
                 </div>
-            </div>
-            
-            <div class="attendance-actions">
-                <button class="save-attendance-btn" id="save-attendance">
-                    <i class="fas fa-save"></i>
-                    Guardar Asistencia
-                </button>
-                <button class="cancel-attendance-btn" id="cancel-attendance">
-                    <i class="fas fa-ban"></i>
-                    Cancelar
-                </button>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Scripts -->
+    <!-- Firebase SDK v8 (legacy) - CARGAR PRIMERO -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <!-- DESPUÉS cargar configuración -->
+    <script src="src/config/firebase.js"></script>
+
+    <!-- FINALMENTE cargar app -->
+    <script src="src/assets/js/app.js"></script>
 </body>
 </html>

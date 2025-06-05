@@ -1801,3 +1801,105 @@ body.dark-mode .nav-link.active {
     background: var(--primary-color);
     color: white;
 }
+
+/* REEMPLAZAR la sección del header simplificado al final del archivo: */
+
+/* ===== HEADER SIMPLIFICADO - SOBRESCRIBIR ESTILOS EXISTENTES ===== */
+.app-header {
+    padding: 0.8rem 2rem !important;
+    min-height: 60px !important;
+}
+
+.header-content {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    gap: 2rem !important; /* Agregar gap para separación */
+}
+
+.app-logo {
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important; /* Evitar que se encoja */
+}
+
+.logo-icon {
+    width: 50px !important;
+    height: 50px !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+    transition: all 0.3s ease !important;
+}
+
+.logo-icon:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
+}
+
+.logo-icon i {
+    font-size: 1.8rem !important;
+    color: var(--primary-color) !important;
+}
+
+/* Asegurar que el menú toggle esté a la derecha */
+.teacher-toggle {
+    margin-left: auto !important; /* Forzar hacia la derecha */
+    flex-shrink: 0 !important; /* Evitar que se encoja */
+}
+
+.profile-button {
+    margin-left: auto !important; /* Forzar hacia la derecha */
+}
+
+/* Modo oscuro para el logo */
+body.dark-mode .logo-icon {
+    background: var(--card-bg) !important;
+    border: 2px solid var(--border-color) !important;
+}
+
+/* Responsive para header simplificado */
+@media (max-width: 768px) {
+    .app-header {
+        padding: 0.6rem 1rem !important;
+        min-height: 50px !important;
+    }
+    
+    .header-content {
+        gap: 1rem !important;
+    }
+    
+    .logo-icon {
+        width: 45px !important;
+        height: 45px !important;
+    }
+    
+    .logo-icon i {
+        font-size: 1.6rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .app-header {
+        padding: 0.5rem 0.8rem !important;
+        min-height: 45px !important;
+    }
+    
+    .header-content {
+        gap: 0.5rem !important;
+    }
+    
+    .logo-icon {
+        width: 40px !important;
+        height: 40px !important;
+    }
+    
+    .logo-icon i {
+        font-size: 1.4rem !important;
+    }
+}

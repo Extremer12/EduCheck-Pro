@@ -10,178 +10,258 @@
     <link rel="icon" href="src/assets/icons/icon-192x192.png" type="image/png">
     <title>Instituciones - EduCheck Pro</title>
     
-    <!-- CSS específico para instituciones -->
+    <!-- CSS -->
+    <link rel="stylesheet" href="src/assets/css/styles.css">
+    <link rel="stylesheet" href="src/assets/css/responsive.css">
     <link rel="stylesheet" href="src/assets/css/instituciones.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <!-- Configuración centralizada -->
+    <script src="src/config/firebase.js"></script>
 </head>
 <body class="institutions-page">
-    <!-- Header profesional -->
-    <header class="institutions-header">
-        <div class="header-content">
-            <button class="back-btn" onclick="window.location.href='index.html'" title="Volver al inicio">
-                <i class="fas fa-arrow-left"></i>
-            </button>
-            <div class="header-title">
-                <h1><i class="fas fa-university"></i> Mis Instituciones</h1>
-                <p>Gestiona tus instituciones educativas y centros de trabajo</p>
-            </div>
-            <div class="header-actions">
-                <div class="dark-mode-toggle">
-                    <label class="toggle-switch" for="darkModeToggle" title="Activar/desactivar modo oscuro">
-                        <input type="checkbox" id="darkModeToggle" aria-label="Activar/desactivar modo oscuro">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <button class="global-stats-btn" id="globalStats" title="Ver estadísticas globales">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Estadísticas</span>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Agregar enlace en el header o sidebar -->
-    <nav class="page-navigation">
-        <a href="index.html" class="nav-link">
-            <i class="fas fa-home"></i>
-            Inicio
-        </a>
-        <a href="estudiantes.html" class="nav-link">
-            <i class="fas fa-users"></i>
-            Estudiantes
-        </a>
-        <a href="cursos.html" class="nav-link">
-            <i class="fas fa-chalkboard-teacher"></i>
-            Cursos
-        </a>
-    </nav>
-
-    <main class="institutions-main">
-        <!-- Dashboard General -->
-        <section class="dashboard-overview">
-            <div class="overview-card">
-                <div class="overview-header">
-                    <div class="overview-icon">
+    <div id="app">
+        <!-- Header igual que index.html -->
+        <header class="app-header">
+            <div class="header-content">
+                <!-- Logo simplificado -->
+                <div class="app-logo">
+                    <div class="logo-icon">
                         <i class="fas fa-graduation-cap"></i>
                     </div>
-                    <div class="overview-title">
-                        <h2>Dashboard General</h2>
-                        <p>Resumen de todas tus actividades académicas</p>
+                </div>
+
+                <!-- Menú de perfil -->
+                <div class="teacher-toggle">
+                    <button class="profile-button" id="profileButton" aria-label="Menú de perfil">
+                        <img id="headerProfileImg" src="https://img.freepik.com/vector-gratis/circulo-azul-usuario-blanco_78370-4707.jpg" alt="Profile" class="profile-img">
+                        <span id="headerTeacherName">Nombre de la Docente</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    
+                    <div class="menu-dropdown" id="menuDropdown">
+                        <div class="menu-header">
+                            <button class="menu-close-btn" id="menu-close-btn" aria-label="Cerrar menú">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <img id="menuProfileImg" src="https://img.freepik.com/vector-gratis/circulo-azul-usuario-blanco_78370-4707.jpg" alt="Profile" class="large-profile-img">
+                            <h3 id="menuTeacherName">Nombre de la Docente</h3>
+                            <p>Docente</p>
+                        </div>
+                        
+                        <div class="menu-content">
+                            <!-- Toggle de modo oscuro -->
+                            <div class="dark-mode-toggle">
+                                <span>Modo Oscuro</span>
+                                <label class="toggle-switch" for="darkModeToggle">
+                                    <input type="checkbox" id="darkModeToggle">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="menu-divider"></div>
+                            
+                            <a href="index.html" class="menu-item">
+                                <i class="fas fa-home"></i>
+                                <div class="menu-item-content">
+                                    <span>Inicio</span>
+                                    <p>Volver al dashboard principal</p>
+                                </div>
+                            </a>
+                            
+                            <a href="instituciones.html" class="menu-item active">
+                                <i class="fas fa-university"></i>
+                                <div class="menu-item-content">
+                                    <span>Mis Instituciones</span>
+                                    <p>Gestionar instituciones y cursos</p>
+                                </div>
+                            </a>
+                            
+                            <a href="estudiantes.html" class="menu-item">
+                                <i class="fas fa-users"></i>
+                                <div class="menu-item-content">
+                                    <span>Mis Estudiantes</span>
+                                    <p>Gestionar estudiantes globalmente</p>
+                                </div>
+                            </a>
+                            
+                            <a href="profile.html" class="menu-item">
+                                <i class="fas fa-user-circle"></i>
+                                <div class="menu-item-content">
+                                    <span>Perfil</span>
+                                    <p>Ver y editar perfil</p>
+                                </div>
+                            </a>
+                            
+                            <div class="menu-divider"></div>
+                            
+                            <a href="#" id="estadisticas-link" class="menu-item">
+                                <i class="fas fa-chart-bar"></i>
+                                <div class="menu-item-content">
+                                    <span>Estadísticas</span>
+                                    <p>Ver estadísticas detalladas</p>
+                                </div>
+                            </a>
+                            
+                            <div class="menu-divider"></div>
+                            
+                            <a href="#" id="logout" class="menu-item">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <div class="menu-item-content">
+                                    <span>Cerrar Sesión</span>
+                                </div>
+                            </a>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-icon institutions">
+            </div>
+        </header>
+
+        <!-- Breadcrumb navigation -->
+        <nav class="breadcrumb-nav">
+            <a href="index.html" class="breadcrumb-item">
+                <i class="fas fa-home"></i>
+                Inicio
+            </a>
+            <span class="breadcrumb-separator">
+                <i class="fas fa-chevron-right"></i>
+            </span>
+            <span class="breadcrumb-current">
+                <i class="fas fa-university"></i>
+                Instituciones
+            </span>
+        </nav>
+
+        <main class="institutions-main">
+            <!-- Dashboard Overview -->
+            <section class="dashboard-overview">
+                <div class="overview-card">
+                    <div class="overview-header">
+                        <div class="overview-icon">
                             <i class="fas fa-university"></i>
                         </div>
-                        <div class="stat-content">
-                            <span class="stat-number" id="total-institutions">0</span>
-                            <span class="stat-label">Instituciones</span>
+                        <div class="overview-title">
+                            <h2>Gestión de Instituciones</h2>
+                            <p>Administra tus instituciones educativas y centros de trabajo</p>
                         </div>
                     </div>
-                    
-                    <div class="stat-item">
-                        <div class="stat-icon courses">
-                            <i class="fas fa-chalkboard-teacher"></i>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-icon institutions">
+                                <i class="fas fa-university"></i>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-number" id="total-institutions">0</span>
+                                <span class="stat-label">Instituciones</span>
+                            </div>
                         </div>
-                        <div class="stat-content">
-                            <span class="stat-number" id="total-courses">0</span>
-                            <span class="stat-label">Cursos Total</span>
+                        <div class="stat-item">
+                            <div class="stat-icon courses">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-number" id="total-courses">0</span>
+                                <span class="stat-label">Cursos</span>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="stat-item">
-                        <div class="stat-icon students">
-                            <i class="fas fa-users"></i>
+                        <div class="stat-item">
+                            <div class="stat-icon students">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-number" id="total-students">0</span>
+                                <span class="stat-label">Estudiantes</span>
+                            </div>
                         </div>
-                        <div class="stat-content">
-                            <span class="stat-number" id="total-students">0</span>
-                            <span class="stat-label">Alumnos Total</span>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-item">
-                        <div class="stat-icon attendance">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div class="stat-content">
-                            <span class="stat-number" id="global-attendance">0%</span>
-                            <span class="stat-label">Asistencia Promedio</span>
+                        <div class="stat-item">
+                            <div class="stat-icon attendance">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-number" id="global-attendance">0%</span>
+                                <span class="stat-label">Asistencia</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- Navegación rápida -->
-        <section class="quick-navigation">
-            <div class="nav-card">
-                <h3><i class="fas fa-rocket"></i> Acceso Rápido</h3>
-                <div class="quick-actions">
-                    <button class="quick-btn" onclick="scrollToInstitutions()">
-                        <i class="fas fa-university"></i>
-                        <span>Ver Instituciones</span>
-                    </button>
-                    <button class="quick-btn" onclick="openAddInstitutionModal()">
+            <!-- Navegación rápida -->
+            <section class="quick-navigation">
+                <div class="nav-card">
+                    <h3><i class="fas fa-rocket"></i> Acceso Rápido</h3>
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="scrollToInstitutions()">
+                            <i class="fas fa-university"></i>
+                            <span>Ver Instituciones</span>
+                        </button>
+                        <button class="quick-btn" onclick="openAddInstitutionModal()">
+                            <i class="fas fa-plus"></i>
+                            <span>Nueva Institución</span>
+                        </button>
+                        <button class="quick-btn" onclick="showTodaySchedule()">
+                            <i class="fas fa-calendar-day"></i>
+                            <span>Clases de Hoy</span>
+                        </button>
+                        <button class="quick-btn" onclick="exportGlobalData()">
+                            <i class="fas fa-download"></i>
+                            <span>Exportar Todo</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Lista de Instituciones -->
+            <section class="institutions-section" id="institutions-section">
+                <div class="section-header">
+                    <h3>
+                        <div class="main-title">
+                            <i class="fas fa-building"></i>
+                            Mis Instituciones
+                        </div>
+                        <span class="institution-count" id="institution-count">(0 instituciones)</span>
+                    </h3>
+                    <button class="add-institution-btn" onclick="openAddInstitutionModal()">
                         <i class="fas fa-plus"></i>
-                        <span>Nueva Institución</span>
-                    </button>
-                    <button class="quick-btn" onclick="showTodaySchedule()">
-                        <i class="fas fa-calendar-day"></i>
-                        <span>Clases de Hoy</span>
-                    </button>
-                    <button class="quick-btn" onclick="exportGlobalData()">
-                        <i class="fas fa-download"></i>
-                        <span>Exportar Todo</span>
+                        Agregar Institución
                     </button>
                 </div>
-            </div>
-        </section>
 
-        <!-- Lista de Instituciones -->
-        <section class="institutions-section" id="institutions-section">
-            <div class="section-header">
-                <h3>
-                    <i class="fas fa-building"></i>
-                    Mis Instituciones
-                    <span class="institution-count" id="institution-count">(0 instituciones)</span>
-                </h3>
-                <button class="add-institution-btn" onclick="openAddInstitutionModal()">
-                    <i class="fas fa-plus"></i>
-                    Agregar Institución
-                </button>
-            </div>
-
-            <!-- Grid de instituciones -->
-            <div id="institutions-container" class="institutions-grid">
-                <!-- Las instituciones se cargarán dinámicamente aquí -->
-            </div>
-
-            <!-- Estado vacío -->
-            <div class="empty-institutions" id="empty-institutions" style="display: none;">
-                <div class="empty-icon">
-                    <i class="fas fa-university"></i>
+                <!-- Grid de instituciones -->
+                <div id="institutions-container" class="institutions-grid">
+                    <!-- Las instituciones se cargarán dinámicamente aquí -->
                 </div>
-                <h3>No hay instituciones registradas</h3>
-                <p>Comienza agregando tu primera institución educativa para organizar tus cursos y alumnos.</p>
-                <button onclick="openAddInstitutionModal()" class="add-first-institution-btn">
-                    <i class="fas fa-plus"></i>
-                    Agregar Primera Institución
-                </button>
-            </div>
-        </section>
 
-        <!-- Actividad reciente -->
-        <section class="recent-activity">
-            <div class="activity-card">
-                <h3><i class="fas fa-clock"></i> Actividad Reciente</h3>
-                <div id="recent-activity-list" class="activity-list">
-                    <!-- La actividad reciente se cargará aquí -->
+                <!-- Estado vacío -->
+                <div class="empty-institutions" id="empty-institutions" style="display: none;">
+                    <div class="empty-icon">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <h3>No hay instituciones registradas</h3>
+                    <p>Comienza agregando tu primera institución educativa para organizar tus cursos y alumnos.</p>
+                    <button onclick="openAddInstitutionModal()" class="add-first-institution-btn">
+                        <i class="fas fa-plus"></i>
+                        Agregar Primera Institución
+                    </button>
                 </div>
-            </div>
-        </section>
-    </main>
+            </section>
+
+            <!-- Actividad reciente -->
+            <section class="recent-activity">
+                <div class="activity-card">
+                    <h3><i class="fas fa-clock"></i> Actividad Reciente</h3>
+                    <div id="recent-activity-list" class="activity-list">
+                        <!-- La actividad reciente se cargará aquí -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
 
     <!-- Modal para agregar/editar institución -->
     <div id="institution-modal" class="modal">
@@ -189,7 +269,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3><i class="fas fa-university"></i> <span id="modal-title">Agregar Institución</span></h3>
-                <button class="close-modal" id="close-institution-modal" title="Cerrar modal">
+                <button class="close-modal" onclick="closeInstitutionModal()" title="Cerrar modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -316,7 +396,7 @@
                         <i class="fas fa-times"></i>
                         Cancelar
                     </button>
-                    <button type="button" class="delete-btn" id="confirm-delete-institution">
+                    <button type="button" class="delete-btn" onclick="confirmDeleteInstitution()">
                         <i class="fas fa-trash"></i>
                         Eliminar Institución
                     </button>
@@ -325,38 +405,7 @@
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script type="module">
-        // Firebase imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-
-        // Firebase config
-        const firebaseConfig = {
-            apiKey: "AIzaSyAC2DxR63utzR1tmnHCqzApYTraxMsH79M",
-            authDomain: "horita-feliz-system.firebaseapp.com",
-            projectId: "horita-feliz-system",
-            storageBucket: "horita-feliz-system.firebasestorage.app",
-            messagingSenderId: "469162449559",
-            appId: "1:469162449559:web:734e8756fd03b1388ce7d2",
-            measurementId: "G-6645JXJBD6"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        
-        window.auth = auth;
-        window.db = db;
-
-        // Verificar autenticación
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                window.location.href = 'login.html';
-            }
-        });
-    </script>
+    <!-- Script principal de instituciones -->
     <script src="src/assets/js/instituciones.js"></script>
 </body>
 </html>
