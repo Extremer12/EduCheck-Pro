@@ -370,16 +370,194 @@
         </div>
     </div>
 
-    <!-- Scripts -->
-    <!-- Firebase SDK v8 (legacy) - CARGAR PRIMERO -->
+    <!-- Scripts en orden específico para evitar problemas de dependencias -->
+    
+    <!-- 1. Firebase SDKs v8 (compat) - PRIMERO -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <!-- Verificación inmediata de Firebase -->
+    <script>
+        if (typeof firebase === 'undefined') {
+            console.error('❌ CRÍTICO: Firebase SDK no se cargó');
+            alert('Error crítico: Firebase SDK no disponible. Recarga la página.');
+        } else {
+            console.log('✅ Firebase SDK cargado correctamente, versión:', firebase.SDK_VERSION);
+        }
+    </script>
 
-    <!-- DESPUÉS cargar configuración -->
+    <!-- 2. Configuración Firebase - SEGUNDO -->
     <script src="src/config/firebase.js"></script>
 
-    <!-- FINALMENTE cargar app -->
+    <!-- 3. Constants - TERCERO -->
+    <script src="src/assets/js/constants.js"></script>
+
+    <!-- 4. SyncManager - CUARTO -->
+    <script src="src/assets/js/syncManager.js"></script>
+
+    <!-- 5. App principal - QUINTO -->
     <script src="src/assets/js/app.js"></script>
+
+    <!-- 6. Verificación final completa -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🔍 Verificando dependencias en index.html...');
+        
+        // Función de verificación con reintentos
+        function verifyDependencies(attempt = 1) {
+            const maxAttempts = 5;
+            
+            const checks = {
+                firebase: typeof firebase !== 'undefined',
+                auth: typeof window.auth !== 'undefined',
+                db: typeof window.db !== 'undefined',
+                syncManager: typeof window.syncManager !== 'undefined',
+                constants: typeof window.DATA_KEYS !== 'undefined',
+                app: typeof window.diagnosisEduCheckPro !== 'undefined'
+            };
+            
+            console.log(`📋 Verificación ${attempt}/${maxAttempts}:`, checks);
+            
+            const missing = Object.entries(checks)
+                .filter(([key, value]) => !value)
+                .map(([key]) => key);
+            
+            if (missing.length > 0) {
+                if (attempt < maxAttempts) {
+                    console.log(`⏳ Reintentando verificación en 1 segundo... (${attempt}/${maxAttempts})`);
+                    setTimeout(() => verifyDependencies(attempt + 1), 1000);
+                    return;
+                }
+                
+                console.error('❌ Faltan dependencias críticas después de varios intentos:', missing);
+                
+                // Mostrar mensaje de error específico
+                const errorDiv = document.createElement('div');
+                errorDiv.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 20px;
+                    right: 20px;
+                    background: #ef4444;
+                    color: white;
+                    padding: 16px;
+                    border-radius: 8px;
+                    z-index: 10000;
+                    font-family: 'Arial', sans-serif;
+                    font-size: 14px;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+                `;
+                
+                let solutions = [];
+                if (missing.includes('firebase')) solutions.push('• Verificar conexión a internet');
+                if (missing.includes('auth') || missing.includes('db')) solutions.push('• Recargar la página');
+                if (missing.includes('syncManager')) solutions.push('• Verificar archivo syncManager.js');
+                
+                errorDiv.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                        <span style="font-size: 20px;">⚠️</span>
+                        <strong>Error de Dependencias Críticas</strong>
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <strong>Faltantes:</strong> ${missing.join(', ')}
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <strong>Soluciones:</strong><br>
+                        ${solutions.join('<br>')}
+                    </div>
+                    <button onclick="window.location.reload()" style="
+                        background: white;
+                        color: #ef4444;
+                        border: none;
+                        padding: 8px 16px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-weight: bold;
+                    ">🔄 Recargar Página</button>
+                `;
+                document.body.appendChild(errorDiv);
+                
+            } else {
+                console.log('✅ Todas las dependencias cargadas correctamente');
+                
+                // Mostrar notificación de éxito temporal
+                const successDiv = document.createElement('div');
+                successDiv.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #10b981;
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    z-index: 10000;
+                    font-family: 'Arial', sans-serif;
+                    font-size: 14px;
+                    font-weight: 500;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+                    transition: transform 0.3s ease;
+                    transform: translateX(100%);
+                `;
+                successDiv.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span>✅</span>
+                        <span>Sistema cargado correctamente</span>
+                    </div>
+                `;
+                document.body.appendChild(successDiv);
+                
+                // Animación de entrada
+                setTimeout(() => {
+                    successDiv.style.transform = 'translateX(0)';
+                }, 10);
+                
+                // Remover después de 3 segundos
+                setTimeout(() => {
+                    successDiv.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        if (successDiv.parentNode) {
+                            successDiv.parentNode.removeChild(successDiv);
+                        }
+                    }, 300);
+                }, 3000);
+                
+                // Ejecutar diagnóstico automático
+                if (window.diagnosisEduCheckPro) {
+                    setTimeout(() => {
+                        console.log('🏥 Ejecutando diagnóstico automático...');
+                        window.diagnosisEduCheckPro();
+                    }, 2000);
+                }
+            }
+        }
+        
+        // Iniciar verificación después de un breve delay
+        setTimeout(() => verifyDependencies(), 500);
+    });
+    </script>
+
+    <!-- 7. Script de limpieza de IndexedDB (opcional) -->
+    <script>
+    // Función para limpiar datos obsoletos de Firestore
+    function cleanFirestoreCache() {
+        if (confirm('¿Quieres limpiar la caché de Firestore? Esto puede solucionar problemas de sincronización.')) {
+            if ('indexedDB' in window) {
+                const deleteRequest = indexedDB.deleteDatabase('firestore/horita-feliz-system/default');
+                deleteRequest.onsuccess = () => {
+                    alert('✅ Caché limpiada. Recarga la página.');
+                    window.location.reload();
+                };
+                deleteRequest.onerror = () => {
+                    alert('❌ Error limpiando caché. Hazlo manualmente desde DevTools.');
+                };
+            }
+        }
+    }
+    
+    // Hacer disponible globalmente
+    window.cleanFirestoreCache = cleanFirestoreCache;
+    </script>
+    
 </body>
 </html>
