@@ -1,13 +1,12 @@
 /**
- * EduCheck Pro - Sistema de Gestión de Perfil
- * Módulo completo para administración del perfil del docente
- * 
- * @version 2.0.0
- * @author EduCheck Pro Team
+ * EduCheck Pro - Sistema de Gestión de Perfil ACTUALIZADO
+ * Compatible con header unificado
  */
 
-// ===== FUNCIONES AUXILIARES =====
+// ===== ELIMINAR FUNCIONES DE MENÚ DUPLICADAS =====
+// Ya no necesitamos las funciones de menú porque app.js las maneja
 
+// ===== FUNCIONES AUXILIARES (SIN CAMBIOS) =====
 function getUserData(key) {
     const user = window.auth?.currentUser;
     if (!user) return null;
@@ -22,6 +21,13 @@ function setUserData(key, value) {
 }
 
 function showNotification(message, type = 'success') {
+    // Usar la función global de app.js si existe
+    if (window.showNotification) {
+        window.showNotification(message, type);
+        return;
+    }
+    
+    // Fallback si no existe
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.textContent = message;
@@ -48,227 +54,24 @@ function showNotification(message, type = 'success') {
     }, 3000);
 }
 
-// ===== VARIABLES GLOBALES PARA EL MENÚ =====
-let profileMenuElements = {
-    profileButton: null,
-    menuDropdown: null,
-    menuCloseBtn: null
-};
-
-// ===== FUNCIONES DEL MENÚ TOGGLE =====
-
-function initializeMenuToggle() {
-    console.log('🔧 Profile.js - Inicializando menú toggle...');
-    
-    // Buscar elementos del menú
-    const profileButton = document.getElementById('profileButton') || document.querySelector('.profile-button');
-    const menuDropdown = document.getElementById('menuDropdown') || document.querySelector('.menu-dropdown');
-    const menuCloseBtn = document.getElementById('menu-close-btn') || document.querySelector('.menu-close-btn');
-    
-    // Guardar referencias globales
-    profileMenuElements.profileButton = profileButton;
-    profileMenuElements.menuDropdown = menuDropdown;
-    profileMenuElements.menuCloseBtn = menuCloseBtn;
-    
-    console.log('🔍 Profile.js - Elementos encontrados:', {
-        profileButton: !!profileButton,
-        menuDropdown: !!menuDropdown,
-        menuCloseBtn: !!menuCloseBtn,
-        profileButtonId: profileButton?.id,
-        menuDropdownId: menuDropdown?.id
-    });
-    
-    if (!profileButton || !menuDropdown) {
-        console.error('❌ Profile.js - Elementos del menú no encontrados');
-        console.log('🔍 Elementos disponibles en DOM:', {
-            allButtons: document.querySelectorAll('button').length,
-            allMenus: document.querySelectorAll('.menu-dropdown').length,
-            byId: {
-                profileButton: !!document.getElementById('profileButton'),
-                menuDropdown: !!document.getElementById('menuDropdown')
-            }
-        });
-        return false;
-    }
-    
-    // Función para abrir menú
-    window.openProfileMenu = function() {
-        console.log('📱 Profile.js - Abriendo menú...');
-        
-        if (!menuDropdown) {
-            console.error('❌ No se puede abrir menú - elemento no encontrado');
-            return;
-        }
-        
-        // Usar ambas clases para compatibilidad
-        menuDropdown.classList.add('show');
-        menuDropdown.classList.add('active');
-        menuDropdown.style.display = 'flex';
-        
-        // Prevenir scroll
-        document.body.style.overflow = 'hidden';
-        document.body.classList.add('menu-open');
-        
-        console.log('✅ Profile.js - Menú abierto. Clases:', menuDropdown.className);
-        console.log('✅ Profile.js - Display:', menuDropdown.style.display);
-    };
-    
-    // Función para cerrar menú
-    window.closeProfileMenu = function() {
-        console.log('📱 Profile.js - Cerrando menú...');
-        
-        if (!menuDropdown) {
-            console.error('❌ No se puede cerrar menú - elemento no encontrado');
-            return;
-        }
-        
-        menuDropdown.classList.remove('show');
-        menuDropdown.classList.remove('active');
-        menuDropdown.style.display = '';
-        
-        // Restaurar scroll
-        document.body.style.overflow = '';
-        document.body.classList.remove('menu-open');
-        
-        console.log('✅ Profile.js - Menú cerrado');
-    };
-    
-    // Función de debugging
-    window.debugProfileMenu = function() {
-        console.log('🔍 Profile Menu Debug Info:');
-        console.log('===============================');
-        console.log('Elements found:', {
-            profileButton: !!profileMenuElements.profileButton,
-            menuDropdown: !!profileMenuElements.menuDropdown,
-            menuCloseBtn: !!profileMenuElements.menuCloseBtn
-        });
-        
-        if (profileMenuElements.menuDropdown) {
-            console.log('Menu dropdown state:', {
-                className: profileMenuElements.menuDropdown.className,
-                display: profileMenuElements.menuDropdown.style.display,
-                visible: profileMenuElements.menuDropdown.classList.contains('show') || 
-                        profileMenuElements.menuDropdown.classList.contains('active'),
-                computedDisplay: window.getComputedStyle(profileMenuElements.menuDropdown).display,
-                computedVisibility: window.getComputedStyle(profileMenuElements.menuDropdown).visibility,
-                boundingRect: profileMenuElements.menuDropdown.getBoundingClientRect()
-            });
-        }
-        
-        console.log('Body classes:', document.body.className);
-        console.log('Body overflow:', document.body.style.overflow);
-        console.log('===============================');
-    };
-    
-    // Event listener para abrir menú
-    profileButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('📱 Profile.js - Click detectado en botón de perfil');
-        window.openProfileMenu();
-    });
-    
-    // También escuchar en touchstart para móviles
-    profileButton.addEventListener('touchstart', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('📱 Profile.js - Touch detectado en botón de perfil');
-        window.openProfileMenu();
-    });
-    
-    // Event listener para cerrar menú
-    if (menuCloseBtn) {
-        menuCloseBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('📱 Profile.js - Click en botón cerrar detectado');
-            window.closeProfileMenu();
-        });
-        
-        menuCloseBtn.addEventListener('touchstart', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('📱 Profile.js - Touch en botón cerrar detectado');
-            window.closeProfileMenu();
-        });
-    }
-    
-    // Cerrar menú al hacer click fuera
-    document.addEventListener('click', function(e) {
-        if ((menuDropdown.classList.contains('show') || menuDropdown.classList.contains('active')) && 
-            !menuDropdown.contains(e.target) && 
-            !profileButton.contains(e.target)) {
-            console.log('📱 Profile.js - Click fuera del menú detectado');
-            window.closeProfileMenu();
-        }
-    });
-    
-    // Cerrar menú con tecla Escape
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && 
-            (menuDropdown.classList.contains('show') || menuDropdown.classList.contains('active'))) {
-            console.log('📱 Profile.js - Tecla Escape detectada');
-            window.closeProfileMenu();
-        }
-    });
-    
-    console.log('✅ Profile.js - Menú toggle inicializado correctamente');
-    
-    // Test inmediato después de inicializar
-    setTimeout(() => {
-        console.log('🧪 Profile.js - Test inicial del menú:');
-        window.debugProfileMenu();
-    }, 500);
-    
-    return true;
-}
-
-// ===== FUNCIONES DE PERFIL =====
-
+// ===== FUNCIONES DE PERFIL (ACTUALIZADAS PARA NUEVO HEADER) =====
 function loadProfilePhoto() {
     const user = window.auth?.currentUser;
     if (!user) return;
     
     const savedPhoto = localStorage.getItem(`${user.uid}_profilePhoto`);
     if (savedPhoto) {
+        // Actualizar tanto el header unificado como el perfil específico
         const profileImgs = [
-            document.getElementById('headerProfileImg'),
-            document.getElementById('menuProfileImg'),
-            document.getElementById('profileAvatar')
+            document.getElementById('userAvatar'),          // Header unificado
+            document.getElementById('menuUserAvatar'),      // Menú unificado
+            document.getElementById('profileAvatar')        // Perfil específico
         ];
         
         profileImgs.forEach(img => {
             if (img) img.src = savedPhoto;
         });
     }
-}
-
-function initializeDarkMode() {
-    const user = window.auth?.currentUser;
-    if (!user) return;
-    
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    if (!darkModeToggle) return;
-    
-    // Cargar preferencia guardada
-    const savedDarkMode = localStorage.getItem(`${user.uid}_darkMode`) === 'true';
-    if (savedDarkMode) {
-        document.body.classList.add('dark-mode');
-        darkModeToggle.checked = true;
-    }
-    
-    // Event listener para el toggle
-    darkModeToggle.addEventListener('change', function() {
-        if (this.checked) {
-            document.body.classList.add('dark-mode');
-            localStorage.setItem(`${user.uid}_darkMode`, 'true');
-            showNotification('Modo oscuro activado');
-        } else {
-            document.body.classList.remove('dark-mode');
-            localStorage.setItem(`${user.uid}_darkMode`, 'false');
-            showNotification('Modo claro activado');
-        }
-    });
 }
 
 function setupPhotoUpload() {
@@ -300,11 +103,11 @@ function setupPhotoUpload() {
         reader.onload = function(e) {
             const imageData = e.target.result;
             
-            // Actualizar todas las imágenes de perfil
+            // Actualizar TODAS las imágenes (header unificado + perfil)
             const profileImgs = [
-                document.getElementById('headerProfileImg'),
-                document.getElementById('menuProfileImg'),
-                document.getElementById('profileAvatar')
+                document.getElementById('userAvatar'),          // Header unificado
+                document.getElementById('menuUserAvatar'),      // Menú unificado
+                document.getElementById('profileAvatar')        // Perfil específico
             ];
             
             profileImgs.forEach(img => {
@@ -323,6 +126,114 @@ function setupPhotoUpload() {
     });
 }
 
+function setupEditNameFunction() {
+    const editNameBtn = document.getElementById('editNameBtn');
+    const profileNameDisplay = document.getElementById('profileNameDisplay');
+    
+    if (!editNameBtn || !profileNameDisplay) return;
+    
+    editNameBtn.addEventListener('click', function() {
+        const currentName = profileNameDisplay.textContent;
+        const newName = prompt('Ingresa tu nuevo nombre:', currentName);
+        
+        if (newName && newName.trim() !== '' && newName !== currentName) {
+            // Actualizar en Firebase Auth
+            const user = window.auth?.currentUser;
+            if (user) {
+                user.updateProfile({
+                    displayName: newName.trim()
+                }).then(() => {
+                    // Actualizar TODOS los elementos de nombre (header unificado + perfil)
+                    const teacherNameElements = [
+                        document.getElementById('teacherName'),         // Header unificado
+                        document.getElementById('menuTeacherName'),     // Menú unificado
+                        document.getElementById('profileNameDisplay')   // Perfil específico
+                    ];
+                    
+                    teacherNameElements.forEach(element => {
+                        if (element) {
+                            element.textContent = newName.trim();
+                        }
+                    });
+                    
+                    showNotification('Nombre actualizado correctamente');
+                }).catch((error) => {
+                    console.error('Error al actualizar nombre:', error);
+                    showNotification('Error al actualizar el nombre', 'error');
+                });
+            }
+        }
+    });
+}
+
+// ===== FUNCIÓN PRINCIPAL DE INICIALIZACIÓN (ACTUALIZADA) =====
+function initializeProfile() {
+    console.log('🚀 Profile.js - Inicializando perfil con header unificado...');
+    
+    const user = window.auth?.currentUser;
+    if (!user) {
+        console.log('❌ Usuario no autenticado');
+        return;
+    }
+    
+    // Actualizar nombre del docente en TODOS los elementos
+    const displayName = user.displayName || user.email.split('@')[0];
+    
+    const teacherNameElements = [
+        document.getElementById('teacherName'),         // Header unificado
+        document.getElementById('menuTeacherName'),     // Menú unificado
+        document.getElementById('profileNameDisplay')   // Perfil específico
+    ];
+    
+    teacherNameElements.forEach(element => {
+        if (element) {
+            element.textContent = displayName;
+        }
+    });
+    
+    // Actualizar fecha de registro
+    const joinDateElement = document.getElementById('joinDate');
+    if (joinDateElement && user.metadata?.creationTime) {
+        const joinDate = new Date(user.metadata.creationTime).toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long'
+        });
+        joinDateElement.textContent = joinDate;
+    }
+    
+    // Cargar foto de perfil
+    loadProfilePhoto();
+    
+    // YA NO NECESITAMOS initializeDarkMode() porque app.js lo maneja
+    
+    // YA NO NECESITAMOS initializeMenuToggle() porque app.js lo maneja
+    
+    // Configurar subida de fotos
+    setupPhotoUpload();
+    
+    // Configurar edición de nombre
+    setupEditNameFunction();
+    
+    // Cargar estadísticas
+    updateProfileStatistics();
+    
+    // Inicializar logros
+    initializeAchievements();
+    
+    // Configurar botón de estadísticas
+    const viewStatsBtn = document.getElementById('viewStatsBtn');
+    if (viewStatsBtn) {
+        viewStatsBtn.addEventListener('click', function() {
+            showNotification('Página de estadísticas en desarrollo', 'info');
+        });
+    }
+    
+    // YA NO NECESITAMOS configurar estadísticas link ni logout porque app.js lo maneja
+    
+    console.log('✅ Profile.js - Perfil inicializado correctamente con header unificado');
+}
+
+// ===== RESTO DE FUNCIONES SIN CAMBIOS =====
 function updateProfileStatistics() {
     const user = window.auth?.currentUser;
     if (!user) return;
@@ -440,248 +351,39 @@ function initializeAchievements() {
     }
 }
 
-function setupEditNameFunction() {
-    const editNameBtn = document.getElementById('editNameBtn');
-    const teacherName = document.getElementById('teacherName');
-    
-    if (!editNameBtn || !teacherName) return;
-    
-    editNameBtn.addEventListener('click', function() {
-        const currentName = teacherName.textContent;
-        const newName = prompt('Ingresa tu nuevo nombre:', currentName);
-        
-        if (newName && newName.trim() !== '' && newName !== currentName) {
-            // Actualizar en Firebase Auth
-            const user = window.auth?.currentUser;
-            if (user) {
-                user.updateProfile({
-                    displayName: newName.trim()
-                }).then(() => {
-                    // Actualizar en la UI
-                    const teacherNameElements = [
-                        document.getElementById('headerTeacherName'),
-                        document.getElementById('menuTeacherName'),
-                        document.getElementById('teacherName')
-                    ];
-                    
-                    teacherNameElements.forEach(element => {
-                        if (element) {
-                            element.textContent = newName.trim();
-                        }
-                    });
-                    
-                    showNotification('Nombre actualizado correctamente');
-                }).catch((error) => {
-                    console.error('Error al actualizar nombre:', error);
-                    showNotification('Error al actualizar el nombre', 'error');
-                });
-            }
-        }
-    });
-}
-
-// ===== FUNCIÓN PRINCIPAL DE INICIALIZACIÓN =====
-
-function initializeProfile() {
-    console.log('🚀 Profile.js - Inicializando perfil...');
-    
-    const user = window.auth?.currentUser;
-    if (!user) {
-        console.log('❌ Usuario no autenticado');
-        return;
-    }
-    
-    // Actualizar nombre del docente
-    const displayName = user.displayName || user.email.split('@')[0];
-    
-    const teacherNameElements = [
-        document.getElementById('headerTeacherName'),
-        document.getElementById('menuTeacherName'),
-        document.getElementById('teacherName')
-    ];
-    
-    teacherNameElements.forEach(element => {
-        if (element) {
-            element.textContent = displayName;
-        }
-    });
-    
-    // Actualizar fecha de registro
-    const joinDateElement = document.getElementById('joinDate');
-    if (joinDateElement && user.metadata?.creationTime) {
-        const joinDate = new Date(user.metadata.creationTime).toLocaleDateString('es-ES', {
-            year: 'numeric',
-            month: 'long'
-        });
-        joinDateElement.textContent = joinDate;
-    }
-    
-    // Cargar foto de perfil
-    loadProfilePhoto();
-    
-    // Inicializar modo oscuro
-    initializeDarkMode();
-    
-    // CRÍTICO: Inicializar menú toggle con delay
-    setTimeout(() => {
-        const menuInitialized = initializeMenuToggle();
-        if (!menuInitialized) {
-            console.warn('⚠️ Menú toggle no se pudo inicializar, reintentando...');
-            setTimeout(() => {
-                initializeMenuToggle();
-            }, 1000);
-        }
-    }, 300);
-    
-    // Configurar subida de fotos
-    setupPhotoUpload();
-    
-    // Configurar edición de nombre
-    setupEditNameFunction();
-    
-    // Cargar estadísticas
-    updateProfileStatistics();
-    
-    // Inicializar logros
-    initializeAchievements();
-    
-    // Configurar botón de estadísticas
-    const viewStatsBtn = document.getElementById('viewStatsBtn');
-    if (viewStatsBtn) {
-        viewStatsBtn.addEventListener('click', function() {
-            showNotification('Página de estadísticas en desarrollo', 'info');
-        });
-    }
-    
-    // Configurar estadísticas link
-    const estadisticasLink = document.getElementById('estadisticas-link');
-    if (estadisticasLink) {
-        estadisticasLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            showNotification('Página de estadísticas en desarrollo', 'info');
-        });
-    }
-    
-    // Configurar logout
-    const logoutBtn = document.getElementById('logout');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-                window.auth.signOut().then(() => {
-                    localStorage.clear(); // Limpiar datos locales
-                    window.location.href = 'login.html';
-                }).catch((error) => {
-                    console.error('Error al cerrar sesión:', error);
-                    showNotification('Error al cerrar sesión', 'error');
-                });
-            }
-        });
-    }
-    
-    console.log('✅ Profile.js - Perfil inicializado correctamente');
-}
-
-// ===== CONFIGURACIÓN FIREBASE Y AUTENTICACIÓN =====
-
+// ===== CONFIGURACIÓN FIREBASE Y AUTENTICACIÓN (SIMPLIFICADA) =====
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📄 Profile.js - DOM cargado');
+    console.log('📄 Profile.js - DOM cargado con header unificado');
     
-    // Verificar que Firebase esté disponible
-    if (typeof firebase === 'undefined') {
-        console.error('❌ Firebase no está disponible');
-        return;
-    }
+    // Esperar a que app.js configure todo
+    const waitForApp = setInterval(() => {
+        if (window.auth && typeof window.setupMenuToggle === 'function') {
+            clearInterval(waitForApp);
+            console.log('🔗 Profile.js - App.js detectado, configurando listener...');
+            
+            // Configurar listener de autenticación
+            window.auth.onAuthStateChanged((user) => {
+                if (user) {
+                    console.log(`👤 Profile.js - Usuario autenticado: ${user.email}`);
+                    
+                    // Esperar un poco más para que app.js termine de configurar el header
+                    setTimeout(() => {
+                        initializeProfile();
+                    }, 1000);
+                    
+                } else {
+                    console.log('❌ Profile.js - Usuario no autenticado, redirigiendo...');
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+    }, 100);
     
-    // Verificar que la configuración de Firebase esté lista
-    if (!window.auth) {
-        console.log('⏳ Esperando configuración de Firebase...');
-        const checkAuth = setInterval(() => {
-            if (window.auth) {
-                clearInterval(checkAuth);
-                setupAuthListener();
-            }
-        }, 100);
-    } else {
-        setupAuthListener();
-    }
-    
-    function setupAuthListener() {
-        window.auth.onAuthStateChanged((user) => {
-            if (user) {
-                console.log(`👤 Usuario autenticado: ${user.uid} (${user.email})`);
-                
-                // Esperar más tiempo para asegurar que el DOM esté completamente listo
-                setTimeout(() => {
-                    initializeProfile();
-                }, 1000);
-                
-            } else {
-                console.log('❌ Usuario no autenticado, redirigiendo...');
-                window.location.href = 'login.html';
-            }
-        });
-    }
+    // Timeout de seguridad
+    setTimeout(() => {
+        clearInterval(waitForApp);
+        if (!window.auth) {
+            console.error('❌ Profile.js - App.js no se cargó correctamente');
+        }
+    }, 10000);
 });
-
-// ===== CSS ADICIONAL PARA GARANTIZAR FUNCIONAMIENTO =====
-const additionalStyles = document.createElement('style');
-additionalStyles.textContent = `
-    /* Profile.js - Estilos adicionales para menú toggle */
-    .menu-dropdown {
-        position: fixed !important;
-        top: 0 !important;
-        right: -100% !important;
-        width: 100% !important;
-        height: 100vh !important;
-        background: linear-gradient(135deg, var(--profile-primary, #FFB6C1) 0%, var(--profile-secondary, #B0E0E6) 100%) !important;
-        z-index: 9999 !important;
-        transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-        overflow-y: auto !important;
-        display: none !important;
-        flex-direction: column !important;
-    }
-    
-    .menu-dropdown.show,
-    .menu-dropdown.active {
-        right: 0 !important;
-        display: flex !important;
-    }
-    
-    /* Asegurar que el botón funcione */
-    .profile-button {
-        cursor: pointer !important;
-        pointer-events: all !important;
-        position: relative !important;
-        z-index: 10 !important;
-    }
-    
-    /* Prevenir scroll cuando el menú está abierto */
-    body.menu-open {
-        overflow: hidden !important;
-    }
-    
-    @keyframes slideInNotification {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    
-    @keyframes slideOutNotification {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-    }
-    
-    .notification {
-        font-family: 'Quicksand', sans-serif;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-`;
-document.head.appendChild(additionalStyles);
-
-// Hacer funciones globales disponibles inmediatamente
-window.profileMenuElements = profileMenuElements;
-
-console.log('✅ Profile.js - Módulo de perfil cargado completamente con debugging avanzado');

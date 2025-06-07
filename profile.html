@@ -10,220 +10,208 @@
     <link rel="icon" href="src/assets/icons/icon-192x192.png" type="image/png">
     <title>Mi Perfil - EduCheck Pro</title>
     
-    <!-- CSS -->
+    <!-- CSS EN EL MISMO ORDEN QUE OTRAS PÁGINAS -->
     <link rel="stylesheet" href="src/assets/css/styles.css">
     <link rel="stylesheet" href="src/assets/css/responsive.css">
     <link rel="stylesheet" href="src/assets/css/profile.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- Firebase -->
+</head>
+<body class="edu-system-ready profile-page">
+    <!-- ===== HEADER IDÉNTICO A INDEX.HTML ===== -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-brand">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h1>EduCheck Pro</h1>
+            </div>
+            
+            <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ===== OVERLAY DEL MENÚ ===== -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- ===== MENÚ DESPLEGABLE IDÉNTICO A INDEX.HTML ===== -->
+    <div class="dropdown-menu" id="dropdownMenu">
+        <div class="menu-header">
+            <button class="menu-close" id="menuClose" aria-label="Cerrar menú">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <h3 id="menuTeacherName">Cargando...</h3>
+                    <p>Docente</p>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="menu-items">
+            <a href="index.html" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="instituciones.html" class="menu-item">
+                <i class="fas fa-university"></i>
+                <span>Instituciones</span>
+            </a>
+            <a href="cursos.html" class="menu-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Cursos</span>
+            </a>
+            <a href="estudiantes.html" class="menu-item">
+                <i class="fas fa-user-graduate"></i>
+                <span>Estudiantes</span>
+            </a>
+            <a href="actividades.html" class="menu-item">
+                <i class="fas fa-calendar-check"></i>
+                <span>Actividades</span>
+            </a>
+            <a href="gallery.html" class="menu-item">
+                <i class="fas fa-images"></i>
+                <span>Galería</span>
+            </a>
+            <a href="reportes.html" class="menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reportes</span>
+            </a>
+            
+            <div class="menu-divider"></div>
+            
+            <a href="profile.html" class="menu-item active">
+                <i class="fas fa-user-cog"></i>
+                <span>Perfil</span>
+            </a>
+            <a href="#" class="menu-item" id="logoutOption">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </nav>
+        
+        <div class="menu-footer">
+            <div class="theme-toggle">
+                <span class="theme-label">Modo Oscuro</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="darkModeToggle" aria-label="Activar modo oscuro">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CONTENIDO PRINCIPAL (AJUSTADO PARA EL HEADER CORRECTO) ===== -->
+    <main class="profile-main">
+        <!-- Información Personal Simplificada -->
+        <section class="personal-info-section">
+            <div class="profile-card">
+                <div class="profile-avatar-section">
+                    <div class="avatar-container">
+                        <img id="profileAvatar" src="https://img.freepik.com/vector-gratis/circulo-azul-usuario-blanco_78370-4707.jpg" alt="Foto de perfil">
+                        <button class="change-photo-btn" id="changePhotoBtn" title="Cambiar foto">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                        <input type="file" id="photoInput" accept="image/*" hidden>
+                    </div>
+                    <div class="profile-status">
+                        <span class="status-indicator active"></span>
+                        <span class="status-text">Activo</span>
+                    </div>
+                </div>
+                
+                <div class="profile-details">
+                    <div class="name-section">
+                        <h2 id="profileNameDisplay">Nombre de la Docente</h2>
+                        <button class="edit-name-btn" id="editNameBtn" title="Editar nombre">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                    </div>
+                    <p class="join-date">
+                        <i class="fas fa-calendar-alt"></i>
+                        Miembro desde <span id="joinDate">Enero 2024</span>
+                    </p>
+                    
+                    <div class="quick-info">
+                        <div class="info-item">
+                            <i class="fas fa-heart"></i>
+                            <span>EduCheck Pro</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-users"></i>
+                            <span id="totalStudentsQuick">0 Estudiantes</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-university"></i>
+                            <span id="totalInstitutionsQuick">0 Instituciones</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <span id="totalCoursesQuick">0 Cursos</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Botón para ir a estadísticas -->
+                    <div class="profile-actions">
+                        <button class="stats-btn" id="viewStatsBtn">
+                            <i class="fas fa-chart-line"></i>
+                            Ver Estadísticas Detalladas
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Logros y Reconocimientos Mejorados -->
+        <section class="achievements-section">
+            <div class="section-header">
+                <h3>
+                    <i class="fas fa-trophy"></i>
+                    Logros y Reconocimientos
+                </h3>
+                <div class="achievements-progress">
+                    <span id="achievementsProgress">0 de 6 logros obtenidos</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="achievements-grid" id="achievementsGrid">
+                <!-- Los logros se cargarán dinámicamente -->
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== SCRIPTS IDÉNTICOS A OTRAS PÁGINAS ===== -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     
-    <!-- Configuración centralizada -->
+    <!-- Core scripts -->
+    <script src="src/assets/js/constants.js"></script>
     <script src="src/config/firebase.js"></script>
-</head>
-<body class="profile-page">
-    <div id="app">
-        <!-- Header simplificado con menú dropdown -->
-        <header class="app-header">
-            <div class="header-content">
-                <!-- Logo y branding -->
-                <div class="app-logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
-                    <div class="app-info">
-                        <h1>EduCheck Pro</h1>
-                        <p>Mi Perfil</p>
-                    </div>
-                </div>
-
-                <!-- Navegación contextual -->
-                <nav class="breadcrumb-nav">
-                    <a href="index.html" class="breadcrumb-item">
-                        <i class="fas fa-home"></i>
-                        Inicio
-                    </a>
-                    <span class="breadcrumb-separator">
-                        <i class="fas fa-chevron-right"></i>
-                    </span>
-                    <span class="breadcrumb-current">
-                        <i class="fas fa-user-circle"></i>
-                        Perfil
-                    </span>
-                </nav>
-
-                <!-- Menú de perfil -->
-                <div class="teacher-toggle">
-                    <button class="profile-button" id="profileButton" aria-label="Menú de perfil">
-                        <img id="headerProfileImg" src="https://img.freepik.com/vector-gratis/circulo-azul-usuario-blanco_78370-4707.jpg" alt="Profile" class="profile-img">
-                        <span id="headerTeacherName">Nombre de la Docente</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    
-                    <div class="menu-dropdown" id="menuDropdown">
-                        <div class="menu-header">
-                            <button class="menu-close-btn" id="menu-close-btn" aria-label="Cerrar menú">
-                                <i class="fas fa-times"></i>
-                            </button>
-                            <img id="menuProfileImg" src="https://img.freepik.com/vector-gratis/circulo-azul-usuario-blanco_78370-4707.jpg" alt="Profile" class="large-profile-img">
-                            <h3 id="menuTeacherName">Nombre de la Docente</h3>
-                            <p>Docente</p>
-                        </div>
-                        
-                        <div class="menu-content">
-                            <!-- Toggle de modo oscuro -->
-                            <div class="dark-mode-toggle">
-                                <span>Modo Oscuro</span>
-                                <label class="toggle-switch" for="darkModeToggle">
-                                    <input type="checkbox" id="darkModeToggle" aria-label="Activar modo oscuro">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                            
-                            <div class="menu-divider"></div>
-                            
-                            <a href="index.html" class="menu-item">
-                                <i class="fas fa-home"></i>
-                                <div class="menu-item-content">
-                                    <span>Inicio</span>
-                                    <p>Volver al dashboard principal</p>
-                                </div>
-                            </a>
-                            
-                            <a href="instituciones.html" class="menu-item">
-                                <i class="fas fa-university"></i>
-                                <div class="menu-item-content">
-                                    <span>Mis Instituciones</span>
-                                    <p>Gestionar instituciones y cursos</p>
-                                </div>
-                            </a>
-                            
-                            <a href="estudiantes.html" class="menu-item">
-                                <i class="fas fa-users"></i>
-                                <div class="menu-item-content">
-                                    <span>Mis Estudiantes</span>
-                                    <p>Gestionar estudiantes globalmente</p>
-                                </div>
-                            </a>
-                            
-                            <a href="profile.html" class="menu-item active">
-                                <i class="fas fa-user-circle"></i>
-                                <div class="menu-item-content">
-                                    <span>Perfil</span>
-                                    <p>Ver y editar perfil</p>
-                                </div>
-                            </a>
-                            
-                            <div class="menu-divider"></div>
-                            
-                            <a href="#" id="estadisticas-link" class="menu-item">
-                                <i class="fas fa-chart-bar"></i>
-                                <div class="menu-item-content">
-                                    <span>Estadísticas</span>
-                                    <p>Ver estadísticas detalladas</p>
-                                </div>
-                            </a>
-                            
-                            <div class="menu-divider"></div>
-                            
-                            <a href="#" id="logout" class="menu-item">
-                                <i class="fas fa-sign-out-alt"></i>
-                                <div class="menu-item-content">
-                                    <span>Cerrar Sesión</span>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <main class="profile-main">
-            <!-- Información Personal Simplificada -->
-            <section class="personal-info-section">
-                <div class="profile-card">
-                    <div class="profile-avatar-section">
-                        <div class="avatar-container">
-                            <img id="profileAvatar" src="https://img.freepik.com/vector-gratis/circulo-azul-usuario-blanco_78370-4707.jpg" alt="Foto de perfil">
-                            <button class="change-photo-btn" id="changePhotoBtn" title="Cambiar foto">
-                                <i class="fas fa-camera"></i>
-                            </button>
-                            <input type="file" id="photoInput" accept="image/*" hidden>
-                        </div>
-                        <div class="profile-status">
-                            <span class="status-indicator active"></span>
-                            <span class="status-text">Activo</span>
-                        </div>
-                    </div>
-                    
-                    <div class="profile-details">
-                        <div class="name-section">
-                            <h2 id="teacherName">Nombre de la Docente</h2>
-                            <button class="edit-name-btn" id="editNameBtn" title="Editar nombre">
-                                <i class="fas fa-pencil-alt"></i>
-                            </button>
-                        </div>
-                        <p class="join-date">
-                            <i class="fas fa-calendar-alt"></i>
-                            Miembro desde <span id="joinDate">Enero 2024</span>
-                        </p>
-                        
-                        <div class="quick-info">
-                            <div class="info-item">
-                                <i class="fas fa-heart"></i>
-                                <span>EduCheck Pro</span>
-                            </div>
-                            <div class="info-item">
-                                <i class="fas fa-users"></i>
-                                <span id="totalStudentsQuick">0 Estudiantes</span>
-                            </div>
-                            <div class="info-item">
-                                <i class="fas fa-university"></i>
-                                <span id="totalInstitutionsQuick">0 Instituciones</span>
-                            </div>
-                            <div class="info-item">
-                                <i class="fas fa-chalkboard-teacher"></i>
-                                <span id="totalCoursesQuick">0 Cursos</span>
-                            </div>
-                        </div>
-                        
-                        <!-- Botón para ir a estadísticas -->
-                        <div class="profile-actions">
-                            <button class="stats-btn" id="viewStatsBtn">
-                                <i class="fas fa-chart-line"></i>
-                                Ver Estadísticas Detalladas
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Logros y Reconocimientos Mejorados -->
-            <section class="achievements-section">
-                <div class="section-header">
-                    <h3>
-                        <i class="fas fa-trophy"></i>
-                        Logros y Reconocimientos
-                    </h3>
-                    <div class="achievements-progress">
-                        <span id="achievementsProgress">0 de 6 logros obtenidos</span>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="achievements-grid" id="achievementsGrid">
-                    <!-- Los logros se cargarán dinámicamente -->
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <!-- Script principal del perfil -->
+    <script src="src/assets/js/syncManager.js"></script>
+    <script src="src/assets/js/app.js"></script>
+    
+    <!-- Script específico de perfil -->
     <script src="src/assets/js/profile.js"></script>
+    
+    <!-- Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(registration => console.log('✅ SW registrado'))
+                .catch(error => console.log('❌ SW error:', error));
+        }
+    </script>
 </body>
 </html>

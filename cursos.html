@@ -3,419 +3,312 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Gestión de Cursos - EduCheck Pro">
-    <meta name="keywords" content="cursos, aulas, educación, gestión académica, estudiantes">
-    <meta name="author" content="EduCheck Pro Team">
-    <meta name="theme-color" content="#FFB6C1">
-    <meta name="msapplication-navbutton-color" content="#FFB6C1">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <link rel="icon" href="src/assets/icons/icon-192x192.png" type="image/png">
-    <title>Gestión de Cursos - EduCheck Pro</title>
+    <title>EduCheck Pro - Cursos</title>
+    
+    <!-- Favicon y Meta Tags -->
+    <link rel="icon" href="icon-192.png" type="image/png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="description" content="EduCheck Pro - Gestión de cursos académicos">
     
     <!-- CSS -->
     <link rel="stylesheet" href="src/assets/css/styles.css">
-    <link rel="stylesheet" href="src/assets/css/responsive.css">
-    <link rel="stylesheet" href="src/assets/css/cursos.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="src/assets/css/cursos.css"> <!-- 👈 AGREGAR ESTA LÍNEA -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
 </head>
-<body class="courses-page">
-    <!-- ===== HEADER CORRECTO IGUAL AL INDEX.HTML ===== -->
-    <header class="app-header">
-        <div class="header-content">
-            <!-- Logo simplificado -->
-            <div class="app-logo">
-                <div class="logo-icon">
+
+<body class="edu-system-ready courses-page">
+    <!-- ===== HEADER PRINCIPAL UNIFICADO ===== -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-brand">
+                <div class="logo">
                     <i class="fas fa-graduation-cap"></i>
                 </div>
+                <h1>EduCheck Pro</h1>
             </div>
-
-            <!-- Menú de perfil - IDs CORRECTOS -->
-            <div class="teacher-toggle">
-                <button class="profile-button" id="profileButton" aria-label="Menú de perfil">
-                    <img src="https://img.freepik.com/vector-gratis/circulo-azul-usuario-blanco_78370-4707.jpg" alt="Profile" class="profile-img">
-                    <span id="teacher-name">Nombre de la Docente</span>
-                    <i class="fas fa-chevron-down" aria-hidden="true"></i>
-                </button>
-                
-                <!-- CORREGIDO: ID coherente con app.js -->
-                <div class="menu-dropdown" id="menuDropdown">
-                    <!-- Header del menú -->
-                    <div class="menu-header">
-                        <button class="menu-close-btn" id="menu-close-btn" aria-label="Cerrar menú">
-                            <i class="fas fa-times"></i>
-                        </button>
-                        <img src="https://img.freepik.com/vector-gratis/circulo-azul-usuario-blanco_78370-4707.jpg" alt="Profile" class="large-profile-img">
-                        <h3 id="menuTeacherName">Nombre de la Docente</h3>
-                        <p>Sistema EduCheck Pro</p>
-                    </div>
-                    
-                    <!-- Contenido del menú -->
-                    <div class="menu-content">
-                        <!-- Navegación -->
-                        <a href="instituciones.html" id="institutions-list" class="menu-item">
-                            <i class="fas fa-university"></i>
-                            <div class="menu-item-content">
-                                <span>Mis Instituciones</span>
-                                <p>Gestionar instituciones y cursos</p>
-                            </div>
-                        </a>
-                        
-                        <a href="estudiantes.html" id="students-list" class="menu-item">
-                            <i class="fas fa-users"></i>
-                            <div class="menu-item-content">
-                                <span>Mis Estudiantes</span>
-                                <p>Gestionar estudiantes globalmente</p>
-                            </div>
-                        </a>
-                        
-                        <a href="cursos.html" id="courses-list" class="menu-item">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                            <div class="menu-item-content">
-                                <span>Mis Cursos</span>
-                                <p>Ver cursos por institución</p>
-                            </div>
-                        </a>
-                        
-                        <a href="profile.html" id="profile" class="menu-item">
-                            <i class="fas fa-user-circle"></i>
-                            <div class="menu-item-content">
-                                <span>Mi Perfil</span>
-                                <p>Configurar cuenta y preferencias</p>
-                            </div>
-                        </a>
-                        
-                        <div class="menu-divider"></div>
-                        
-                        <!-- Dark Mode Toggle -->
-                        <div class="dark-mode-toggle" id="darkModeToggle">
-                            <span>Modo Oscuro</span>
-                            <label class="toggle-switch" for="darkModeToggleInput">
-                                <input type="checkbox" id="darkModeToggleInput" aria-label="Activar modo oscuro">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                        
-                        <div class="menu-divider"></div>
-                        
-                        <!-- Logout -->
-                        <a href="#" id="logout" class="menu-item">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <div class="menu-item-content">
-                                <span>Cerrar Sesión</span>
-                                <p>Salir del sistema</p>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
+            
+            <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
         </div>
     </header>
 
-    <!-- ===== BREADCRUMB NAVIGATION ===== -->
-    <nav class="breadcrumb-nav">
-        <a href="index.html" class="breadcrumb-item">
-            <i class="fas fa-home"></i>
-            Inicio
-        </a>
-        <span class="breadcrumb-separator">
-            <i class="fas fa-chevron-right"></i>
-        </span>
-        <a href="instituciones.html" class="breadcrumb-item">
-            <i class="fas fa-university"></i>
-            Instituciones
-        </a>
-        <span class="breadcrumb-separator">
-            <i class="fas fa-chevron-right"></i>
-        </span>
-        <span class="breadcrumb-current">
-            <i class="fas fa-chalkboard-teacher"></i>
-            Cursos
-        </span>
-    </nav>
+    <!-- ===== OVERLAY DEL MENÚ ===== -->
+    <div class="menu-overlay" id="menuOverlay"></div>
 
-    <!-- ===== MAIN CONTENT ===== -->
-    <main class="main-content">
-        <!-- Page Header -->
-        <section class="courses-controls">
-            <div class="controls-header">
-                <div class="controls-title">
-                    <div class="institution-badge">
-                        <i class="fas fa-university"></i>
-                        <span id="institutionName">Cargando institución...</span>
-                    </div>
-                    <h2>
-                        <i class="fas fa-chalkboard-teacher"></i>
-                        Gestión de Cursos
-                    </h2>
-                    <p>Administra todos los cursos, niveles educativos y estudiantes de la institución</p>
+    <!-- ===== MENÚ DESPLEGABLE ===== -->
+    <div class="dropdown-menu" id="dropdownMenu">
+        <div class="menu-header">
+            <button class="menu-close" id="menuClose" aria-label="Cerrar menú">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
                 </div>
-                
-                <div class="controls-actions">
-                    <button class="action-btn primary" id="add-course-btn">
+                <div class="user-details">
+                    <h3 id="menuTeacherName">Cargando...</h3>
+                    <p>Docente</p>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="menu-items">
+            <a href="index.html" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="instituciones.html" class="menu-item">
+                <i class="fas fa-university"></i>
+                <span>Instituciones</span>
+            </a>
+            <a href="cursos.html" class="menu-item active">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Cursos</span>
+            </a>
+            <a href="estudiantes.html" class="menu-item">
+                <i class="fas fa-user-graduate"></i>
+                <span>Estudiantes</span>
+            </a>
+            <a href="actividades.html" class="menu-item">
+                <i class="fas fa-calendar-check"></i>
+                <span>Actividades</span>
+            </a>
+            <a href="gallery.html" class="menu-item">
+                <i class="fas fa-images"></i>
+                <span>Galería</span>
+            </a>
+            <a href="reportes.html" class="menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reportes</span>
+            </a>
+            
+            <div class="menu-divider"></div>
+            
+            <a href="profile.html" class="menu-item">
+                <i class="fas fa-user-cog"></i>
+                <span>Perfil</span>
+            </a>
+            <a href="#" class="menu-item" id="logoutOption">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </nav>
+        
+        <div class="menu-footer">
+            <div class="theme-toggle">
+                <span class="theme-label">Modo Oscuro</span>
+                <label class="toggle-switch" for="darkModeToggle">
+                    <input type="checkbox" id="darkModeToggle" title="Activar o desactivar modo oscuro">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CONTENIDO PRINCIPAL ===== -->
+    <main class="page-main">
+        <div class="page-container">
+            
+            <!-- ===== TÍTULO DE LA PÁGINA ===== -->
+            <section class="page-header">
+                <div class="header-content">
+                    <div class="header-icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="header-text">
+                        <h1>Gestión de Cursos</h1>
+                        <p>Administra todos los cursos y organiza tu enseñanza de manera eficiente</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-primary" id="addCourseBtn">
                         <i class="fas fa-plus"></i>
                         <span>Nuevo Curso</span>
                     </button>
-                    <button class="action-btn secondary" id="add-students-btn">
-                        <i class="fas fa-user-plus"></i>
-                        <span>Agregar Estudiantes</span>
-                    </button>
-                    <button class="action-btn tertiary" id="export-courses-btn">
-                        <i class="fas fa-download"></i>
-                        <span>Exportar</span>
-                    </button>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- Filters Section -->
-        <section class="courses-filters">
-            <div class="filters-container">
-                <div class="filter-group">
-                    <label for="courseSearch">
+            <!-- ===== FILTROS Y BÚSQUEDA ===== -->
+            <section class="filters-section">
+                <div class="search-and-filters">
+                    <div class="search-box">
                         <i class="fas fa-search"></i>
-                        Buscar cursos
-                    </label>
-                    <input type="text" id="courseSearch" placeholder="Buscar por nombre..." class="filter-input">
+                        <input type="text" id="course-search" placeholder="Buscar cursos por nombre...">
+                    </div>
+                    <div class="filters">
+                        <select id="level-filter" class="filter-select" title="Filtrar cursos por nivel educativo">
+                            <option value="">Todos los niveles</option>
+                            <option value="inicial">Inicial</option>
+                            <option value="primario">Primario</option>
+                            <option value="secundario">Secundario</option>
+                            <option value="universitario">Universitario</option>
+                            <option value="mixto">Mixto</option>
+                        </select>
+                        <select id="status-filter" class="filter-select" title="Filtrar cursos por estado">
+                            <option value="">Todos los estados</option>
+                            <option value="active">Activos</option>
+                            <option value="inactive">Inactivos</option>
+                        </select>
+                    </div>
                 </div>
-                
-                <div class="filter-group">
-                    <label for="levelFilter">
-                        <i class="fas fa-layer-group"></i>
-                        Filtrar por nivel
-                    </label>
-                    <select id="levelFilter" class="filter-select">
-                        <option value="">Todos los niveles</option>
-                        <option value="inicial">Inicial</option>
-                        <option value="primario">Primario</option>
-                        <option value="secundario">Secundario</option>
-                        <option value="universitario">Universitario</option>
-                        <option value="mixto">Mixto</option>
-                    </select>
-                </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- Courses List -->
-        <section class="courses-list">
-            <!-- Courses Grid/List -->
-            <div class="courses-container" id="coursesContainer">
-                <!-- Los cursos se cargarán aquí dinámicamente -->
-            </div>
-
-            <!-- Empty State -->
-            <div class="empty-state" id="emptyState" style="display: none;">
-                <div class="empty-illustration">
-                    <i class="fas fa-chalkboard-teacher"></i>
+            <!-- ===== LISTA DE CURSOS ===== -->
+            <section class="courses-section">
+                <div class="courses-grid" id="coursesGrid">
+                    <div class="loading-placeholder">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Cargando cursos...</p>
+                    </div>
                 </div>
-                <h3>No hay cursos registrados</h3>
-                <p>Comienza creando tu primer curso para esta institución</p>
-                <button class="empty-action-btn" onclick="openCourseModal()">
-                    <i class="fas fa-plus"></i>
-                    <span>Crear Primer Curso</span>
-                </button>
-            </div>
-        </section>
+            </section>
+            
+        </div>
     </main>
 
-    <!-- Modal: Nuevo/Editar Curso -->
-    <div class="modal" id="courseModal">
-        <div class="modal-content course-modal-content">
+    <!-- ===== MODAL PARA CREAR/EDITAR CURSO ===== -->
+    <div id="course-modal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
             <div class="modal-header">
-                <h3 id="courseModalTitle">Nuevo Curso</h3>
-                <buttonbutton class="modal-close" onclick="closeCourseModal()" title="Cerrar modal">
+                <h3>
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span id="modal-title">Nuevo Curso</span>
+                </h3>
+                <button class="close-modal" onclick="closeCourseModal()" title="Cerrar modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            
             <div class="modal-body">
-                <form id="course-form" class="course-form">
-                    <!-- Información Básica -->
-                    <div class="form-section">
-                        <h4 class="section-title">
-                            <i class="fas fa-info-circle"></i>
-                            Información Básica
-                        </h4>
+                <form id="course-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="courseName">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                Nombre del Curso
+                            </label>
+                            <input 
+                                type="text" 
+                                id="courseName" 
+                                name="name"
+                                placeholder="Ej: Matemáticas 5to Grado"
+                                required
+                            >
+                        </div>
                         
-                        <div class="form-grid">
-                            <!-- NUEVO: Selector de Establecimiento -->
-                            <div class="form-field full-width">
-                                <label for="courseInstitution" class="field-label required">
-                                    <i class="fas fa-university"></i>
-                                    Establecimiento
-                                </label>
-                                <select id="courseInstitution" name="courseInstitution" class="field-select" required>
-                                    <option value="">Seleccionar establecimiento...</option>
-                                    <!-- Se cargarán dinámicamente -->
-                                </select>
-                                <div class="field-help">
-                                    <i class="fas fa-info-circle"></i>
-                                    <span>El curso será asignado al establecimiento seleccionado</span>
-                                </div>
-                            </div>
-
-                            <div class="form-field">
-                                <label for="courseName" class="field-label required">
-                                    <i class="fas fa-chalkboard-teacher"></i>
-                                    Nombre del Curso
-                                </label>
-                                <input type="text" id="courseName" name="courseName" class="field-input" 
-                                       placeholder="Ej: Matemáticas 5to Grado" required>
-                            </div>
-
-                            <div class="form-field">
-                                <label for="courseLevel" class="field-label required">
-                                    <i class="fas fa-layer-group"></i>
-                                    Nivel Educativo
-                                </label>
-                                <select id="courseLevel" name="courseLevel" class="field-select" required>
-                                    <option value="">Seleccionar nivel...</option>
-                                    <option value="inicial">Inicial</option>
-                                    <option value="primario">Primario</option>
-                                    <option value="secundario">Secundario</option>
-                                    <option value="universitario">Universitario</option>
-                                    <option value="mixto">Mixto</option>
-                                </select>
-                            </div>
-
-                            <div class="form-field">
-                                <label for="courseClassroom" class="field-label">
-                                    <i class="fas fa-door-open"></i>
-                                    Aula/Salón
-                                </label>
-                                <input type="text" id="courseClassroom" name="courseClassroom" class="field-input" 
-                                       placeholder="Ej: Aula 101, Laboratorio A">
-                            </div>
-
-                            <div class="form-field">
-                                <label for="courseCapacity" class="field-label">
-                                    <i class="fas fa-users"></i>
-                                    Capacidad Máxima
-                                </label>
-                                <input type="number" id="courseCapacity" name="courseCapacity" class="field-input" 
-                                       placeholder="Número de estudiantes" min="1" max="100">
-                            </div>
-
-                            <div class="form-field">
-                                <label for="courseTeacher" class="field-label">
-                                    <i class="fas fa-user-tie"></i>
-                                    Docente a Cargo
-                                </label>
-                                <input type="text" id="courseTeacher" name="courseTeacher" class="field-input" 
-                                       placeholder="Nombre del docente">
-                            </div>
-
-                            <div class="form-field">
-                                <label for="courseSchedule" class="field-label">
-                                    <i class="fas fa-clock"></i>
-                                    Horario
-                                </label>
-                                <input type="text" id="courseSchedule" name="courseSchedule" class="field-input" 
-                                       placeholder="Ej: Lunes y Miércoles 8:00-10:00">
-                            </div>
+                        <div class="form-group">
+                            <label for="courseLevel">
+                                <i class="fas fa-layer-group"></i>
+                                Nivel Educativo
+                            </label>
+                            <select id="courseLevel" name="level" required>
+                                <option value="">Seleccionar nivel</option>
+                                <option value="inicial">Inicial</option>
+                                <option value="primario">Primario</option>
+                                <option value="secundario">Secundario</option>
+                                <option value="universitario">Universitario</option>
+                                <option value="mixto">Mixto</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="courseClassroom">
+                                <i class="fas fa-door-open"></i>
+                                Aula/Salón
+                            </label>
+                            <input 
+                                type="text" 
+                                id="courseClassroom" 
+                                name="classroom"
+                                placeholder="Ej: Aula 101, Laboratorio A"
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="courseCapacity">
+                                <i class="fas fa-users"></i>
+                                Capacidad Máxima
+                            </label>
+                            <input 
+                                type="number" 
+                                id="courseCapacity" 
+                                name="capacity"
+                                placeholder="Número de estudiantes"
+                                min="1"
+                                max="100"
+                            >
                         </div>
                     </div>
 
-                    <!-- Información Adicional -->
-                    <div class="form-section">
-                        <h4 class="section-title">
+                    <div class="form-group full-width">
+                        <label for="courseDescription">
                             <i class="fas fa-align-left"></i>
-                            Información Adicional
-                        </h4>
-                        
-                        <div class="form-field full-width">
-                            <label for="courseDescription" class="field-label">
-                                <i class="fas fa-align-left"></i>
-                                Descripción del Curso
-                            </label>
-                            <textarea id="courseDescription" name="courseDescription" class="field-textarea" rows="4"
-                                      placeholder="Describe el contenido, objetivos y metodología del curso..."></textarea>
-                        </div>
-
-                        <div class="form-field full-width">
-                            <label for="courseNotes" class="field-label">
-                                <i class="fas fa-sticky-note"></i>
-                                Notas Adicionales
-                            </label>
-                            <textarea id="courseNotes" name="courseNotes" class="field-textarea" rows="3"
-                                      placeholder="Información adicional, requisitos, observaciones..."></textarea>
-                        </div>
+                            Descripción del Curso
+                        </label>
+                        <textarea 
+                            id="courseDescription" 
+                            name="description"
+                            placeholder="Describe el contenido, objetivos y metodología del curso..."
+                            rows="4"
+                        ></textarea>
                     </div>
 
-                    <!-- Estado del Curso -->
-                    <div class="form-section">
-                        <div class="checkbox-field">
-                            <input type="checkbox" id="courseActive" name="courseActive" checked>
-                            <label for="courseActive" class="checkbox-label">
+                    <div class="form-group full-width">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="courseActive" name="isActive" checked>
+                            <label for="courseActive">
                                 <i class="fas fa-toggle-on"></i>
-                                <div>
-                                    <strong>Curso Activo</strong>
-                                    <p>El curso está disponible para recibir estudiantes y registrar asistencia</p>
-                                </div>
+                                Curso activo
                             </label>
                         </div>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="cancel-btn" onclick="closeCourseModal()">
+                            <i class="fas fa-times"></i>
+                            Cancelar
+                        </button>
+                        <button type="submit" class="save-btn">
+                            <i class="fas fa-save"></i>
+                            <span id="save-btn-text">Guardar Curso</span>
+                        </button>
                     </div>
                 </form>
             </div>
-            
-            <div class="modal-actions">
-                <button type="button" class="btn-secondary" onclick="closeCourseModal()">
-                    <i class="fas fa-times"></i>
-                    Cancelar
-                </button>
-                <button type="submit" form="course-form" class="btn-primary">
-                    <i class="fas fa-save"></i>
-                    <span id="saveCourseText">Guardar Curso</span>
-                </button>
-            </div>
         </div>
     </div>
 
-    <!-- Modal: Confirmar Eliminación -->
-    <div class="modal" id="deleteModal" style="display: none;">
-        <div class="modal-content confirm-modal-content">
-            <div class="modal-header">
-                <h3>Confirmar Eliminación</h3>
-                <button class="modal-close" onclick="closeDeleteModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="modal-body">
-                <div class="confirm-content">
-                    <div class="confirm-icon">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <h4>¿Eliminar curso permanentemente?</h4>
-                    <p>Estás a punto de eliminar el curso <strong id="deleteCourseeName"></strong>.</p>
-                    <div class="warning-alert">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <div class="warning-content">
-                            <strong>¡Atención!</strong>
-                            <span>Esta acción también eliminará todos los estudiantes asociados y no se puede deshacer.</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="modal-actions">
-                <button type="button" class="btn-secondary" onclick="closeDeleteModal()">
-                    <i class="fas fa-times"></i>
-                    Cancelar
-                </button>
-                <button type="button" class="btn-danger" id="confirmDeleteBtn">
-                    <i class="fas fa-trash"></i>
-                    Eliminar Curso
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scripts en orden correcto -->
+    <!-- ===== SCRIPTS UNIFICADOS ===== -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <!-- Core scripts -->
+    <script src="src/assets/js/constants.js"></script>
     <script src="src/config/firebase.js"></script>
+    <script src="src/assets/js/syncManager.js"></script>
     <script src="src/assets/js/app.js"></script>
+    
+    <!-- Script específico de cursos -->
     <script src="src/assets/js/cursos.js"></script>
+    
+    <!-- Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(registration => console.log('✅ SW registrado'))
+                .catch(error => console.log('❌ SW error:', error));
+        }
+    </script>
 </body>
 </html>

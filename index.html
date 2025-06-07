@@ -3,561 +3,395 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="EduCheck Pro - Sistema profesional de gestión de asistencia y administración educativa">
-    <meta name="keywords" content="educación, asistencia, gestión educativa, instituciones, estudiantes, profesional">
-    <meta name="author" content="Zion Code">
-    <meta name="theme-color" content="#FFB6C1">
+    <title>EduCheck Pro - Dashboard Principal</title>
     
-    <!-- Open Graph / Social Media -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="EduCheck Pro - Sistema de Gestión Educativa">
-    <meta property="og:description" content="Plataforma profesional para la gestión de asistencia e instituciones educativas">
-    <meta property="og:url" content="https://educheck-pro.web.app">
-    <meta property="og:image" content="src/assets/icons/icon-512x512.png">
-    
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="EduCheck Pro">
-    <meta name="twitter:description" content="Sistema profesional de gestión educativa">
-    
-    <!-- Apple Touch Icon -->
-    <link rel="apple-touch-icon" href="src/assets/icons/icon-192x192.png">
-    <link rel="icon" href="src/assets/icons/icon-192x192.png" type="image/png">
-    
-    <title>EduCheck Pro - Sistema de Gestión Educativa</title>
-    
-    <!-- Manifest -->
-    <link rel="manifest" href="manifest.json">
+    <!-- Favicon y Meta Tags -->
+    <link rel="icon" href="icon-192.png" type="image/png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="description" content="EduCheck Pro - Sistema de gestión educativa profesional">
     
     <!-- CSS -->
     <link rel="stylesheet" href="src/assets/css/styles.css">
-    <link rel="stylesheet" href="src/assets/css/responsive.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
 </head>
-<body>
-    <div id="app">
-        <!-- Header principal -->
-        <header class="app-header">
-            <div class="header-content">
-                <!-- Logo simplificado -->
-                <div class="app-logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
-                </div>
 
-                <!-- Menú de perfil -->
-                <div class="teacher-toggle">
-                    <!-- CORREGIDO: ID coherente con estudiantes.js -->
-                    <button class="profile-button" id="profileButton" aria-label="Menú de perfil">
-                        <img src="https://img.freepik.com/vector-gratis/circulo-azul-usuario-blanco_78370-4707.jpg?semt=ais_hybrid&w=740" alt="Profile" class="profile-img">
-                        <span id="teacher-name">Nombre de la Docente</span>
-                        <i class="fas fa-chevron-down" aria-hidden="true"></i>
-                    </button>
-                    
-                    <!-- CORREGIDO: ID coherente con estudiantes.js -->
-                    <div class="menu-dropdown" id="menuDropdown">
-                        <!-- Header del menú -->
-                        <div class="menu-header">
-                            <button class="menu-close-btn" id="menu-close-btn" aria-label="Cerrar menú">
-                                <i class="fas fa-times"></i>
-                            </button>
-                            <img src="https://img.freepik.com/vector-gratis/circulo-azul-usuario-blanco_78370-4707.jpg?semt=ais_hybrid&w=740" alt="Profile" class="large-profile-img">
-                            <h3 id="menuTeacherName">Nombre de la Docente</h3>
-                            <p>Docente</p>
-                        </div>
-                        
-                        <!-- Contenido del menú -->
-                        <div class="menu-content">
-                            <!-- Botón de modo oscuro -->
-                            <div class="dark-mode-toggle">
-                                <span>Modo Oscuro</span>
-                                <label class="toggle-switch" for="darkModeToggle">
-                                    <input type="checkbox" id="darkModeToggle" aria-label="Activar modo oscuro" title="Activar/desactivar modo oscuro">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                            
-                            <div class="menu-divider"></div>
-                            
-                            <!-- CORREGIDO: Link a instituciones -->
-                            <a href="instituciones.html" id="institutions-list" class="menu-item">
-                                <i class="fas fa-university"></i>
-                                <div class="menu-item-content">
-                                    <span>Mis Instituciones</span>
-                                    <p>Gestionar instituciones y cursos</p>
-                                </div>
-                            </a>
-                            
-                            <!-- CORREGIDO: Link a estudiantes -->
-                            <a href="estudiantes.html" id="students-list" class="menu-item">
-                                <i class="fas fa-users"></i>
-                                <div class="menu-item-content">
-                                    <span>Mis Estudiantes</span>
-                                    <p>Gestionar estudiantes globalmente</p>
-                                </div>
-                            </a>
-                            
-                            <!-- CORREGIDO: Link a cursos -->
-                            <a href="cursos.html" id="courses-list" class="menu-item">
-                                <i class="fas fa-chalkboard-teacher"></i>
-                                <div class="menu-item-content">
-                                    <span>Mis Cursos</span>
-                                    <p>Ver cursos por institución</p>
-                                </div>
-                            </a>
-                            
-                            <a href="profile.html" id="profile" class="menu-item">
-                                <i class="fas fa-user-circle"></i>
-                                <div class="menu-item-content">
-                                    <span>Perfil</span>
-                                    <p>Ver y editar perfil</p>
-                                </div>
-                            </a>
-                            
-                            <div class="menu-divider"></div>
-                            
-                            <!-- Funcionalidades adicionales -->
-                            <a href="#" id="attendance-reports" class="menu-item">
-                                <i class="fas fa-clipboard-list"></i>
-                                <div class="menu-item-content">
-                                    <span>Planillas de Asistencia</span>
-                                    <p>Ver y exportar planillas</p>
-                                </div>
-                            </a>
-                            
-                            <a href="#" id="gallery" class="menu-item">
-                                <i class="fas fa-images"></i>
-                                <div class="menu-item-content">
-                                    <span>Galería</span>
-                                    <p>Ver fotos de actividades</p>
-                                </div>
-                            </a>
-                            
-                            <div class="menu-divider"></div>
-                            
-                            <!-- Configuraciones -->
-                            <a href="#" id="global-stats" class="menu-item">
-                                <i class="fas fa-chart-bar"></i>
-                                <div class="menu-item-content">
-                                    <span>Estadísticas</span>
-                                    <p>Resumen de todas las instituciones</p>
-                                </div>
-                            </a>
-                            
-                            <a href="#" id="installApp" class="menu-item">
-                                <i class="fas fa-download"></i>
-                                <div class="menu-item-content">
-                                    <span>Instalar App</span>
-                                    <p>Instalar como aplicación</p>
-                                </div>
-                            </a>
-                            
-                            <div class="menu-divider"></div>
-                            
-                            <a href="#" id="logout" class="menu-item">
-                                <i class="fas fa-sign-out-alt"></i>
-                                <div class="menu-item-content">
-                                    <span>Cerrar Sesión</span>
-                                </div>
-                            </a>
-                            
-                            <a href="#" id="deleteAccount" class="menu-item">
-                                <i class="fas fa-user-times"></i>
-                                <div class="menu-item-content">
-                                    <span>Eliminar Cuenta</span>
-                                    <p>Esta acción no se puede deshacer</p>
-                                </div>
-                            </a>
-                            
-                            <!-- Botón de donación -->
-                            <button id="donationBtn" class="donation-btn">
-                                <i class="fas fa-heart"></i> Realizar Donación
-                            </button>
-                        </div>
-                    </div>
+<body class="edu-system-ready">
+    <!-- ===== HEADER PRINCIPAL ===== -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-brand">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
                 </div>
+                <h1>EduCheck Pro</h1>
             </div>
-        </header>
+            
+            <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </div>
+    </header>
 
-        <main>
-            <!-- Sección de actividades principal -->
-            <section id="activity-log">
-                <form class="activity-form">
-                    <div class="form-header">
-                        <i class="fas fa-book-open form-icon"></i>
-                        <h2>Registro de Actividades</h2>
-                        <p class="form-description">
-                            Registra las actividades que realizarás en clase. 
-                            Esto te ayudará a mantener un historial de las lecciones 
-                            y el progreso de tus estudiantes.
-                        </p>
-                    </div>
-                    <div class="form-group">
-                        <label for="activityName">
-                            <i class="fas fa-star"></i> Nombre de la Actividad
-                        </label>
-                        <input type="text" id="activityName" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="activityDate">
-                            <i class="fas fa-calendar"></i> Fecha
-                        </label>
-                        <input type="date" id="activityDate" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>
-                            <i class="fas fa-image"></i> Foto de la Actividad
-                        </label>
-                        <div class="image-upload-container">
-                            <input type="file" id="activityImage" accept="image/*" hidden aria-label="Imagen de actividad" title="Seleccionar imagen para la actividad">
-                            <div class="image-preview">
-                                <img id="imagePreview" src="#" alt="Vista previa de imagen">
-                                <button type="button" class="remove-image" aria-label="Eliminar imagen" title="Eliminar imagen">
-                                    <i class="fas fa-times" aria-hidden="true"></i>
-                                </button>
-                            </div>
-                            <label for="activityImage" class="upload-placeholder" title="Subir imagen">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <span>Click para subir imagen</span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="add-activity-btn">
-                        <i class="fas fa-plus"></i>
-                        Agregar Actividad
-                    </button>
-                </form>
-            </section>
+    <!-- ===== OVERLAY DEL MENÚ ===== -->
+    <div class="menu-overlay" id="menuOverlay"></div>
 
-            <section id="activities-list" class="activities-container">
-                <div class="form-header">
-                    <i class="fas fa-list-check form-icon"></i>
-                    <h2>Mis Actividades</h2>
-                    <p class="form-description">
-                        Aquí encontrarás todas las actividades registradas.
-                    </p>
-                </div>
-
-                <div class="activities-filters">
-                    <div class="filter-group">
-                        <label class="filter-label">
-                            <i class="fas fa-search"></i>
-                            Buscar actividad
-                        </label>
-                        <input type="text" id="activity-search" placeholder="Ej: Lección">
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label">
-                            <i class="fas fa-calendar"></i>
-                            Filtrar por fecha
-                        </label>
-                        <input type="date" id="activity-date-filter" title="Seleccionar fecha para filtrar actividades" aria-label="Filtrar actividades por fecha">
-                    </div>
-                </div>
-
-                <div id="activities-grid"></div>
-            </section>
-        </main>
-    </div>
-
-    <button id="scroll-to-top" class="scroll-to-top" aria-label="Volver arriba">
-        <i class="fas fa-chevron-up" aria-hidden="true"></i>
-    </button>
-
-    <!-- Modal de confirmación para eliminar cuenta -->
-    <div id="deleteConfirmModal" class="confirm-modal">
-        <div class="confirm-content">
-            <button class="confirm-close" id="closeConfirmModal" aria-label="Cerrar modal">
+    <!-- ===== MENÚ DESPLEGABLE ===== -->
+    <div class="dropdown-menu" id="dropdownMenu">
+        <div class="menu-header">
+            <button class="menu-close" id="menuClose" aria-label="Cerrar menú">
                 <i class="fas fa-times"></i>
             </button>
-            
-            <div class="confirm-icon">
-                <i class="fas fa-exclamation-triangle"></i>
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <h3 id="menuTeacherName">Cargando...</h3>
+                    <p>Docente</p>
+                </div>
             </div>
-            <h3 class="confirm-title">¿Estás seguro?</h3>
-            <p class="confirm-text">Esta acción eliminará permanentemente tu cuenta y todos tus datos. Esta operación no se puede deshacer.</p>
-            <div class="confirm-buttons">
-                <button id="cancelDelete" class="confirm-cancel">Cancelar</button>
-                <button id="confirmDelete" class="confirm-delete">Eliminar Cuenta</button>
+        </div>
+        
+        <nav class="menu-items">
+            <a href="index.html" class="menu-item active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="instituciones.html" class="menu-item">
+                <i class="fas fa-university"></i>
+                <span>Instituciones</span>
+            </a>
+            <a href="cursos.html" class="menu-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Cursos</span>
+            </a>
+            <a href="estudiantes.html" class="menu-item">
+                <i class="fas fa-user-graduate"></i>
+                <span>Estudiantes</span>
+            </a>
+            <a href="actividades.html" class="menu-item">
+                <i class="fas fa-calendar-check"></i>
+                <span>Actividades</span>
+            </a>
+            <a href="gallery.html" class="menu-item">
+                <i class="fas fa-images"></i>
+                <span>Galería</span>
+            </a>
+            <a href="reportes.html" class="menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reportes</span>
+            </a>
+            
+            <div class="menu-divider"></div>
+            
+            <a href="profile.html" class="menu-item">
+                <i class="fas fa-user-cog"></i>
+                <span>Perfil</span>
+            </a>
+            <a href="#" class="menu-item" id="logoutOption">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </nav>
+        
+        <div class="menu-footer">
+            <div class="theme-toggle">
+                <label class="toggle-switch" for="darkModeToggle">
+                    <span class="theme-label">Modo Oscuro</span>
+                    <input type="checkbox" id="darkModeToggle">
+                    <span class="toggle-slider"></span>
+                </label>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Asistencia -->
-    <div id="attendance-modal" class="modal">
-        <div class="modal-content attendance-modal-content">
+    <!-- ===== CONTENIDO PRINCIPAL ===== -->
+    <main class="dashboard-main">
+        <div class="dashboard-container">
+            
+            <!-- ===== SECCIÓN DE BIENVENIDA ===== -->
+            <section class="welcome-section">
+                <div class="welcome-content">
+                    <h2 class="welcome-title">
+                        <span class="greeting-text">Bienvenid@,</span>
+                        <span class="teacher-name" id="teacherName">Cargando...</span>
+                    </h2>
+                    <p class="current-date" id="currentDate">Cargando fecha...</p>
+                </div>
+                <div class="welcome-icon">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+            </section>
+
+            <!-- ===== ACCIÓN PRINCIPAL - TOMAR ASISTENCIA ===== -->
+            <section class="primary-action-section">
+                <div class="primary-action-card attendance-focus">
+                    <div class="action-content">
+                        <div class="action-icon">
+                            <i class="fas fa-clipboard-check"></i>
+                        </div>
+                        <div class="action-text">
+                            <h3>Tomar Asistencia Ahora</h3>
+                            <p>¿En qué curso vas a dar clase hoy?</p>
+                        </div>
+                    </div>
+                    <button class="primary-action-btn" id="startAttendanceBtn">
+                        <i class="fas fa-users"></i>
+                        <span>Comenzar Asistencia</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- ===== ÚLTIMA CLASE ===== -->
+            <section class="last-class-section" id="lastClassSection">
+                <div class="last-class-card">
+                    <div class="last-class-info">
+                        <div class="class-icon">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <div class="class-details">
+                            <h4>Última Clase</h4>
+                            <p id="lastClassName">No hay clases registradas</p>
+                            <span class="last-date" id="lastClassDate"></span>
+                        </div>
+                    </div>
+                    <button class="repeat-attendance-btn" id="repeatAttendanceBtn" style="display: none;">
+                        <i class="fas fa-redo"></i>
+                        <span>Repetir Asistencia</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- ===== ACCESOS RÁPIDOS ===== -->
+            <section class="quick-access-section">
+                <div class="section-header">
+                    <h3>
+                        <i class="fas fa-bolt"></i>
+                        Accesos Rápidos
+                    </h3>
+                </div>
+                
+                <div class="quick-access-grid">
+                    <a href="instituciones.html" class="quick-access-card institutions">
+                        <div class="quick-icon">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <div class="quick-info">
+                            <h4>Instituciones</h4>
+                            <p id="institutionsCount">0 registradas</p>
+                        </div>
+                        <div class="quick-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                    
+                    <a href="estudiantes.html" class="quick-access-card students">
+                        <div class="quick-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div class="quick-info">
+                            <h4>Estudiantes</h4>
+                            <p id="studentsCount">0 registrados</p>
+                        </div>
+                        <div class="quick-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                    
+                    <a href="cursos.html" class="quick-access-card courses">
+                        <div class="quick-icon">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <div class="quick-info">
+                            <h4>Cursos</h4>
+                            <p id="coursesCount">0 registrados</p>
+                        </div>
+                        <div class="quick-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                    
+                    <a href="actividades.html" class="quick-access-card activities">
+                        <div class="quick-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="quick-info">
+                            <h4>Actividades</h4>
+                            <p id="activitiesCount">0 registradas</p>
+                        </div>
+                        <div class="quick-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- ===== ELIMINAR TODAS LAS SECCIONES DE FORMULARIOS ===== -->
+            <!-- Ya no necesitamos activity-form-section ni activities-filters-section -->
+            <!-- Mantener solo institutions-section, tools-section se convierte en quick-access -->
+
+            <!-- ===== ACTIVIDADES RECIENTES ===== -->
+            <section class="recent-activities-section">
+                <div class="section-header">
+                    <h3>
+                        <i class="fas fa-clock"></i>
+                        Actividades Recientes
+                    </h3>
+                    <a href="actividades.html" class="see-all-link">
+                        Ver todas <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+                
+                <div class="recent-carousel" id="recentCarousel">
+                    <div class="loading-placeholder">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Cargando actividades recientes...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== MODAL SELECTOR DE CURSO ===== -->
+            <div class="course-selector-modal" id="courseSelectorModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>
+                            <i class="fas fa-clipboard-check"></i>
+                            Seleccionar Curso para Asistencia
+                        </h3>
+                        <buttonbutton class="modal-close" id="closeCourseSelector" title="Cerrar modal">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <div class="course-selection-info">
+                            <p>Selecciona el curso donde vas a tomar asistencia:</p>
+                        </div>
+                        
+                        <div class="courses-list" id="coursesList">
+                            <!-- Lista de cursos se genera dinámicamente -->
+                        </div>
+                        
+                        <div class="no-courses-message" id="noCoursesMessage" style="display: none;">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <h4>No hay cursos registrados</h4>
+                            <p>Primero registra algunos cursos para poder tomar asistencia</p>
+                            <a href="cursos.html" class="btn-primary">
+                                <i class="fas fa-plus"></i>
+                                Crear Primer Curso
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ===== MODAL DE ASISTENCIA ===== -->
+    <div class="attendance-modal" id="attendance-modal">
+        <div class="modal-content">
             <div class="modal-header">
                 <h3>
                     <i class="fas fa-clipboard-check"></i>
-                    <span id="attendance-title">Tomar Asistencia</span>
+                    Tomar Asistencia
                 </h3>
-                <button class="close-modal" id="close-attendance-modal" aria-label="Cerrar modal">
+                <buttonbutton class="modal-close" id="close-attendance-modal" aria-label="Cerrar modal de asistencia">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             
             <div class="modal-body">
-                <div class="attendance-info">
-                    <div class="activity-details">
-                        <h4 id="attendance-activity-name">Nombre de la Actividad</h4>
-                        <p id="attendance-activity-date">Fecha de la actividad</p>
+                <div class="activity-info">
+                    <h4 id="attendance-activity-name">Cargando...</h4>
+                    <p id="attendance-activity-date">Cargando...</p>
+                </div>
+                
+                <div class="attendance-summary">
+                    <div class="summary-item">
+                        <span class="label">Presentes:</span>
+                        <span class="count" id="present-count">0</span>
                     </div>
-                    
-                    <div class="attendance-summary">
-                        <div class="summary-item">
-                            <i class="fas fa-users"></i>
-                            <span>Total: <strong id="total-students">0</strong></span>
-                        </div>
-                        <div class="summary-item">
-                            <i class="fas fa-check text-success"></i>
-                            <span>Presentes: <strong id="present-count">0</strong></span>
-                        </div>
-                        <div class="summary-item">
-                            <i class="fas fa-times text-danger"></i>
-                            <span>Ausentes: <strong id="absent-count">0</strong></span>
-                        </div>
+                    <div class="summary-item">
+                        <span class="label">Ausentes:</span>
+                        <span class="count" id="absent-count">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Total:</span>
+                        <span class="count" id="total-students">0</span>
                     </div>
                 </div>
                 
-                <div class="students-attendance">
-                    <div class="attendance-header">
-                        <h5>
-                            <i class="fas fa-list"></i>
-                            Lista de Estudiantes
-                        </h5>
-                        <div class="quick-actions">
-                            <button class="quick-btn" id="mark-all-present" title="Marcar todos presentes">
-                                <i class="fas fa-check-double"></i>
-                                Todos Presentes
-                            </button>
-                            <button class="quick-btn" id="mark-all-absent" title="Marcar todos ausentes">
-                                <i class="fas fa-user-times"></i>
-                                Todos Ausentes
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div id="students-attendance-list" class="students-list">
-                        <!-- Los estudiantes se cargarán dinámicamente aquí -->
-                    </div>
-                    
-                    <!-- CORREGIDO: Mensaje actualizado con link correcto -->
-                    <div id="no-students-message" class="empty-state" style="display: none;">
-                        <i class="fas fa-user-plus"></i>
-                        <p>No tienes estudiantes registrados</p>
-                        <a href="estudiantes.html" class="add-students-btn">
-                            <i class="fas fa-plus"></i>
-                            Agregar Estudiantes
-                        </a>
-                    </div>
+                <div class="quick-actions">
+                    <button class="quick-btn" id="mark-all-present">
+                        <i class="fas fa-check-double"></i>
+                        Marcar Todos Presentes
+                    </button>
+                    <button class="quick-btn" id="mark-all-absent">
+                        <i class="fas fa-user-times"></i>
+                        Marcar Todos Ausentes
+                    </button>
                 </div>
                 
-                <div class="attendance-actions">
-                    <button class="save-attendance-btn" id="save-attendance">
-                        <i class="fas fa-save"></i>
-                        Guardar Asistencia
-                    </button>
-                    <button class="cancel-attendance-btn" id="cancel-attendance">
-                        <i class="fas fa-ban"></i>
-                        Cancelar
-                    </button>
+                <div class="students-list" id="students-attendance-list">
+                    <!-- Lista de estudiantes se genera dinámicamente -->
                 </div>
+                
+                <div class="no-students-message" id="no-students-message" style="display: none;">
+                    <i class="fas fa-user-plus"></i>
+                    <h4>No hay estudiantes registrados</h4>
+                    <p>Primero registra algunos estudiantes en la sección correspondiente</p>
+                    <a href="estudiantes.html" class="btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Agregar Estudiantes
+                    </a>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancel-attendance">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button class="btn-primary" id="save-attendance">
+                    <i class="fas fa-save"></i>
+                    Guardar Asistencia
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Scripts en orden específico para evitar problemas de dependencias -->
-    
-    <!-- 1. Firebase SDKs v8 (compat) - PRIMERO -->
+    <!-- ===== SCROLL TO TOP ===== -->
+    <button class="scroll-to-top" id="scroll-to-top" aria-label="Volver arriba">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <!-- ===== SCRIPTS ===== -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     
-    <!-- Verificación inmediata de Firebase -->
-    <script>
-        if (typeof firebase === 'undefined') {
-            console.error('❌ CRÍTICO: Firebase SDK no se cargó');
-            alert('Error crítico: Firebase SDK no disponible. Recarga la página.');
-        } else {
-            console.log('✅ Firebase SDK cargado correctamente, versión:', firebase.SDK_VERSION);
-        }
-    </script>
-
-    <!-- 2. Configuración Firebase - SEGUNDO -->
-    <script src="src/config/firebase.js"></script>
-
-    <!-- 3. Constants - TERCERO -->
+    <!-- Core scripts EN EL ORDEN CORRECTO -->
     <script src="src/assets/js/constants.js"></script>
-
-    <!-- 4. SyncManager - CUARTO -->
+    <script src="src/config/firebase.js"></script>
     <script src="src/assets/js/syncManager.js"></script>
-
-    <!-- 5. App principal - QUINTO -->
+    <!-- COMENTAR dashboard.js SI ESTÁ CAUSANDO CONFLICTOS -->
+    <!-- <script src="src/assets/js/dashboard.js"></script> -->
     <script src="src/assets/js/app.js"></script>
-
-    <!-- 6. Verificación final completa -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('🔍 Verificando dependencias en index.html...');
-        
-        // Función de verificación con reintentos
-        function verifyDependencies(attempt = 1) {
-            const maxAttempts = 5;
-            
-            const checks = {
-                firebase: typeof firebase !== 'undefined',
-                auth: typeof window.auth !== 'undefined',
-                db: typeof window.db !== 'undefined',
-                syncManager: typeof window.syncManager !== 'undefined',
-                constants: typeof window.DATA_KEYS !== 'undefined',
-                app: typeof window.diagnosisEduCheckPro !== 'undefined'
-            };
-            
-            console.log(`📋 Verificación ${attempt}/${maxAttempts}:`, checks);
-            
-            const missing = Object.entries(checks)
-                .filter(([key, value]) => !value)
-                .map(([key]) => key);
-            
-            if (missing.length > 0) {
-                if (attempt < maxAttempts) {
-                    console.log(`⏳ Reintentando verificación en 1 segundo... (${attempt}/${maxAttempts})`);
-                    setTimeout(() => verifyDependencies(attempt + 1), 1000);
-                    return;
-                }
-                
-                console.error('❌ Faltan dependencias críticas después de varios intentos:', missing);
-                
-                // Mostrar mensaje de error específico
-                const errorDiv = document.createElement('div');
-                errorDiv.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    left: 20px;
-                    right: 20px;
-                    background: #ef4444;
-                    color: white;
-                    padding: 16px;
-                    border-radius: 8px;
-                    z-index: 10000;
-                    font-family: 'Arial', sans-serif;
-                    font-size: 14px;
-                    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-                `;
-                
-                let solutions = [];
-                if (missing.includes('firebase')) solutions.push('• Verificar conexión a internet');
-                if (missing.includes('auth') || missing.includes('db')) solutions.push('• Recargar la página');
-                if (missing.includes('syncManager')) solutions.push('• Verificar archivo syncManager.js');
-                
-                errorDiv.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                        <span style="font-size: 20px;">⚠️</span>
-                        <strong>Error de Dependencias Críticas</strong>
-                    </div>
-                    <div style="margin-bottom: 8px;">
-                        <strong>Faltantes:</strong> ${missing.join(', ')}
-                    </div>
-                    <div style="margin-bottom: 12px;">
-                        <strong>Soluciones:</strong><br>
-                        ${solutions.join('<br>')}
-                    </div>
-                    <button onclick="window.location.reload()" style="
-                        background: white;
-                        color: #ef4444;
-                        border: none;
-                        padding: 8px 16px;
-                        border-radius: 4px;
-                        cursor: pointer;
-                        font-weight: bold;
-                    ">🔄 Recargar Página</button>
-                `;
-                document.body.appendChild(errorDiv);
-                
-            } else {
-                console.log('✅ Todas las dependencias cargadas correctamente');
-                
-                // Mostrar notificación de éxito temporal
-                const successDiv = document.createElement('div');
-                successDiv.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: #10b981;
-                    color: white;
-                    padding: 12px 20px;
-                    border-radius: 8px;
-                    z-index: 10000;
-                    font-family: 'Arial', sans-serif;
-                    font-size: 14px;
-                    font-weight: 500;
-                    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-                    transition: transform 0.3s ease;
-                    transform: translateX(100%);
-                `;
-                successDiv.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span>✅</span>
-                        <span>Sistema cargado correctamente</span>
-                    </div>
-                `;
-                document.body.appendChild(successDiv);
-                
-                // Animación de entrada
-                setTimeout(() => {
-                    successDiv.style.transform = 'translateX(0)';
-                }, 10);
-                
-                // Remover después de 3 segundos
-                setTimeout(() => {
-                    successDiv.style.transform = 'translateX(100%)';
-                    setTimeout(() => {
-                        if (successDiv.parentNode) {
-                            successDiv.parentNode.removeChild(successDiv);
-                        }
-                    }, 300);
-                }, 3000);
-                
-                // Ejecutar diagnóstico automático
-                if (window.diagnosisEduCheckPro) {
-                    setTimeout(() => {
-                        console.log('🏥 Ejecutando diagnóstico automático...');
-                        window.diagnosisEduCheckPro();
-                    }, 2000);
-                }
-            }
-        }
-        
-        // Iniciar verificación después de un breve delay
-        setTimeout(() => verifyDependencies(), 500);
-    });
-    </script>
-
-    <!-- 7. Script de limpieza de IndexedDB (opcional) -->
-    <script>
-    // Función para limpiar datos obsoletos de Firestore
-    function cleanFirestoreCache() {
-        if (confirm('¿Quieres limpiar la caché de Firestore? Esto puede solucionar problemas de sincronización.')) {
-            if ('indexedDB' in window) {
-                const deleteRequest = indexedDB.deleteDatabase('firestore/horita-feliz-system/default');
-                deleteRequest.onsuccess = () => {
-                    alert('✅ Caché limpiada. Recarga la página.');
-                    window.location.reload();
-                };
-                deleteRequest.onerror = () => {
-                    alert('❌ Error limpiando caché. Hazlo manualmente desde DevTools.');
-                };
-            }
-        }
-    }
     
-    // Hacer disponible globalmente
-    window.cleanFirestoreCache = cleanFirestoreCache;
+    <!-- Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(registration => console.log('✅ SW registrado'))
+                .catch(error => console.log('❌ SW error:', error));
+        }
     </script>
-    
 </body>
 </html>

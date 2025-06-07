@@ -3,52 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Galería de actividades - Horita Feliz">
+    <meta name="description" content="Galería de actividades - EduCheck Pro">
     <meta name="keywords" content="galería, actividades, fotos, educación">
-    <meta name="author" content="Cristian Bordón">
+    <meta name="author" content="EduCheck Pro Team">
     <meta name="theme-color" content="#FFB6C1">
-    <link rel="icon" href="icon-192.png" type="image/png">
-    <title>Galería - Horita Feliz</title>
+    <link rel="icon" href="src/assets/icons/icon-192x192.png" type="image/png">
+    <title>Galería de Actividades - EduCheck Pro</title>
     
-    <!-- CSS específico para galería -->
+    <!-- CSS EN EL MISMO ORDEN QUE OTRAS PÁGINAS -->
+    <link rel="stylesheet" href="src/assets/css/styles.css">
+    <link rel="stylesheet" href="src/assets/css/responsive.css">
     <link rel="stylesheet" href="src/assets/css/gallery.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="gallery-page">
-    <!-- Header de la galería -->
-    <header class="gallery-header">
-        <div class="header-content">
-            <button class="back-btn" onclick="window.location.href='index.html'" title="Volver a la aplicación">
-                <i class="fas fa-arrow-left"></i>
+<body class="edu-system-ready gallery-page">
+    <!-- ===== HEADER UNIFICADO IDÉNTICO A OTRAS PÁGINAS ===== -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-brand">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h1>EduCheck Pro</h1>
+            </div>
+            
+            <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
             </button>
-            <div class="header-title">
-                <h1><i class="fas fa-images"></i> Galería de Actividades</h1>
-                <p>Explora todas las memorias de tus actividades</p>
-            </div>
-            <div class="header-actions">
-                <!-- Agregar en header-actions de cada página -->
-            <div class="dark-mode-toggle">
-                <label class="toggle-switch" for="darkModeToggle" title="Activar/desactivar modo oscuro">
-                    <input type="checkbox" id="darkModeToggle" title="Activar/desactivar modo oscuro">
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-                <button class="slideshow-btn" id="startSlideshow" title="Iniciar presentación">
-                    <i class="fas fa-play"></i>
-                    <span>Presentación</span>
-                </button>
-            </div>
         </div>
     </header>
 
+    <!-- ===== OVERLAY DEL MENÚ ===== -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- ===== MENÚ DESPLEGABLE IDÉNTICO A OTRAS PÁGINAS ===== -->
+    <div class="dropdown-menu" id="dropdownMenu">
+        <div class="menu-header">
+            <button class="menu-close" id="menuClose" aria-label="Cerrar menú">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <h3 id="menuTeacherName">Cargando...</h3>
+                    <p>Docente</p>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="menu-items">
+            <a href="index.html" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="instituciones.html" class="menu-item">
+                <i class="fas fa-university"></i>
+                <span>Instituciones</span>
+            </a>
+            <a href="cursos.html" class="menu-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Cursos</span>
+            </a>
+            <a href="estudiantes.html" class="menu-item">
+                <i class="fas fa-user-graduate"></i>
+                <span>Estudiantes</span>
+            </a>
+            <a href="actividades.html" class="menu-item">
+                <i class="fas fa-calendar-check"></i>
+                <span>Actividades</span>
+            </a>
+            <a href="gallery.html" class="menu-item active">
+                <i class="fas fa-images"></i>
+                <span>Galería</span>
+            </a>
+            <a href="reportes.html" class="menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reportes</span>
+            </a>
+            
+            <div class="menu-divider"></div>
+            
+            <a href="profile.html" class="menu-item">
+                <i class="fas fa-user-cog"></i>
+                <span>Perfil</span>
+            </a>
+            <a href="#" class="menu-item" id="logoutOption">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </nav>
+        
+        <div class="menu-footer">
+            <div class="theme-toggle">
+                <label class="toggle-switch" for="darkModeToggle">
+                    <span class="theme-label">Modo Oscuro</span>
+                    <input type="checkbox" id="darkModeToggle">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CONTENIDO PRINCIPAL ===== -->
     <main class="gallery-main">
-        <!-- Barra de búsqueda y filtros -->
+        <!-- Header específico de galería -->
+        <section class="gallery-page-header">
+            <div class="page-header-content">
+                <div class="page-title">
+                    <h2>
+                        <i class="fas fa-images"></i>
+                        Galería de Actividades
+                    </h2>
+                    <p>Explora y gestiona todas las fotos de tus actividades educativas</p>
+                </div>
+                
+                <div class="page-actions">
+                    <button class="gallery-action-btn" id="upload-photos-btn">
+                        <i class="fas fa-upload"></i>
+                        Subir Fotos
+                    </button>
+                    <button class="gallery-action-btn" id="slideshow-btn">
+                        <i class="fas fa-play"></i>
+                        Presentación
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Controles de galería -->
         <section class="gallery-controls">
             <div class="search-section">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="gallery-search" placeholder="Buscar actividad...">
+                    <input type="text" id="gallery-search" placeholder="Buscar por actividad, fecha o descripción...">
                 </div>
+                
                 <div class="filter-buttons">
                     <button class="filter-btn active" data-filter="all">
                         <i class="fas fa-th"></i>
@@ -78,114 +171,121 @@
             </div>
         </section>
 
-        <!-- Estadísticas de la galería -->
+        <!-- Estadísticas -->
         <section class="gallery-stats">
             <div class="stat-item">
                 <i class="fas fa-images"></i>
-                <div class="stat-content">
-                    <span class="stat-number" id="total-images">0</span>
-                    <span class="stat-label">Imágenes</span>
+                <div>
+                    <span class="stat-number" id="total-photos">0</span>
+                    <span class="stat-label">Fotos Totales</span>
                 </div>
             </div>
             <div class="stat-item">
-                <i class="fas fa-star"></i>
-                <div class="stat-content">
-                    <span class="stat-number" id="total-activities">0</span>
+                <i class="fas fa-calendar-week"></i>
+                <div>
+                    <span class="stat-number" id="activities-count">0</span>
                     <span class="stat-label">Actividades</span>
                 </div>
             </div>
             <div class="stat-item">
-                <i class="fas fa-calendar"></i>
-                <div class="stat-content">
-                    <span class="stat-number" id="date-range">2024</span>
-                    <span class="stat-label">Período</span>
+                <i class="fas fa-heart"></i>
+                <div>
+                    <span class="stat-number" id="favorites-count">0</span>
+                    <span class="stat-label">Favoritas</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-clock"></i>
+                <div>
+                    <span class="stat-number" id="recent-count">0</span>
+                    <span class="stat-label">Esta Semana</span>
                 </div>
             </div>
         </section>
 
-        <!-- Galería principal -->
+        <!-- Contenido de galería -->
         <section class="gallery-content">
             <div class="gallery-grid" id="gallery-grid">
-                <!-- Las imágenes se cargarán dinámicamente aquí -->
+                <!-- Las fotos se cargarán dinámicamente -->
             </div>
-
+            
             <!-- Estado vacío -->
             <div class="empty-gallery" id="empty-gallery" style="display: none;">
                 <div class="empty-icon">
                     <i class="fas fa-images"></i>
                 </div>
-                <h3>No hay imágenes aún</h3>
-                <p>Las fotos de tus actividades aparecerán aquí cuando las agregues desde el registro de actividades.</p>
-                <button onclick="window.location.href='index.html'" class="add-activity-btn">
+                <h3>No hay fotos en tu galería</h3>
+                <p>Comienza subiendo fotos de tus actividades para crear una galería increíble</p>
+                <button class="add-activity-btn" id="add-first-photo">
                     <i class="fas fa-plus"></i>
-                    Agregar Primera Actividad
+                    Subir Primera Foto
                 </button>
             </div>
         </section>
     </main>
 
-    <!-- Modal de vista detallada -->
-    <div id="image-modal" class="image-modal">
-        <div class="modal-overlay"></div>
+    <!-- Modal de visualización de imagen -->
+    <div class="image-modal" id="image-modal">
         <div class="modal-content">
-            <!-- Header del modal -->
             <div class="modal-header">
                 <div class="modal-title">
-                    <h3 id="modal-activity-name">Nombre de la Actividad</h3>
-                    <p id="modal-activity-date">Fecha</p>
+                    <h3 id="modal-image-title">Título de la imagen</h3>
+                    <p id="modal-image-subtitle">Información adicional</p>
                 </div>
                 <div class="modal-actions">
-                    <button class="modal-btn favorite-btn" id="toggle-favorite" title="Marcar como favorita">
-                        <i class="far fa-heart"></i>
+                    <button class="modal-btn" id="favorite-modal-btn" title="Marcar como favorita">
+                        <i class="fas fa-heart"></i>
                     </button>
-                    <button class="modal-btn download-btn" id="download-image" title="Descargar imagen">
+                    <button class="modal-btn" id="download-modal-btn" title="Descargar imagen">
                         <i class="fas fa-download"></i>
                     </button>
-                    <button class="modal-btn" id="close-modal" title="Cerrar">
+                    <button class="modal-btn" id="share-modal-btn" title="Compartir">
+                        <i class="fas fa-share"></i>
+                    </button>
+                    <button class="modal-btn" id="close-modal-btn" title="Cerrar">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
             </div>
-
-            <!-- Contenido del modal -->
+            
             <div class="modal-body">
                 <div class="image-container">
-                    <button class="nav-btn prev-btn" id="prev-image" title="Imagen anterior">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    
                     <div class="image-wrapper">
-                        <img id="modal-image" src="" alt="Imagen de actividad">
-                        <div class="image-info">
-                            <div class="zoom-controls">
-                                <button class="zoom-btn" id="zoom-out" title="Alejar">
-                                    <i class="fas fa-search-minus"></i>
-                                </button>
-                                <button class="zoom-btn" id="zoom-reset" title="Tamaño original">
-                                    <i class="fas fa-expand-arrows-alt"></i>
-                                </button>
-                                <button class="zoom-btn" id="zoom-in" title="Acercar">
-                                    <i class="fas fa-search-plus"></i>
-                                </button>
-                            </div>
-                        </div>
+                        <img id="modal-image" src="" alt="">
                     </div>
                     
-                    <button class="nav-btn next-btn" id="next-image" title="Siguiente imagen">
+                    <!-- Navegación -->
+                    <button class="nav-btn prev-btn" id="prev-image-btn" title="Imagen anterior">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="nav-btn next-btn" id="next-image-btn" title="Siguiente imagen">
                         <i class="fas fa-chevron-right"></i>
                     </button>
+                    
+                    <!-- Controles de zoom -->
+                    <div class="zoom-controls">
+                        <button class="zoom-btn" id="zoom-out-btn" title="Alejar">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <button class="zoom-btn" id="reset-zoom-btn" title="Restablecer zoom">
+                            <i class="fas fa-compress"></i>
+                        </button>
+                        <button class="zoom-btn" id="zoom-in-btn" title="Acercar">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
                 </div>
-
-                <!-- Información adicional -->
+                
+                <!-- Detalles de la imagen -->
                 <div class="image-details">
                     <div class="detail-tabs">
                         <button class="tab-btn active" data-tab="info">
                             <i class="fas fa-info-circle"></i>
                             Información
                         </button>
-                        <button class="tab-btn" data-tab="metadata">
-                            <i class="fas fa-camera"></i>
-                            Detalles
+                        <button class="tab-btn" data-tab="activity">
+                            <i class="fas fa-calendar"></i>
+                            Actividad
                         </button>
                     </div>
                     
@@ -193,121 +293,122 @@
                         <div class="tab-panel active" id="info-panel">
                             <div class="info-grid">
                                 <div class="info-item">
-                                    <i class="fas fa-tag"></i>
-                                    <span class="info-label">Actividad:</span>
-                                    <span class="info-value" id="info-activity">-</span>
-                                </div>
-                                <div class="info-item">
-                                    <i class="fas fa-calendar-day"></i>
+                                    <i class="fas fa-calendar"></i>
                                     <span class="info-label">Fecha:</span>
-                                    <span class="info-value" id="info-date">-</span>
+                                    <span class="info-value" id="image-date">-</span>
                                 </div>
                                 <div class="info-item">
-                                    <i class="fas fa-users"></i>
-                                    <span class="info-label">Participantes:</span>
-                                    <span class="info-value" id="info-participants">-</span>
+                                    <i class="fas fa-clock"></i>
+                                    <span class="info-label">Hora:</span>
+                                    <span class="info-value" id="image-time">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-user"></i>
+                                    <span class="info-label">Subida por:</span>
+                                    <span class="info-value" id="image-author">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-expand"></i>
+                                    <span class="info-label">Tamaño:</span>
+                                    <span class="info-value" id="image-size">-</span>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="tab-panel" id="metadata-panel">
+                        <div class="tab-panel" id="activity-panel">
                             <div class="info-grid">
                                 <div class="info-item">
-                                    <i class="fas fa-file-image"></i>
-                                    <span class="info-label">Formato:</span>
-                                    <span class="info-value" id="meta-format">-</span>
+                                    <i class="fas fa-bookmark"></i>
+                                    <span class="info-label">Actividad:</span>
+                                    <span class="info-value" id="activity-name">-</span>
                                 </div>
                                 <div class="info-item">
-                                    <i class="fas fa-expand-arrows-alt"></i>
-                                    <span class="info-label">Dimensiones:</span>
-                                    <span class="info-value" id="meta-dimensions">-</span>
+                                    <i class="fas fa-university"></i>
+                                    <span class="info-label">Institución:</span>
+                                    <span class="info-value" id="activity-institution">-</span>
                                 </div>
                                 <div class="info-item">
-                                    <i class="fas fa-weight-hanging"></i>
-                                    <span class="info-label">Tamaño:</span>
-                                    <span class="info-value" id="meta-size">-</span>
+                                    <i class="fas fa-users"></i>
+                                    <span class="info-label">Estudiantes:</span>
+                                    <span class="info-value" id="activity-students">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span class="info-label">Ubicación:</span>
+                                    <span class="info-value" id="activity-location">-</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Miniaturas de navegación -->
+            
+            <!-- Tira de miniaturas -->
             <div class="thumbnail-strip">
                 <div class="thumbnails-container" id="thumbnails-container">
-                    <!-- Las miniaturas se generarán dinámicamente -->
+                    <!-- Miniaturas se cargan dinámicamente -->
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Modal de presentación -->
-    <div id="slideshow-modal" class="slideshow-modal">
+    <div class="slideshow-modal" id="slideshow-modal">
+        <div class="slideshow-header">
+            <div class="slideshow-info">
+                <h3 id="slideshow-title">Presentación de Galería</h3>
+                <p id="slideshow-subtitle">Visualización automática</p>
+            </div>
+            <div class="slideshow-controls">
+                <button class="slideshow-btn" id="play-pause-btn" title="Reproducir/Pausar">
+                    <i class="fas fa-pause"></i>
+                </button>
+                <button class="slideshow-btn" id="slideshow-speed-btn" title="Velocidad">
+                    <i class="fas fa-tachometer-alt"></i>
+                </button>
+                <button class="slideshow-btn" id="close-slideshow-btn" title="Cerrar presentación">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        
         <div class="slideshow-content">
-            <div class="slideshow-header">
-                <div class="slideshow-info">
-                    <h3 id="slideshow-title">Presentación de Actividades</h3>
-                    <p id="slideshow-progress">1 de 10</p>
-                </div>
-                <div class="slideshow-controls">
-                    <button class="slideshow-btn" id="pause-slideshow" title="Pausar">
-                        <i class="fas fa-pause"></i>
-                    </button>
-                    <button class="slideshow-btn" id="stop-slideshow" title="Detener">
-                        <i class="fas fa-stop"></i>
-                    </button>
-                </div>
-            </div>
-            
             <div class="slideshow-image">
-                <img id="slideshow-img" src="" alt="Imagen de presentación">
+                <img id="slideshow-img" src="" alt="">
                 <div class="slideshow-caption">
-                    <h4 id="slideshow-activity">Nombre de Actividad</h4>
-                    <p id="slideshow-date">Fecha</p>
+                    <h4 id="slideshow-caption-title">Título</h4>
+                    <p id="slideshow-caption-text">Descripción de la imagen</p>
                 </div>
             </div>
-            
-            <div class="slideshow-progress-bar">
-                <div class="progress-fill" id="slideshow-progress-fill"></div>
-            </div>
+        </div>
+        
+        <div class="slideshow-progress-bar">
+            <div class="progress-fill" id="slideshow-progress"></div>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script type="module">
-        // Firebase imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-
-        // Firebase config
-        const firebaseConfig = {
-            apiKey: "AIzaSyAC2DxR63utzR1tmnHCqzApYTraxMsH79M",
-            authDomain: "horita-feliz-system.firebaseapp.com",
-            projectId: "horita-feliz-system",
-            storageBucket: "horita-feliz-system.firebasestorage.app",
-            messagingSenderId: "469162449559",
-            appId: "1:469162449559:web:734e8756fd03b1388ce7d2",
-            measurementId: "G-6645JXJBD6"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        
-        window.auth = auth;
-        window.db = db;
-
-        // Verificar autenticación
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                window.location.href = 'login.html';
-            } else {
-                loadGallery();
-            }
-        });
-    </script>
+    <!-- ===== SCRIPTS UNIFICADOS COMO OTRAS PÁGINAS ===== -->
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <!-- Core scripts -->
+    <script src="src/assets/js/constants.js"></script>
+    <script src="src/config/firebase.js"></script>
+    <script src="src/assets/js/syncManager.js"></script>
+    <script src="src/assets/js/app.js"></script>
+    
+    <!-- Script específico de galería -->
     <script src="src/assets/js/gallery.js"></script>
+    
+    <!-- Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(registration => console.log('✅ SW registrado'))
+                .catch(error => console.log('❌ SW error:', error));
+        }
+    </script>
 </body>
 </html>

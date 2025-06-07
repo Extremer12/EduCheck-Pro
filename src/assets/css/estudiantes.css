@@ -1,5 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800&display=swap');
 
+/* ===== AJUSTES PARA HEADER UNIFICADO ===== */
+.main-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    display: block; /* Cambiar de grid a block */
+    gap: 3rem;
+    /* CRÍTICO: Ajustar para el header de styles.css */
+    margin-top: 100px; /* Espacio para el header fijo */
+    min-height: calc(100vh - 100px);
+}
+
 /* ===== VARIABLES CSS EDUCHECK PRO - PALETA ORIGINAL ===== */
 :root {
     /* Paleta principal EduCheck Pro */

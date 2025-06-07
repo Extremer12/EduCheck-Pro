@@ -1,4 +1,9 @@
-// Variables globales para la galería
+/**
+ * EduCheck Pro - Sistema de Galería ACTUALIZADO
+ * Compatible con header unificado y app.js
+ */
+
+// ===== VARIABLES GLOBALES (SIN CAMBIOS) =====
 let galleryImages = [];
 let currentImageIndex = 0;
 let currentView = 'grid';
@@ -6,54 +11,103 @@ let currentFilter = 'all';
 let slideshowInterval = null;
 let isSlideshow = false;
 let zoomLevel = 1;
+let currentUser = null;
 
-// Inicializar la galería cuando se carga la página
+// ===== INICIALIZACIÓN ACTUALIZADA =====
 document.addEventListener('DOMContentLoaded', function() {
-    if (window.location.pathname.includes('gallery.html')) {
-        initializeGallery();
-    }
+    console.log('🖼️ Inicializando galería con header unificado...');
+    
+    // Esperar a que app.js configure Firebase y el menú
+    const waitForApp = setInterval(() => {
+        if (window.auth && typeof window.setupMenuToggle === 'function') {
+            clearInterval(waitForApp);
+            console.log('🔗 Gallery.js - App.js detectado, configurando listener...');
+            
+            // Configurar listener de autenticación
+            window.auth.onAuthStateChanged((user) => {
+                if (user) {
+                    currentUser = user;
+                    console.log(`👤 Gallery - Usuario autenticado: ${user.email}`);
+                    
+                    // Esperar un poco para que app.js termine de configurar el header
+                    setTimeout(() => {
+                        initializeGallery();
+                    }, 1000);
+                    
+                } else {
+                    console.log('❌ Gallery - Usuario no autenticado, redirigiendo...');
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+    }, 100);
+    
+    // Timeout de seguridad
+    setTimeout(() => {
+        clearInterval(waitForApp);
+        if (!window.auth) {
+            console.error('❌ Gallery.js - App.js no se cargó correctamente');
+        }
+    }, 10000);
 });
 
-// Función para inicializar la galería
+// ===== FUNCIÓN PRINCIPAL DE INICIALIZACIÓN (SIMPLIFICADA) =====
 function initializeGallery() {
-    console.log('🖼️ Inicializando galería...');
+    console.log('🎯 Inicializando sistema completo de galería...');
     
-    loadGalleryData();
-    setupEventListeners();
-    setViewMode('grid');
-    displayGalleryImages();
-    
-    console.log('✅ Galería inicializada correctamente');
+    try {
+        // YA NO NECESITAMOS initializeFirebase() porque app.js lo maneja
+        
+        // Cargar datos
+        loadGalleryData();
+        
+        // Configurar interfaz
+        setupEventListeners();
+        setViewMode('grid');
+        displayGalleryImages();
+        
+        // YA NO NECESITAMOS initializeDarkMode() porque app.js lo maneja
+        
+        console.log('✅ Sistema de galería inicializado correctamente con header unificado');
+        
+    } catch (error) {
+        console.error('❌ Error inicializando galería:', error);
+        showNotification('Error al cargar la galería', 'error');
+    }
 }
 
-// Función para cargar datos de la galería
+// ===== FUNCIÓN PARA CARGAR DATOS (ACTUALIZADA) =====
 function loadGalleryData() {
     try {
-        const user = window.auth?.currentUser;
-        if (!user) {
+        if (!currentUser) {
             console.log('❌ Usuario no autenticado');
+            galleryImages = [];
             return;
         }
         
-        // Cargar actividades usando el patrón UID
-        const savedActivities = localStorage.getItem(`${user.uid}_activities`);
+        // Cargar actividades usando el patrón UID unificado
+        const savedActivities = localStorage.getItem(`${currentUser.uid}_activities`);
         const activities = savedActivities ? JSON.parse(savedActivities) : [];
         
-        // Convertir actividades a formato de galería
-        galleryImages = activities
-            .filter(activity => activity.imageData) // Solo actividades con imagen
-            .map((activity, index) => ({
-                id: activity.id || `activity-${index}`,
-                src: activity.imageData,
-                title: activity.name || 'Actividad sin nombre',
-                date: activity.date || new Date().toISOString().split('T')[0],
-                participants: 0, // Aquí podrías calcular desde asistencias
-                type: 'actividad',
-                favorite: activity.favorite || false,
-                timestamp: new Date(activity.date || Date.now()).getTime()
-            }));
+        // Filtrar solo actividades del usuario actual con imagen
+        const userActivities = activities.filter(activity => 
+            activity.createdBy === currentUser.uid && activity.imageData
+        );
         
-        console.log(`📊 Cargadas ${galleryImages.length} imágenes de la galería`);
+        // Convertir actividades a formato de galería
+        galleryImages = userActivities.map((activity, index) => ({
+            id: activity.id || `activity-${index}`,
+            src: activity.imageData,
+            title: activity.name || 'Actividad sin nombre',
+            date: activity.date || new Date().toISOString().split('T')[0],
+            participants: activity.participants?.length || 0,
+            type: 'actividad',
+            favorite: activity.favorite || false,
+            timestamp: new Date(activity.date || Date.now()).getTime(),
+            createdBy: activity.createdBy
+        }));
+        
+        console.log(`📊 Cargadas ${galleryImages.length} imágenes de galería para usuario ${currentUser.uid}`);
         updateGalleryStats();
         
     } catch (error) {
@@ -62,7 +116,95 @@ function loadGalleryData() {
     }
 }
 
-// Función para actualizar estadísticas de la galería
+// ===== ELIMINAR FUNCIONES DUPLICADAS =====
+// Ya no necesitamos:
+// - initializeFirebase() (app.js lo maneja)
+// - initializeDarkMode() (app.js lo maneja)
+// - updateUserInfo() (app.js lo maneja)
+
+// ===== FUNCIÓN showNotification ACTUALIZADA =====
+function showNotification(message, type = 'info') {
+    // Usar la función global de app.js si existe
+    if (window.showNotification) {
+        window.showNotification(message, type);
+        return;
+    }
+    
+    // Fallback mejorado si no existe
+    console.log(`📢 ${type.toUpperCase()}: ${message}`);
+    
+    const notification = document.createElement('div');
+    notification.className = `gallery-notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas fa-info-circle"></i>
+            <span>${message}</span>
+        </div>
+        <button class="close-notification" onclick="this.parentElement.remove()">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    // Estilos inline mejorados
+    notification.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background: var(--edu-bg-primary, white);
+        color: var(--edu-text-primary, #2C3E50);
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        box-shadow: var(--edu-shadow-lg, 0 4px 15px rgba(0,0,0,0.1));
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 3000;
+        max-width: 350px;
+        transform: translateX(120%);
+        transition: transform 0.3s ease;
+        border-left: 4px solid var(--edu-primary, #FFB6C1);
+        font-family: 'Quicksand', sans-serif;
+        font-weight: 500;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(120%)';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 4000);
+}
+
+// ===== FUNCIÓN PARA ACTUALIZAR FAVORITOS (ACTUALIZADA) =====
+function updateActivityFavoriteStatus(imageId, isFavorite) {
+    try {
+        if (!currentUser) return;
+        
+        const savedActivities = localStorage.getItem(`${currentUser.uid}_activities`);
+        const activities = savedActivities ? JSON.parse(savedActivities) : [];
+        const activityIndex = activities.findIndex(activity => 
+            activity.id === imageId && activity.createdBy === currentUser.uid
+        );
+        
+        if (activityIndex !== -1) {
+            activities[activityIndex].favorite = isFavorite;
+            localStorage.setItem(`${currentUser.uid}_activities`, JSON.stringify(activities));
+            console.log(`📌 Favorito actualizado para actividad ${imageId}: ${isFavorite}`);
+        }
+    } catch (error) {
+        console.error('❌ Error actualizando favorito:', error);
+    }
+}
+
+// ===== RESTO DE FUNCIONES SIN CAMBIOS =====
 function updateGalleryStats() {
     const totalImages = galleryImages.length;
     const totalActivities = new Set(galleryImages.map(img => img.title)).size;
@@ -73,7 +215,6 @@ function updateGalleryStats() {
     updateElement('date-range', dateRange);
 }
 
-// Función auxiliar para actualizar elementos del DOM
 function updateElement(id, value) {
     const element = document.getElementById(id);
     if (element) {
@@ -81,7 +222,6 @@ function updateElement(id, value) {
     }
 }
 
-// Función para obtener el rango de fechas
 function getDateRange() {
     if (galleryImages.length === 0) return '2024';
     
@@ -95,7 +235,6 @@ function getDateRange() {
     return minYear === maxYear ? minYear.toString() : `${minYear} - ${maxYear}`;
 }
 
-// Configurar event listeners
 function setupEventListeners() {
     // Búsqueda
     const searchInput = document.getElementById('gallery-search');
@@ -126,7 +265,6 @@ function setupEventListeners() {
     document.addEventListener('keydown', handleKeyboardEvents);
 }
 
-// Función para manejar la búsqueda
 function handleSearch(event) {
     const searchTerm = event.target.value.toLowerCase();
     const filteredImages = galleryImages.filter(img => 
@@ -136,7 +274,6 @@ function handleSearch(event) {
     displayFilteredImages(filteredImages);
 }
 
-// Función para manejar filtros
 function handleFilter(event) {
     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
@@ -145,7 +282,6 @@ function handleFilter(event) {
     applyCurrentFilter();
 }
 
-// Función para aplicar filtro actual
 function applyCurrentFilter() {
     let filteredImages = [...galleryImages];
     
@@ -166,7 +302,6 @@ function applyCurrentFilter() {
     displayFilteredImages(filteredImages);
 }
 
-// Función para manejar cambio de vista
 function handleViewChange(event) {
     document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
@@ -174,7 +309,6 @@ function handleViewChange(event) {
     setViewMode(event.target.dataset.view);
 }
 
-// Función para establecer modo de vista
 function setViewMode(view) {
     currentView = view;
     const galleryGrid = document.getElementById('gallery-grid');
@@ -192,12 +326,10 @@ function setViewMode(view) {
     displayGalleryImages();
 }
 
-// Función principal para mostrar imágenes
 function displayGalleryImages() {
     applyCurrentFilter();
 }
 
-// Función para mostrar imágenes filtradas
 function displayFilteredImages(images) {
     const galleryGrid = document.getElementById('gallery-grid');
     const emptyGallery = document.getElementById('empty-gallery');
@@ -216,7 +348,6 @@ function displayFilteredImages(images) {
     galleryGrid.innerHTML = images.map((image, index) => createGalleryItem(image, index)).join('');
 }
 
-// Función para crear elemento de galería
 function createGalleryItem(image, index) {
     const formattedDate = formatDate(image.date);
     
@@ -251,7 +382,6 @@ function createGalleryItem(image, index) {
     `;
 }
 
-// Función para formatear fecha
 function formatDate(dateString) {
     const date = new Date(dateString);
     return date.toLocaleDateString('es-ES', {
@@ -261,7 +391,6 @@ function formatDate(dateString) {
     });
 }
 
-// Función para alternar favorito
 function toggleFavorite(imageId) {
     const imageIndex = galleryImages.findIndex(img => img.id === imageId);
     if (imageIndex !== -1) {
@@ -292,26 +421,6 @@ function toggleFavorite(imageId) {
     }
 }
 
-// Función para actualizar estado de favorito en actividades
-function updateActivityFavoriteStatus(imageId, isFavorite) {
-    try {
-        const user = window.auth?.currentUser;
-        if (!user) return;
-        
-        const savedActivities = localStorage.getItem(`${user.uid}_activities`);
-        const activities = savedActivities ? JSON.parse(savedActivities) : [];
-        const activityIndex = activities.findIndex(activity => activity.id === imageId);
-        
-        if (activityIndex !== -1) {
-            activities[activityIndex].favorite = isFavorite;
-            localStorage.setItem(`${user.uid}_activities`, JSON.stringify(activities));
-        }
-    } catch (error) {
-        console.error('Error actualizando favorito:', error);
-    }
-}
-
-// Función para descargar imagen
 function downloadImage(src, title) {
     const link = document.createElement('a');
     link.href = src;
@@ -323,7 +432,9 @@ function downloadImage(src, title) {
     showNotification('📥 Imagen descargada');
 }
 
-// === MODAL DE IMAGEN ===
+// ===== RESTO DE FUNCIONES DE MODAL, SLIDESHOW, ETC. SIN CAMBIOS =====
+// [Todas las funciones de modal, slideshow, zoom, etc. se mantienen igual]
+
 function setupImageModal() {
     const modal = document.getElementById('image-modal');
     const closeBtn = document.getElementById('close-modal');
@@ -419,7 +530,6 @@ function toggleFavoriteInModal() {
     }
 }
 
-// === ZOOM CONTROLS ===
 function setupZoomControls() {
     const zoomInBtn = document.getElementById('zoom-in');
     const zoomOutBtn = document.getElementById('zoom-out');
@@ -457,7 +567,6 @@ function handleWheelZoom(event) {
     zoom(delta);
 }
 
-// === MODAL TABS ===
 function setupModalTabs() {
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -477,7 +586,6 @@ function switchTab(targetTab) {
     });
 }
 
-// === THUMBNAILS ===
 function generateThumbnails() {
     const container = document.getElementById('thumbnails-container');
     if (!container) return;
@@ -501,7 +609,6 @@ function updateThumbnailSelection() {
     });
 }
 
-// === SLIDESHOW ===
 function setupSlideshowModal() {
     const pauseBtn = document.getElementById('pause-slideshow');
     const stopBtn = document.getElementById('stop-slideshow');
@@ -585,7 +692,6 @@ function stopSlideshow() {
     }
 }
 
-// === KEYBOARD EVENTS ===
 function handleKeyboardEvents(event) {
     const imageModal = document.getElementById('image-modal');
     const slideshowModal = document.getElementById('slideshow-modal');
@@ -612,57 +718,7 @@ function handleKeyboardEvents(event) {
     }
 }
 
-// === NOTIFICACIONES ===
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `gallery-notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas fa-info-circle"></i>
-            <span>${message}</span>
-        </div>
-        <button class="close-notification" onclick="this.parentElement.remove()">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-    
-    // Estilos inline
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: white;
-        color: #2C3E50;
-        border-radius: 8px;
-        padding: 1rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        z-index: 3000;
-        max-width: 350px;
-        transform: translateX(120%);
-        transition: transform 0.3s ease;
-        border-left: 4px solid var(--gallery-primary);
-    `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.style.transform = 'translateX(0)';
-    }, 100);
-    
-    setTimeout(() => {
-        notification.style.transform = 'translateX(120%)';
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
-            }
-        }, 300);
-    }, 3000);
-}
-
-// === FUNCIONES GLOBALES ===
+// ===== FUNCIONES GLOBALES =====
 window.loadGallery = function() {
     loadGalleryData();
     displayGalleryImages();
@@ -676,35 +732,4 @@ window.startSlideshow = startSlideshow;
 window.stopSlideshow = stopSlideshow;
 window.selectThumbnail = selectThumbnail;
 
-console.log('📸 Gallery.js optimizado cargado correctamente');
-
-// Función para inicializar el modo oscuro
-function initializeDarkMode() {
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    
-    // Cargar preferencia guardada
-    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-    if (savedDarkMode) {
-        document.body.classList.add('dark-mode');
-        if (darkModeToggle) darkModeToggle.checked = true;
-    }
-    
-    // Event listener para el toggle
-    if (darkModeToggle) {
-        darkModeToggle.addEventListener('change', function() {
-            if (this.checked) {
-                document.body.classList.add('dark-mode');
-                localStorage.setItem('darkMode', 'true');
-            } else {
-                document.body.classList.remove('dark-mode');
-                localStorage.setItem('darkMode', 'false');
-            }
-        });
-    }
-}
-
-// Llamar la función al cargar la página
-document.addEventListener('DOMContentLoaded', function() {
-    initializeDarkMode();
-    // ... resto del código de inicialización
-});
+console.log('✅ gallery.js actualizado para header unificado');

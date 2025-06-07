@@ -48,8 +48,10 @@ function initializeInstitutionsSystem() {
     console.log('🎯 Inicializando sistema completo...');
     
     try {
-        // Inicializar componentes
-        initializeMenuToggle();
+        // Eliminar esta línea:
+        // initializeMenuToggle();
+        
+        // El menú toggle ya se maneja desde app.js
         initializeDarkMode();
         updateUserInfo();
         
@@ -642,74 +644,74 @@ function deleteRelatedData(institutionId) {
 }
 
 // ===== MENÚ TOGGLE =====
-function initializeMenuToggle() {
-    console.log('🔧 Instituciones: Inicializando menú toggle...');
+// function initializeMenuToggle() {
+//     console.log('🔧 Instituciones: Inicializando menú toggle...');
     
-    const profileButton = document.getElementById('profileButton');
-    const menuDropdown = document.getElementById('menuDropdown');
-    const menuCloseBtn = document.getElementById('menu-close-btn');
+//     const profileButton = document.getElementById('profileButton');
+//     const menuDropdown = document.getElementById('menuDropdown');
+//     const menuCloseBtn = document.getElementById('menu-close-btn');
     
-    if (!profileButton || !menuDropdown) {
-        console.error('❌ Elementos del menú no encontrados');
-        return;
-    }
+//     if (!profileButton || !menuDropdown) {
+//         console.error('❌ Elementos del menú no encontrados');
+//         return;
+//     }
     
-    function openMenu() {
-        menuDropdown.classList.add('show', 'active');
-        document.body.style.overflow = 'hidden';
-    }
+//     function openMenu() {
+//         menuDropdown.classList.add('show', 'active');
+//         document.body.style.overflow = 'hidden';
+//     }
     
-    function closeMenu() {
-        menuDropdown.classList.remove('show', 'active');
-        document.body.style.overflow = '';
-    }
+//     function closeMenu() {
+//         menuDropdown.classList.remove('show', 'active');
+//         document.body.style.overflow = '';
+//     }
     
-    profileButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        openMenu();
-    });
+//     profileButton.addEventListener('click', function(e) {
+//         e.preventDefault();
+//         e.stopPropagation();
+//         openMenu();
+//     });
     
-    if (menuCloseBtn) {
-        menuCloseBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            closeMenu();
-        });
-    }
+//     if (menuCloseBtn) {
+//         menuCloseBtn.addEventListener('click', function(e) {
+//             e.preventDefault();
+//             e.stopPropagation();
+//             closeMenu();
+//         });
+//     }
     
-    document.addEventListener('click', function(e) {
-        if (menuDropdown.classList.contains('show') && 
-            !menuDropdown.contains(e.target) && 
-            !profileButton.contains(e.target)) {
-            closeMenu();
-        }
-    });
+//     document.addEventListener('click', function(e) {
+//         if (menuDropdown.classList.contains('show') && 
+//             !menuDropdown.contains(e.target) && 
+//             !profileButton.contains(e.target)) {
+//             closeMenu();
+//         }
+//     });
     
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && menuDropdown.classList.contains('show')) {
-            closeMenu();
-        }
-    });
+//     document.addEventListener('keydown', function(e) {
+//         if (e.key === 'Escape' && menuDropdown.classList.contains('show')) {
+//             closeMenu();
+//         }
+//     });
     
-    // Configurar logout
-    const logoutBtn = document.getElementById('logout');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-                window.auth.signOut().then(() => {
-                    window.location.href = 'login.html';
-                }).catch((error) => {
-                    console.error('Error al cerrar sesión:', error);
-                    showNotification('Error al cerrar sesión', 'error');
-                });
-            }
-        });
-    }
+//     // Configurar logout
+//     const logoutBtn = document.getElementById('logout');
+//     if (logoutBtn) {
+//         logoutBtn.addEventListener('click', function(e) {
+//             e.preventDefault();
+//             if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+//                 window.auth.signOut().then(() => {
+//                     window.location.href = 'login.html';
+//                 }).catch((error) => {
+//                     console.error('Error al cerrar sesión:', error);
+//                     showNotification('Error al cerrar sesión', 'error');
+//                 });
+//             }
+//         });
+//     }
     
-    console.log('✅ Menú toggle inicializado');
-}
+//     console.log('✅ Menú toggle inicializado');
+// }
 
 // ===== MODO OSCURO =====
 function initializeDarkMode() {
@@ -760,7 +762,7 @@ function updateUserInfo() {
 
 // ===== CONFIGURAR EVENT LISTENERS =====
 function setupEventListeners() {
-    // Formulario de institución - CORREGIDO
+    // Formulario de institución
     const institutionForm = document.getElementById('institution-form');
     if (institutionForm) {
         institutionForm.addEventListener('submit', handleSaveInstitution);
@@ -782,7 +784,7 @@ function setupEventListeners() {
         });
     });
     
-    console.log('🎛️ Event listeners configurados');
+    console.log('🎛️ Event listeners configurados (sin duplicar menú)');
 }
 
 // ===== FUNCIONES AUXILIARES =====

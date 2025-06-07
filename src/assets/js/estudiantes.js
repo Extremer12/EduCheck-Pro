@@ -1,12 +1,102 @@
 /**
- * EduCheck Pro - Sistema de Gestión de Estudiantes
- * Módulo completo para administración de estudiantes
- * 
- * @version 2.0.0
- * @author EduCheck Pro Team
+ * EduCheck Pro - Sistema de Gestión de Estudiantes ACTUALIZADO
+ * Compatible con header unificado y app.js
  */
 
-// ===== FUNCIONES AUXILIARES =====
+// ===== ELIMINAR FUNCIONES DE MENÚ DUPLICADAS =====
+// Ya no necesitamos initializeMenuToggle() ni updateUserInfo() porque app.js las maneja
+
+// ===== VARIABLES GLOBALES (SIN CAMBIOS) =====
+let currentStudents = [];
+let filteredStudents = [];
+let currentFilter = 'all';
+let currentView = 'grid';
+let selectedStudents = new Set();
+let currentEditingStudent = null;
+let currentUser = null;
+
+// Elementos DOM
+let elements = {
+    container: null,
+    searchInput: null,
+    addButton: null,
+    modal: null,
+    form: null
+};
+
+// ===== INICIALIZACIÓN ACTUALIZADA =====
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('👥 Inicializando sistema de estudiantes con header unificado...');
+    
+    // Esperar a que app.js configure Firebase y el menú
+    const waitForApp = setInterval(() => {
+        if (window.auth && typeof window.setupMenuToggle === 'function') {
+            clearInterval(waitForApp);
+            console.log('🔗 Estudiantes.js - App.js detectado, configurando listener...');
+            
+            // Configurar listener de autenticación
+            window.auth.onAuthStateChanged((user) => {
+                if (user) {
+                    currentUser = user;
+                    console.log(`👤 Estudiantes - Usuario autenticado: ${user.email}`);
+                    
+                    // Esperar un poco para que app.js termine de configurar el header
+                    setTimeout(() => {
+                        initializeStudentsSystem();
+                    }, 1000);
+                    
+                } else {
+                    console.log('❌ Estudiantes - Usuario no autenticado, redirigiendo...');
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+    }, 100);
+    
+    // Timeout de seguridad
+    setTimeout(() => {
+        clearInterval(waitForApp);
+        if (!window.auth) {
+            console.error('❌ Estudiantes.js - App.js no se cargó correctamente');
+        }
+    }, 10000);
+});
+
+// ===== FUNCIÓN PRINCIPAL DE INICIALIZACIÓN (SIMPLIFICADA) =====
+function initializeStudentsSystem() {
+    console.log('🎯 Inicializando sistema completo de estudiantes...');
+    
+    try {
+        // Inicializar elementos DOM
+        initializeDOMElements();
+        
+        // YA NO NECESITAMOS initializeMenuToggle() ni updateUserInfo() porque app.js lo maneja
+        
+        // Cargar datos
+        loadStudents();
+        
+        // Configurar interfaz
+        setupEventListeners();
+        
+        // Renderizar datos
+        renderStudents();
+        updateStudentsCount();
+        
+        console.log('✅ Sistema de estudiantes inicializado correctamente con header unificado');
+        
+    } catch (error) {
+        console.error('❌ Error inicializando sistema:', error);
+        showNotification('Error al cargar el sistema de estudiantes', 'error');
+    }
+}
+
+// ===== ELIMINAR FUNCIONES DUPLICADAS =====
+// Ya no necesitamos:
+// - initializeMenuToggle() 
+// - updateUserInfo()
+// - initializeTheme() (app.js lo maneja)
+
+// ===== RESTO DE FUNCIONES SIN CAMBIOS =====
 function getUserData(key) {
     const user = window.auth?.currentUser;
     if (!user) return null;
@@ -46,6 +136,13 @@ function generateUniqueId() {
 }
 
 function showNotification(message, type = 'info') {
+    // Usar la función global de app.js si existe
+    if (window.showNotification) {
+        window.showNotification(message, type);
+        return;
+    }
+    
+    // Fallback si no existe
     console.log(`📢 ${type.toUpperCase()}: ${message}`);
     
     let notification = document.querySelector('.notification');
@@ -88,99 +185,6 @@ function showNotification(message, type = 'info') {
     }, 5000);
 }
 
-function initializeTheme() {
-    const user = window.auth?.currentUser;
-    if (!user) return;
-    
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    const savedTheme = getUserData('darkMode') === 'true';
-    
-    if (savedTheme) {
-        document.body.classList.add('dark-mode');
-        if (darkModeToggle) darkModeToggle.checked = true;
-    }
-    
-    if (darkModeToggle) {
-        darkModeToggle.addEventListener('change', toggleTheme);
-    }
-}
-
-function toggleTheme() {
-    const isDark = document.body.classList.toggle('dark-mode');
-    setUserData('darkMode', isDark.toString());
-    showNotification(isDark ? '🌙 Modo oscuro activado' : '☀️ Modo claro activado', 'success');
-}
-
-// ===== VARIABLES GLOBALES =====
-let currentStudents = [];
-let filteredStudents = [];
-let currentFilter = 'all';
-let currentView = 'grid';
-let selectedStudents = new Set();
-let currentEditingStudent = null;
-let currentUser = null;
-
-// Elementos DOM
-let elements = {
-    container: null,
-    searchInput: null,
-    addButton: null,
-    modal: null,
-    form: null
-};
-
-// ===== INICIALIZACIÓN =====
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('👥 Inicializando sistema de estudiantes...');
-    
-    if (!window.auth) {
-        console.error('❌ Firebase Auth no disponible');
-        return;
-    }
-    
-    window.auth.onAuthStateChanged(user => {
-        if (user) {
-            currentUser = user;
-            console.log(`👤 Usuario autenticado: ${user.uid} (${user.email})`);
-            initializeStudentsSystem();
-        } else {
-            console.log('❌ Usuario no autenticado, redirigiendo...');
-            window.location.href = 'login.html';
-        }
-    });
-});
-
-// ===== FUNCIÓN PRINCIPAL DE INICIALIZACIÓN =====
-function initializeStudentsSystem() {
-    console.log('🎯 Inicializando sistema completo de estudiantes...');
-    
-    try {
-        // Inicializar elementos DOM
-        initializeDOMElements();
-        
-        // Inicializar menú toggle
-        initializeMenuToggle();
-        
-        // Cargar datos
-        loadStudents();
-        
-        // Configurar interfaz
-        setupEventListeners();
-        initializeTheme();
-        updateUserInfo();
-        
-        // Renderizar datos
-        renderStudents();
-        updateStudentsCount();
-        
-        console.log('✅ Sistema de estudiantes inicializado correctamente');
-        
-    } catch (error) {
-        console.error('❌ Error inicializando sistema:', error);
-        showNotification('Error al cargar el sistema de estudiantes', 'error');
-    }
-}
-
 // ===== INICIALIZACIÓN DE ELEMENTOS DOM =====
 function initializeDOMElements() {
     elements.container = document.getElementById('students-grid');
@@ -192,103 +196,7 @@ function initializeDOMElements() {
     console.log('🔧 Elementos DOM inicializados');
 }
 
-// ===== MENÚ TOGGLE =====
-function initializeMenuToggle() {
-    console.log('🔧 Estudiantes: Inicializando menú toggle...');
-    
-    const profileButton = document.getElementById('profileButton');
-    const menuDropdown = document.getElementById('menuDropdown');
-    const menuCloseBtn = document.getElementById('menu-close-btn');
-    
-    if (!profileButton || !menuDropdown) {
-        console.error('❌ Elementos del menú no encontrados');
-        console.log('🔍 Elementos encontrados:', {
-            profileButton: !!profileButton,
-            menuDropdown: !!menuDropdown,
-            menuCloseBtn: !!menuCloseBtn
-        });
-        return;
-    }
-    
-    function openMenu() {
-        menuDropdown.classList.add('show', 'active');
-        document.body.style.overflow = 'hidden';
-    }
-    
-    function closeMenu() {
-        menuDropdown.classList.remove('show', 'active');
-        document.body.style.overflow = '';
-    }
-    
-    profileButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('🖱️ Profile button clicked');
-        openMenu();
-    });
-    
-    if (menuCloseBtn) {
-        menuCloseBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            closeMenu();
-        });
-    }
-    
-    document.addEventListener('click', function(e) {
-        if (menuDropdown.classList.contains('show') && 
-            !menuDropdown.contains(e.target) && 
-            !profileButton.contains(e.target)) {
-            closeMenu();
-        }
-    });
-    
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && menuDropdown.classList.contains('show')) {
-            closeMenu();
-        }
-    });
-    
-    // Configurar logout
-    const logoutBtn = document.getElementById('logout');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-                window.auth.signOut().then(() => {
-                    window.location.href = 'login.html';
-                }).catch((error) => {
-                    console.error('Error al cerrar sesión:', error);
-                    showNotification('Error al cerrar sesión', 'error');
-                });
-            }
-        });
-    }
-    
-    console.log('✅ Menú toggle inicializado');
-}
-
-// ===== ACTUALIZAR INFO DEL USUARIO =====
-function updateUserInfo() {
-    if (!currentUser) return;
-    
-    const displayName = currentUser.displayName || currentUser.email.split('@')[0];
-    
-    const nameElements = [
-        document.getElementById('headerTeacherName'),
-        document.getElementById('menuTeacherName')
-    ];
-    
-    nameElements.forEach(element => {
-        if (element) {
-            element.textContent = displayName;
-        }
-    });
-    
-    console.log(`👤 Info de usuario actualizada: ${displayName}`);
-}
-
-// ===== GESTIÓN DE DATOS =====
+// ===== GESTIÓN DE DATOS (SIN CAMBIOS) =====
 function loadStudents() {
     try {
         if (!currentUser) {
@@ -328,7 +236,7 @@ function saveStudents() {
     console.log(`💾 ${userStudents.length} estudiantes guardados para usuario ${currentUser.uid}`);
 }
 
-// ===== CONFIGURAR EVENT LISTENERS =====
+// ===== RESTO DE FUNCIONES MANTIENEN SU ESTRUCTURA ORIGINAL =====
 function setupEventListeners() {
     // Búsqueda con debounce
     if (elements.searchInput) {
@@ -796,4 +704,4 @@ window.editStudent = editStudent;
 window.deleteStudent = deleteStudent;
 window.openAddStudentModal = openAddStudentModal;
 
-console.log('✅ estudiantes.js cargado completamente con todas las funciones');
+console.log('✅ estudiantes.js actualizado para header unificado');
