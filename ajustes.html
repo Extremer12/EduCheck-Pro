@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Configuración y Ajustes - EduCheck Pro">
+    <meta name="theme-color" content="#FFB6C1">
+    <link rel="icon" href="src/assets/icons/icon-192x192.png" type="image/png">
+    <title>Ajustes - EduCheck Pro</title>
+    
+    <!-- CSS EN EL MISMO ORDEN -->
+    <link rel="stylesheet" href="src/assets/css/styles.css">
+    <link rel="stylesheet" href="src/assets/css/responsive.css">
+    <link rel="stylesheet" href="src/assets/css/ajustes.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="edu-system-ready settings-page">
+    <!-- ===== HEADER UNIFICADO IDÉNTICO ===== -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-brand">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h1>EduCheck Pro</h1>
+            </div>
+            
+            <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ===== OVERLAY DEL MENÚ ===== -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- ===== MENÚ DESPLEGABLE CON AJUSTES AGREGADO ===== -->
+    <div class="dropdown-menu" id="dropdownMenu">
+        <div class="menu-header">
+            <button class="menu-close" id="menuClose" aria-label="Cerrar menú">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <h3 id="menuTeacherName">Cargando...</h3>
+                    <p>Docente</p>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="menu-items">
+            <a href="index.html" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="instituciones.html" class="menu-item">
+                <i class="fas fa-university"></i>
+                <span>Instituciones</span>
+            </a>
+            <a href="cursos.html" class="menu-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Cursos</span>
+            </a>
+            <a href="estudiantes.html" class="menu-item">
+                <i class="fas fa-user-graduate"></i>
+                <span>Estudiantes</span>
+            </a>
+            <a href="asistencia.html" class="menu-item">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Asistencia</span>
+            </a>
+            <a href="actividades.html" class="menu-item">
+                <i class="fas fa-calendar-check"></i>
+                <span>Actividades</span>
+            </a>
+            <a href="gallery.html" class="menu-item">
+                <i class="fas fa-images"></i>
+                <span>Galería</span>
+            </a>
+            <a href="reportes.html" class="menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reportes</span>
+            </a>
+            
+            <div class="menu-divider"></div>
+            
+            <a href="profile.html" class="menu-item">
+                <i class="fas fa-user-cog"></i>
+                <span>Perfil</span>
+            </a>
+            <!-- 👇 NUEVO ELEMENTO AJUSTES -->
+            <a href="ajustes.html" class="menu-item active">
+                <i class="fas fa-cogs"></i>
+                <span>Ajustes</span>
+            </a>
+            <a href="#" class="menu-item" id="logoutOption">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </nav>
+        
+        <!-- 👇 REMOVER EL TOGGLE DE AQUÍ - MOVER A AJUSTES -->
+        <div class="menu-footer">
+            <p style="text-align: center; color: var(--edu-text-muted); font-size: 0.8rem;">
+                v1.0 - EduCheck Pro
+            </p>
+        </div>
+    </div>
+
+    <!-- ===== CONTENIDO PRINCIPAL DE AJUSTES ===== -->
+    <main class="settings-main">
+        <!-- Header de ajustes -->
+        <section class="settings-page-header">
+            <div class="page-header-content">
+                <div class="page-title">
+                    <h2>
+                        <i class="fas fa-cogs"></i>
+                        Configuración y Ajustes
+                    </h2>
+                    <p>Personaliza tu experiencia en EduCheck Pro</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Apariencia -->
+        <section class="settings-section">
+            <div class="settings-card">
+                <div class="settings-header">
+                    <h3>
+                        <i class="fas fa-palette"></i>
+                        Apariencia
+                    </h3>
+                    <p>Personaliza el tema visual de la aplicación</p>
+                </div>
+                <div class="settings-content">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Modo Oscuro</h4>
+                            <p>Cambia entre tema claro y oscuro</p>
+                        </div>
+                        <div class="setting-control">
+                            <label class="theme-toggle-switch" for="globalDarkModeToggle">
+                                <input type="checkbox" id="globalDarkModeToggle" title="Alternar modo oscuro">
+                                <span class="toggle-slider">
+                                    <i class="fas fa-sun"></i>
+                                    <i class="fas fa-moon"></i>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Tamaño de Fuente</h4>
+                            <p>Ajusta el tamaño del texto para mejor legibilidad</p>
+                        </div>
+                        <div class="setting-control">
+                            <select id="fontSizeSelect" class="setting-select" title="Seleccionar tamaño de fuente">
+                                <option value="small">Pequeño</option>
+                                <option value="normal" selected>Normal</option>
+                                <option value="large">Grande</option>
+                                <option value="extra-large">Extra Grande</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Animaciones</h4>
+                            <p>Habilitar o deshabilitar animaciones de la interfaz</p>
+                        </div>
+                        <div class="setting-control">
+                            <label class="simple-toggle">
+                                <input type="checkbox" id="animationsToggle" checked title="Habilitar o deshabilitar animaciones">
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Notificaciones -->
+        <section class="settings-section">
+            <div class="settings-card">
+                <div class="settings-header">
+                    <h3>
+                        <i class="fas fa-bell"></i>
+                        Notificaciones
+                    </h3>
+                    <p>Configura cómo y cuándo recibir notificaciones</p>
+                </div>
+                <div class="settings-content">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Notificaciones de Escritorio</h4>
+                            <p>Recibir notificaciones del sistema</p>
+                        </div>
+                        <div class="setting-control">
+                            <label class="simple-toggle">
+                                <input type="checkbox" id="desktopNotifications">
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Efectos de Sonido</h4>
+                            <p>Reproducir sonidos para acciones importantes</p>
+                        </div>
+                        <div class="setting-control">
+                            <label class="simple-toggle" for="soundEffects">
+                                <input type="checkbox" id="soundEffects" checked>
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Datos -->
+        <section class="settings-section">
+            <div class="settings-card">
+                <div class="settings-header">
+                    <h3>
+                        <i class="fas fa-database"></i>
+                        Gestión de Datos
+                    </h3>
+                    <p>Administra tus datos y configuraciones</p>
+                </div>
+                <div class="settings-content">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Exportar Datos</h4>
+                            <p>Descarga una copia de toda tu información</p>
+                        </div>
+                        <div class="setting-control">
+                            <button class="setting-btn secondary" id="exportDataBtn">
+                                <i class="fas fa-download"></i>
+                                Exportar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Limpiar Caché</h4>
+                            <p>Elimina archivos temporales para liberar espacio</p>
+                        </div>
+                        <div class="setting-control">
+                            <button class="setting-btn secondary" id="clearCacheBtn">
+                                <i class="fas fa-broom"></i>
+                                Limpiar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Restablecer Configuración</h4>
+                            <p>Volver a la configuración predeterminada</p>
+                        </div>
+                        <div class="setting-control">
+                            <button class="setting-btn secondary" id="resetSettingsBtn">
+                                <i class="fas fa-undo"></i>
+                                Restablecer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Apoyo -->
+        <section class="settings-section">
+            <div class="settings-card">
+                <div class="settings-header">
+                    <h3>
+                        <i class="fas fa-heart"></i>
+                        Apoya el Proyecto
+                    </h3>
+                    <p>Ayuda a mantener y mejorar EduCheck Pro</p>
+                </div>
+                <div class="settings-content">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Realizar Donación</h4>
+                            <p>Contribuye al desarrollo continuo de la plataforma</p>
+                        </div>
+                        <div class="setting-control">
+                            <button class="setting-btn primary" id="donationBtn">
+                                <i class="fas fa-donate"></i>
+                                Donar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Cuenta (Peligrosa) -->
+        <section class="settings-section">
+            <div class="settings-card">
+                <div class="settings-header">
+                    <h3>
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Zona de Peligro
+                    </h3>
+                    <p>Acciones irreversibles - procede con precaución</p>
+                </div>
+                <div class="settings-content">
+                    <div class="setting-item danger">
+                        <div class="setting-info">
+                            <h4>Eliminar Cuenta</h4>
+                            <p>Elimina permanentemente tu cuenta y todos los datos asociados</p>
+                        </div>
+                        <div class="setting-control">
+                            <button class="setting-btn danger" id="deleteAccountBtn">
+                                <i class="fas fa-trash-alt"></i>
+                                Eliminar Cuenta
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de Donación -->
+    <div class="modal" id="donationModal">
+        <div class="modal-content donation-modal">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-heart"></i>
+                    ¡Apoya EduCheck Pro!
+                </h3>
+                <button class="close-modal" onclick="closeDonationModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="donation-content">
+                    <div class="donation-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <h4>¡Pronto disponible!</h4>
+                    <p>Las donaciones estarán disponibles muy pronto. Mientras tanto, puedes realizar una donación directamente a nuestro alias:</p>
+                    
+                    <div class="alias-container">
+                        <div class="alias-display">
+                            <span id="aliasText">cristian.mp.cb</span>
+                            <button class="copy-btn" id="copyAliasBtn" title="Copiar alias">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="donation-note">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Tu apoyo nos ayuda a mantener y mejorar la plataforma</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="setting-btn secondary" onclick="closeDonationModal()">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación de Eliminación -->
+    <div class="modal" id="deleteAccountModal">
+        <div class="modal-content delete-account-modal">
+            <div class="modal-header danger">
+                <h3>
+                    <i class="fas fa-exclamation-triangle"></i>
+                    ¿Eliminar Cuenta?
+                </h3>
+                <button class="close-modal" onclick="closeDeleteAccountModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="delete-warning">
+                    <div class="warning-icon">
+                        <i class="fas fa-user-times"></i>
+                    </div>
+                    <h4>¡Esta acción es irreversible!</h4>
+                    <p>Al eliminar tu cuenta se borrarán <strong>permanentemente</strong>:</p>
+                    <ul class="delete-consequences">
+                        <li><i class="fas fa-university"></i> Todas tus instituciones</li>
+                        <li><i class="fas fa-chalkboard-teacher"></i> Todos tus cursos</li>
+                        <li><i class="fas fa-user-graduate"></i> Todos los estudiantes</li>
+                        <li><i class="fas fa-clipboard-check"></i> Registros de asistencia</li>
+                        <li><i class="fas fa-calendar-check"></i> Actividades creadas</li>
+                        <li><i class="fas fa-images"></i> Galería de imágenes</li>
+                        <li><i class="fas fa-cog"></i> Configuraciones personales</li>
+                    </ul>
+                    
+                    <div class="confirmation-input">
+                        <label for="deleteConfirmation">
+                            Para confirmar, escribe <strong>"ELIMINAR"</strong> en el campo:
+                        </label>
+                        <input type="text" id="deleteConfirmation" placeholder="Escribe ELIMINAR para confirmar">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="setting-btn secondary" onclick="closeDeleteAccountModal()">
+                    Cancelar
+                </button>
+                <button class="setting-btn danger" id="confirmDeleteBtn" disabled>
+                    <i class="fas fa-trash-alt"></i>
+                    Eliminar Cuenta Permanentemente
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="src/assets/js/theme-manager.js"></script>
+    <!-- ===== SCRIPTS IDÉNTICOS ===== -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <script src="src/assets/js/constants.js"></script>
+    <script src="src/config/firebase.js"></script>
+    <script src="src/assets/js/syncManager.js"></script>
+    <script src="src/assets/js/app.js"></script>
+    
+    <!-- Script específico de ajustes -->
+    <script src="src/assets/js/ajustes.js"></script>
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+        }
+    </script>
+</body>
+</html>

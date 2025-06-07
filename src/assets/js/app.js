@@ -454,4 +454,29 @@ window.setupMenuToggle = setupMenuToggle;
 window.getUserData = getUserData;
 window.setUserData = setUserData;
 
-console.log('✅ App.js v4.0 cargado correctamente - Sistema unificado');
+// AGREGAR al final del setupUnifiedInterface():
+
+function setupUnifiedInterface() {
+    console.log('🎨 Configurando interfaz unificada...');
+    
+    // Configurar menú toggle
+    setTimeout(() => {
+        setupMenuToggle();
+        setupMenuNavigation();
+    }, 100);
+    
+    // 👇 AGREGAR ESTA LÍNEA
+    // Inicializar configuración global
+    if (typeof window.initializeGlobalSettings === 'function') {
+        window.initializeGlobalSettings();
+    }
+    
+    // Configurar modo oscuro (mantener por compatibilidad)
+    initializeDarkMode();
+    
+    // Actualizar fecha
+    updateCurrentDate();
+    
+    console.log('✅ Interfaz unificada configurada');
+}
+
