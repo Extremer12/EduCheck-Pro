@@ -1,10 +1,8 @@
-const CACHE_NAME = 'horita-feliz-v1';
+const CACHE_NAME = 'educheck-pro-v1';
 const urlsToCache = [
-    './',
-    './index.html',
-    './login.html',
-    './manifest.json',
-    './src/assets/css/styles.css',
+    '/',
+    '/index.html',
+    '/src/assets/css/styles.css',
     './src/assets/css/responsive.css',
     './src/assets/js/app.js',
     './src/assets/js/auth.js',
@@ -15,6 +13,15 @@ const urlsToCache = [
     './src/utils/helpers.js',
     './icon-192.png',
     './icon-512.png'
+];
+
+// URLs que NO deben ser cacheadas (AMPLIADO)
+const EXCLUDED_URLS = [
+    'firebasestorage.googleapis.com',
+    'firebase.google.com',
+    'googleapis.com',
+    'gstatic.com',
+    'firebaseapp.com'
 ];
 
 self.addEventListener('install', event => {
@@ -38,6 +45,17 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('fetch', event => {
+    // No interceptar requests de Firebase Storage o relacionados
+    if (EXCLUDED_URLS.some(excluded => event.request.url.includes(excluded))) {
+        console.log('🔥 Excluyendo de SW:', event.request.url);
+        return;
+    }
+    
+    // No interceptar requests POST, PUT, DELETE
+    if (event.request.method !== 'GET') {
+        return;
+    }
+    
     event.respondWith(
         caches.match(event.request)
             .then(response => {

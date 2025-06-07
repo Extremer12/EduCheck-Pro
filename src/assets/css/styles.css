@@ -3356,3 +3356,60 @@ input:checked + .toggle-slider:before {
         font-size: 1.1rem;
     }
 }
+
+/* ===== ESTILOS PARA CARD DE ASISTENCIA ===== */
+.quick-access-card.attendance {
+    background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.quick-access-card.attendance:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.25);
+}
+
+.quick-access-card.attendance .quick-icon {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.quick-access-card.attendance .quick-info h4 {
+    color: white;
+}
+
+.quick-access-card.attendance .quick-info p {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.quick-access-card.attendance .quick-arrow {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* ===== BOTÓN PRINCIPAL DE ASISTENCIA ===== */
+.primary-action-card.attendance-focus {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    border: none;
+    color: white;
+}
+
+.primary-action-card.attendance-focus .action-icon {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.primary-action-card.attendance-focus .action-text h3,
+.primary-action-card.attendance-focus .action-text p {
+    color: white;
+}
+
+.primary-action-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.primary-action-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}

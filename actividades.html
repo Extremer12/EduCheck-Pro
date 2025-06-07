@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gestión de Actividades - EduCheck Pro">
+    <meta name="keywords" content="actividades, tareas, eventos, educación">
+    <meta name="author" content="EduCheck Pro Team">
+    <meta name="theme-color" content="#FFB6C1">
+    <link rel="icon" href="src/assets/icons/icon-192x192.png" type="image/png">
+    <title>Gestión de Actividades - EduCheck Pro</title>
+    
+    <!-- CSS EN EL MISMO ORDEN QUE OTRAS PÁGINAS -->
+    <link rel="stylesheet" href="src/assets/css/styles.css">
+    <link rel="stylesheet" href="src/assets/css/responsive.css">
+    <link rel="stylesheet" href="src/assets/css/actividades.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="edu-system-ready activities-page">
+    <!-- ===== HEADER UNIFICADO IDÉNTICO A OTRAS PÁGINAS ===== -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-brand">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h1>EduCheck Pro</h1>
+            </div>
+            
+            <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ===== OVERLAY DEL MENÚ ===== -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- ===== MENÚ DESPLEGABLE IDÉNTICO A OTRAS PÁGINAS ===== -->
+    <div class="dropdown-menu" id="dropdownMenu">
+        <div class="menu-header">
+            <button class="menu-close" id="menuClose" aria-label="Cerrar menú">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <h3 id="menuTeacherName">Cargando...</h3>
+                    <p>Docente</p>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="menu-items">
+            <a href="index.html" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="instituciones.html" class="menu-item">
+                <i class="fas fa-university"></i>
+                <span>Instituciones</span>
+            </a>
+            <a href="cursos.html" class="menu-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Cursos</span>
+            </a>
+            <a href="estudiantes.html" class="menu-item">
+                <i class="fas fa-user-graduate"></i>
+                <span>Estudiantes</span>
+            </a>
+            <a href="asistencia.html" class="menu-item">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Asistencia</span>
+            </a>
+            <a href="actividades.html" class="menu-item active">
+                <i class="fas fa-calendar-check"></i>
+                <span>Actividades</span>
+            </a>
+            <a href="gallery.html" class="menu-item">
+                <i class="fas fa-images"></i>
+                <span>Galería</span>
+            </a>
+            <a href="reportes.html" class="menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reportes</span>
+            </a>
+            
+            <div class="menu-divider"></div>
+            
+            <a href="profile.html" class="menu-item">
+                <i class="fas fa-user-cog"></i>
+                <span>Perfil</span>
+            </a>
+            <a href="#" class="menu-item" id="logoutOption">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </nav>
+        
+        <div class="menu-footer">
+            <div class="theme-toggle">
+                <span class="theme-label">Modo Oscuro</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="darkModeToggle" aria-label="Activar modo oscuro">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CONTENIDO PRINCIPAL - FEED ESTILO RED SOCIAL ===== -->
+    <main class="activities-main">
+        <!-- Header de la página -->
+        <section class="activities-page-header">
+            <div class="page-header-content">
+                <div class="page-title">
+                    <h2>
+                        <i class="fas fa-calendar-check"></i>
+                        Actividades Educativas
+                    </h2>
+                    <p>Comparte y descubre experiencias educativas increíbles</p>
+                </div>
+                
+                <div class="page-actions">
+                    <button class="activities-action-btn" id="newActivityBtn">
+                        <i class="fas fa-plus"></i>
+                        <span>Nueva Actividad</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Búsqueda y filtros estilo red social -->
+        <section class="activities-search-bar">
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="activitiesSearch" placeholder="Buscar actividades...">
+                </div>
+                
+                <div class="filter-controls">
+                    <select id="dateFilter" class="date-filter" aria-label="Filtrar por fecha">
+                        <option value="">Todas las fechas</option>
+                        <option value="today">Hoy</option>
+                        <option value="week">Esta semana</option>
+                        <option value="month">Este mes</option>
+                    </select>
+                    
+                    <selectselect id="courseFilter" class="course-filter" aria-label="Filtrar por curso">
+                        <option value="">Todos los cursos</option>
+                    </select>
+                    
+                    <button class="clear-btn" id="clearFilters">
+                        <i class="fas fa-times"></i>
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feed de actividades estilo red social -->
+        <section class="activities-feed">
+            <div class="feed-container" id="activitiesFeed">
+                <!-- Las actividades se cargarán dinámicamente aquí -->
+            </div>
+            
+            <!-- Estado vacío -->
+            <div class="empty-feed" id="emptyFeed" style="display: none;">
+                <div class="empty-icon">
+                    <i class="fas fa-calendar-plus"></i>
+                </div>
+                <h3>No hay actividades aún</h3>
+                <p>¡Comparte tu primera actividad educativa y comienza a crear recuerdos!</p>
+                <button class="empty-action-btn" id="createFirstActivity">
+                    <i class="fas fa-plus"></i>
+                    <span>Crear Primera Actividad</span>
+                </button>
+            </div>
+            
+            <!-- Loading más actividades -->
+            <div class="load-more" id="loadMore" style="display: none;">
+                <button class="load-more-btn" id="loadMoreBtn">
+                    <i class="fas fa-chevron-down"></i>
+                    <span>Cargar más actividades</span>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== MODAL PARA NUEVA/EDITAR ACTIVIDAD ===== -->
+    <div class="modal" id="activityModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">
+                    <i class="fas fa-calendar-plus"></i>
+                    Nueva Actividad
+                </h3>
+                <buttonbutton class="close-modal" type="button" aria-label="Cerrar modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="activityForm">
+                    <div class="form-group">
+                        <label for="activityTitle">
+                            <i class="fas fa-heading"></i>
+                            Título de la actividad *
+                        </label>
+                        <input type="text" id="activityTitle" name="title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="activityDescription">
+                            <i class="fas fa-align-left"></i>
+                            Descripción *
+                        </label>
+                        <textarea id="activityDescription" name="description" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="activityCourse">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                Curso
+                            </label>
+                            <select id="activityCourse" name="course">
+                                <option value="">Seleccionar curso</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="activityDate">
+                                <i class="fas fa-calendar"></i>
+                                Fecha
+                            </label>
+                            <input type="date" id="activityDate" name="date">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="activityLocation">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Ubicación
+                        </label>
+                        <input type="text" id="activityLocation" name="location">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="activityImage">
+                            <i class="fas fa-image"></i>
+                            Imagen (opcional)
+                        </label>
+                        <input type="file" id="activityImage" accept="image/*">
+                    </div>
+                    
+                    <div id="imagePreview" style="display: none;"></div>
+                </form>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" id="cancelActivity">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button type="submit" form="activityForm" class="btn-primary" id="saveActivity">
+                    <i class="fas fa-save"></i>
+                    Guardar Actividad
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL PARA VER ACTIVIDAD COMPLETA ===== -->
+    <div class="modal" id="activityViewModal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="viewModalTitle">
+                    <i class="fas fa-eye"></i>
+                    Ver Actividad
+                </h3>
+                <button class="close-modal" aria-label="Cerrar modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="activity-view-content" id="activityViewContent">
+                    <!-- Contenido de la actividad se carga dinámicamente -->
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" id="editActivityBtn">
+                    <i class="fas fa-edit"></i>
+                    Editar Actividad
+                </button>
+                <button type="button" class="btn-secondary" onclick="closeModal('activityViewModal')">
+                    <i class="fas fa-times"></i>
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SCRIPTS UNIFICADOS ===== -->
+    <!-- 1. Firebase SDK v8 CDN (SOLO ESTOS) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+    <!-- 2. Configuración de Firebase (PRIMERO) -->
+    <script src="src/config/firebase.js"></script>
+
+    <!-- 3. Constantes y utilidades -->
+    <script src="src/assets/js/constants.js"></script>
+
+    <!-- 4. Managers -->
+    <script src="src/assets/js/syncManager.js"></script>
+
+    <!-- 5. App principal -->
+    <script src="src/assets/js/app.js"></script>
+
+    <!-- 6. Script específico de la página -->
+    <script src="src/assets/js/actividades.js"></script>
+    
+    <!-- Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(registration => console.log('✅ SW registrado'))
+                .catch(error => console.log('❌ SW error:', error));
+        }
+    </script>
+</body>
+</html>

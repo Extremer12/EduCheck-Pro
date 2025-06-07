@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema de Asistencias - EduCheck Pro">
+    <meta name="keywords" content="asistencia, estudiantes, cursos, educación">
+    <meta name="author" content="EduCheck Pro Team">
+    <meta name="theme-color" content="#4F46E5">
+    <link rel="icon" href="src/assets/icons/icon-192x192.png" type="image/png">
+    <title>Sistema de Asistencias - EduCheck Pro</title>
+    
+    <!-- CSS EN EL MISMO ORDEN QUE INDEX.HTML -->
+    <link rel="stylesheet" href="src/assets/css/styles.css">
+    <link rel="stylesheet" href="src/assets/css/responsive.css">
+    <link rel="stylesheet" href="src/assets/css/asistencia.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="edu-system-ready attendance-page">
+    <!-- ===== HEADER UNIFICADO IDÉNTICO A INDEX.HTML ===== -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-brand">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h1>EduCheck Pro</h1>
+            </div>
+            
+            <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ===== OVERLAY DEL MENÚ ===== -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- ===== MENÚ DESPLEGABLE IDÉNTICO A INDEX.HTML ===== -->
+    <div class="dropdown-menu" id="dropdownMenu">
+        <div class="menu-header">
+            <button class="menu-close" id="menuClose" aria-label="Cerrar menú">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <h3 id="menuTeacherName">Cargando...</h3>
+                    <p>Docente</p>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="menu-items">
+            <a href="index.html" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="instituciones.html" class="menu-item">
+                <i class="fas fa-university"></i>
+                <span>Instituciones</span>
+            </a>
+            <a href="cursos.html" class="menu-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Cursos</span>
+            </a>
+            <a href="estudiantes.html" class="menu-item">
+                <i class="fas fa-user-graduate"></i>
+                <span>Estudiantes</span>
+            </a>
+            <a href="asistencia.html" class="menu-item active">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Asistencias</span>
+            </a>
+            <a href="actividades.html" class="menu-item">
+                <i class="fas fa-calendar-check"></i>
+                <span>Actividades</span>
+            </a>
+            <a href="gallery.html" class="menu-item">
+                <i class="fas fa-images"></i>
+                <span>Galería</span>
+            </a>
+            <a href="reportes.html" class="menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reportes</span>
+            </a>
+            
+            <div class="menu-divider"></div>
+            
+            <a href="profile.html" class="menu-item">
+                <i class="fas fa-user-cog"></i>
+                <span>Perfil</span>
+            </a>
+            <a href="#" class="menu-item" id="logoutOption">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </nav>
+        
+        <div class="menu-footer">
+            <div class="theme-toggle">
+                <span class="theme-label">Modo Oscuro</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="darkModeToggle" aria-label="Activar modo oscuro">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CONTENIDO PRINCIPAL ===== -->
+    <main class="main-content">
+        <!-- Header de la página -->
+        <section class="attendance-page-header">
+            <div class="page-header-content">
+                <div class="page-title">
+                    <h2>
+                        <i class="fas fa-clipboard-check"></i>
+                        Sistema de Asistencias
+                    </h2>
+                    <p>Gestiona la asistencia de tus estudiantes de manera eficiente</p>
+                </div>
+                
+                <div class="page-actions">
+                    <button class="attendance-action-btn" id="newSessionBtn">
+                        <i class="fas fa-plus"></i>
+                        Nueva Sesión
+                    </button>
+                    
+                    <button class="attendance-action-btn" id="historyBtn">
+                        <i class="fas fa-history"></i>
+                        Historial
+                    </button>
+                    
+                    <button class="attendance-action-btn" id="reportBtn">
+                        <i class="fas fa-chart-line"></i>
+                        Reportes
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Selector de Curso -->
+        <section class="course-selection-section" id="courseSelectionSection">
+            <div class="course-selection-card">
+                <div class="selection-header">
+                    <h3>
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        Seleccionar Curso
+                    </h3>
+                    <p>Elige el curso donde vas a tomar asistencia</p>
+                </div>
+                
+                <div class="course-selector">
+                    <div class="form-group">
+                        <label for="institutionSelect">
+                            <i class="fas fa-university"></i>
+                            Institución
+                        </label>
+                        <select id="institutionSelect" class="form-select">
+                            <option value="">Selecciona una institución</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="courseSelect">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            Curso
+                        </label>
+                        <select id="courseSelect" class="form-select">
+                            <option value="">Primero selecciona una institución</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sessionDate">
+                            <i class="fas fa-calendar-alt"></i>
+                            Fecha de la sesión
+                        </label>
+                        <input type="date" id="sessionDate" class="form-input" required>
+                    </div>
+                </div>
+                
+                <div class="selection-actions">
+                    <button class="btn-primary" id="startAttendanceBtn" disabled>
+                        <i class="fas fa-play"></i>
+                        Iniciar Asistencia
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Panel de Asistencia -->
+        <section class="attendance-panel" id="attendancePanel" style="display: none;">
+            <!-- Información de la Sesión -->
+            <div class="session-info-card">
+                <div class="session-header">
+                    <div class="session-details">
+                        <h3 id="sessionTitle">Curso de Matemáticas</h3>
+                        <div class="session-meta">
+                            <span id="sessionDate">Hoy, 15 de marzo 2024</span>
+                            <span class="separator">•</span>
+                            <span id="sessionTime">09:30 AM</span>
+                            <span class="separator">•</span>
+                            <span id="sessionInstitution">Colegio San José</span>
+                        </div>
+                    </div>
+                    
+                    <div class="session-actions">
+                        <button class="btn-secondary" id="editSessionBtn">
+                            <i class="fas fa-edit"></i>
+                            Editar Sesión
+                        </button>
+                        
+                        <button class="btn-success" id="saveSessionBtn">
+                            <i class="fas fa-save"></i>
+                            Guardar Asistencia
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Estadísticas Rápidas -->
+                <div class="attendance-stats">
+                    <div class="stat-item present">
+                        <div class="stat-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="presentCount">0</div>
+                            <div class="stat-label">Presentes</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item absent">
+                        <div class="stat-icon">
+                            <i class="fas fa-times"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="absentCount">0</div>
+                            <div class="stat-label">Ausentes</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item late">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="lateCount">0</div>
+                            <div class="stat-label">Tardanzas</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item total">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="totalStudents">0</div>
+                            <div class="stat-label">Total</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controles de Asistencia -->
+            <div class="attendance-controls-card">
+                <div class="controls-header">
+                    <h4>
+                        <i class="fas fa-sliders-h"></i>
+                        Controles de Asistencia
+                    </h4>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-btn" id="markAllPresentBtn">
+                            <i class="fas fa-check-double"></i>
+                            Todos Presentes
+                        </button>
+                        
+                        <button class="quick-btn" id="markAllAbsentBtn">
+                            <i class="fas fa-user-times"></i>
+                            Todos Ausentes
+                        </button>
+                        
+                        <button class="quick-btn" id="resetAttendanceBtn">
+                            <i class="fas fa-undo"></i>
+                            Reiniciar
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Búsqueda de Estudiantes -->
+                <div class="search-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="studentSearch" class="search-input" placeholder="Buscar estudiante por nombre...">
+                    </div>
+                    
+                    <div class="filter-controls">
+                        <select id="statusFilter" class="filter-select">
+                            <option value="all">Todos los estados</option>
+                            <option value="present">Solo presentes</option>
+                            <option value="absent">Solo ausentes</option>
+                            <option value="late">Solo tardanzas</option>
+                            <option value="pending">Sin marcar</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Estudiantes -->
+            <div class="students-attendance-section">
+                <div class="section-header">
+                    <h4>
+                        <i class="fas fa-user-graduate"></i>
+                        Lista de Estudiantes
+                    </h4>
+                    <div class="students-counter">
+                        <span id="studentsCounter">0 estudiantes</span>
+                    </div>
+                </div>
+                
+                <div class="students-grid" id="studentsGrid">
+                    <!-- Los estudiantes se cargarán dinámicamente aquí -->
+                </div>
+                
+                <!-- Estado vacío -->
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <div class="empty-icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h4>No hay estudiantes en este curso</h4>
+                    <p>Agrega estudiantes al curso para poder tomar asistencia</p>
+                    <button class="btn-primary" id="addStudentsBtn">
+                        <i class="fas fa-plus"></i>
+                        Agregar Estudiantes
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Historial de Asistencias -->
+        <section class="attendance-history" id="attendanceHistory" style="display: none;">
+            <div class="history-header">
+                <h3>
+                    <i class="fas fa-history"></i>
+                    Historial de Asistencias
+                </h3>
+                
+                <div class="history-filters">
+                    <select id="historyInstitutionFilter" class="filter-select">
+                        <option value="">Todas las instituciones</option>
+                    </select>
+                    
+                    <select id="historyCourseFilter" class="filter-select">
+                        <option value="">Todos los cursos</option>
+                    </select>
+                    
+                    <input type="date" id="historyDateFilter" class="form-input">
+                    
+                    <button class="btn-secondary" id="clearHistoryFilters">
+                        <i class="fas fa-times"></i>
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+            
+            <div class="history-grid" id="historyGrid">
+                <!-- Historial se carga dinámicamente -->
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== MODAL DE CONFIRMACIÓN ===== -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="confirmationTitle">
+                    <i class="fas fa-question-circle"></i>
+                    Confirmar Acción
+                </h3>
+            </div>
+            
+            <div class="modal-body">
+                <p id="confirmationMessage">¿Estás seguro de que quieres realizar esta acción?</p>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-secondary" id="cancelConfirmation">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                
+                <button class="btn-primary" id="confirmAction">
+                    <i class="fas fa-check"></i>
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL DE DETALLES DE ESTUDIANTE ===== -->
+    <div class="modal" id="studentDetailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="studentDetailsTitle">
+                    <i class="fas fa-user-graduate"></i>
+                    Detalles del Estudiante
+                </h3>
+                <buttonbutton class="close-modal" onclick="closeStudentDetailsModal()" aria-label="Cerrar modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div id="studentDetailsContent">
+                    <!-- Contenido se carga dinámicamente -->
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeStudentDetailsModal()">
+                    <i class="fas fa-times"></i>
+                    Cerrar
+                </button>
+                
+                <button class="btn-primary" id="editStudentBtn">
+                    <i class="fas fa-edit"></i>
+                    Editar Estudiante
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SCRIPTS UNIFICADOS COMO INDEX.HTML ===== -->
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <!-- Core scripts EN EL MISMO ORDEN QUE INDEX.HTML -->
+    <script src="src/assets/js/constants.js"></script>
+    <script src="src/config/firebase.js"></script>
+    <script src="src/assets/js/syncManager.js"></script>
+    <script src="src/assets/js/app.js"></script>
+    
+    <!-- Script específico de asistencias -->
+    <script src="src/assets/js/asistencia.js"></script>
+    
+    <!-- Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(registration => console.log('✅ SW registrado'))
+                .catch(error => console.log('❌ SW error:', error));
+        }
+    </script>
+</body>
+</html>
