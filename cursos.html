@@ -123,9 +123,10 @@
                     </div>
                 </div>
                 <div class="header-actions">
-                    <button class="btn-primary" id="addCourseBtn">
+                    <!-- Asegurar que el botón tenga el ID correcto -->
+                    <button class="btn-primary" id="new-course-btn">
                         <i class="fas fa-plus"></i>
-                        <span>Nuevo Curso</span>
+                        Nuevo Curso
                     </button>
                 </div>
             </section>
@@ -169,20 +170,17 @@
     </main>
 
     <!-- ===== MODAL PARA CREAR/EDITAR CURSO ===== -->
-    <div id="course-modal" class="modal">
+    <div id="courseModal" class="modal">
         <div class="modal-overlay"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h3>
-                    <i class="fas fa-chalkboard-teacher"></i>
-                    <span id="modal-title">Nuevo Curso</span>
-                </h3>
+                <h3 id="modal-title">Nuevo Curso</h3>
                 <button class="close-modal" onclick="closeCourseModal()" title="Cerrar modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="modal-body">
-                <form id="course-form">
+                <form id="courseForm">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="courseName">
@@ -198,6 +196,20 @@
                             >
                         </div>
                         
+                        <!-- 👇 AGREGAR ESTE CAMPO QUE FALTABA -->
+                        <div class="form-group">
+                            <label for="courseInstitution">
+                                <i class="fas fa-university"></i>
+                                Institución
+                            </label>
+                            <select id="courseInstitution" name="institutionId" required>
+                                <option value="">Seleccionar institución</option>
+                                <!-- Las opciones se cargarán dinámicamente -->
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
                         <div class="form-group">
                             <label for="courseLevel">
                                 <i class="fas fa-layer-group"></i>
@@ -212,9 +224,7 @@
                                 <option value="mixto">Mixto</option>
                             </select>
                         </div>
-                    </div>
-                    
-                    <div class="form-row">
+                        
                         <div class="form-group">
                             <label for="courseClassroom">
                                 <i class="fas fa-door-open"></i>
@@ -222,22 +232,37 @@
                             </label>
                             <input 
                                 type="text" 
-                                id="courseClassroom" 
+                                id="courseClassroom"
                                 name="classroom"
                                 placeholder="Ej: Aula 101, Laboratorio A"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="courseSchedule">
+                                <i class="fas fa-clock"></i>
+                                Horario
+                            </label>
+                            <input 
+                                type="text" 
+                                id="courseSchedule"
+                                name="schedule"
+                                placeholder="Ej: Lunes a Viernes 8:00-10:00"
                             >
                         </div>
                         
                         <div class="form-group">
                             <label for="courseCapacity">
                                 <i class="fas fa-users"></i>
-                                Capacidad Máxima
+                                Capacidad
                             </label>
                             <input 
                                 type="number" 
-                                id="courseCapacity" 
+                                id="courseCapacity"
                                 name="capacity"
-                                placeholder="Número de estudiantes"
+                                placeholder="Número máximo de estudiantes"
                                 min="1"
                                 max="100"
                             >
@@ -247,13 +272,13 @@
                     <div class="form-group full-width">
                         <label for="courseDescription">
                             <i class="fas fa-align-left"></i>
-                            Descripción del Curso
+                            Descripción
                         </label>
                         <textarea 
-                            id="courseDescription" 
+                            id="courseDescription"
                             name="description"
-                            placeholder="Describe el contenido, objetivos y metodología del curso..."
                             rows="4"
+                            placeholder="Describe el contenido y objetivos del curso..."
                         ></textarea>
                     </div>
 
@@ -274,7 +299,7 @@
                         </button>
                         <button type="submit" class="save-btn">
                             <i class="fas fa-save"></i>
-                            <span id="save-btn-text">Guardar Curso</span>
+                            Guardar Curso
                         </button>
                     </div>
                 </form>

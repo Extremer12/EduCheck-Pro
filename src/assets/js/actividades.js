@@ -253,38 +253,21 @@ function setupModalEventListeners() {
 // ===== CARGAR CURSOS PARA EL SELECT =====
 function loadCoursesForSelect() {
     const courseSelect = document.getElementById('activityCourse');
-    const courseFilter = document.getElementById('courseFilter');
+    if (!courseSelect) return;
+
+    const savedCourses = getUserData('courses');
+    const courses = savedCourses ? JSON.parse(savedCourses) : [];
     
-    if (!courseSelect || !currentUser) return;
+    courseSelect.innerHTML = '<option value="">Seleccionar curso</option>';
     
-    try {
-        const coursesData = getUserData('courses');
-        const courses = coursesData ? JSON.parse(coursesData) : [];
-        
-        // Limpiar opciones anteriores
-        courseSelect.innerHTML = '<option value="">Seleccionar curso</option>';
-        
-        if (courseFilter) {
-            courseFilter.innerHTML = '<option value="">Todos los cursos</option>';
-        }
-        
-        courses.forEach(course => {
+    courses.forEach(course => {
+        if (course.createdBy === currentUser?.uid) {
             const option = document.createElement('option');
             option.value = course.id;
-            option.textContent = `${course.name} - ${course.level || ''}`;
+            option.textContent = course.name;
             courseSelect.appendChild(option);
-            
-            // También agregar al filtro
-            if (courseFilter) {
-                const filterOption = option.cloneNode(true);
-                courseFilter.appendChild(filterOption);
-            }
-        });
-        
-        console.log(`📚 ${courses.length} cursos cargados en selects`);
-    } catch (error) {
-        console.error('❌ Error cargando cursos:', error);
-    }
+        }
+    });
 }
 
 // ===== ABRIR MODAL NUEVA ACTIVIDAD =====

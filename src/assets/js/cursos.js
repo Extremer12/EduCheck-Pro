@@ -1,342 +1,590 @@
 /**
- * EduCheck Pro - Sistema de Gestión de Cursos INTEGRADO
- * Usa las utilidades existentes de database.js y syncManager.js
+ * EduCheck Pro - Sistema de Gestión de Cursos v2.2 CORREGIDO FINAL
+ * Compatible con header unificado y sin errores de notificación
  */
 
 // ===== VARIABLES GLOBALES =====
-let coursesCollection = null;
-let coursesListener = null;
-let allCourses = [];
-let filteredCourses = [];
 let currentUser = null;
+let institutions = [];
+let courses = [];
+let currentEditingCourse = null;
 
 // ===== INICIALIZACIÓN =====
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📚 Inicializando gestión de cursos integrada...');
-    
-    // Esperar a que Firebase esté listo
-    const waitForFirebase = setInterval(() => {
-        if (window.auth && window.db) {
-            clearInterval(waitForFirebase);
-            setupAuthListener();
-        }
-    }, 100);
+    initializeCourses();
 });
 
-function setupAuthListener() {
-    window.auth.onAuthStateChanged(user => {
-        if (user) {
-            currentUser = user;
-            console.log('✅ Usuario autenticado para cursos:', user.email);
-            initializeCourses();
+async function initializeCourses() {
+    console.log('🎓 Inicializando módulo de cursos...');
+    
+    try {
+        // Verificar autenticación
+        if (window.auth) {
+            window.auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUser = user;
+                    await loadUserData();
+                    await loadCourses();
+                    setupCourseEvents();
+                    updateCoursesDisplay();
+                } else {
+                    window.location.href = 'login.html';
+                }
+            });
         } else {
-            console.log('❌ Usuario no autenticado');
-            window.location.href = 'login.html';
+            console.error('❌ Firebase Auth no disponible');
         }
-    });
+    } catch (error) {
+        console.error('❌ Error inicializando cursos:', error);
+        showNotification('Error al cargar el sistema de cursos', 'error');
+    }
 }
 
-// ===== INICIALIZAR CURSOS =====
-function initializeCourses() {
-    console.log('📚 Inicializando gestión de cursos...');
+// ===== CARGAR DATOS =====
+async function loadUserData() {
+    try {
+        const institutionsData = getUserData('institutions');
+        institutions = institutionsData ? JSON.parse(institutionsData) : [];
+        console.log(`🏛️ ${institutions.length} instituciones cargadas:`, institutions.map(i => i.name));
+        
+        // Verificar si hay instituciones del usuario actual
+        const userInstitutions = institutions.filter(i => i.createdBy === currentUser?.uid);
+        console.log(`👤 ${userInstitutions.length} instituciones del usuario actual`);
+        
+        if (userInstitutions.length === 0) {
+            console.warn('⚠️ El usuario no tiene instituciones. Debe crear una institución primero.');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error cargando instituciones:', error);
+        institutions = [];
+    }
+}
+
+async function loadCourses() {
+    try {
+        // Cargar cursos del localStorage PRIMERO
+        const savedCourses = getUserData('courses');
+        courses = savedCourses ? JSON.parse(savedCourses) : [];
+        
+        console.log(`🎓 ${courses.length} cursos cargados desde localStorage`);
+        
+        // SOLO intentar Firebase si está disponible Y hay usuario autenticado
+        if (window.db && currentUser && courses.length === 0) {
+            try {
+                console.log('📥 Intentando cargar desde Firebase...');
+                const snapshot = await window.db.collection('users')
+                    .doc(currentUser.uid)
+                    .collection('courses')
+                    .orderBy('createdAt', 'desc')
+                    .get();
+                    
+                const firebaseCourses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                if (firebaseCourses.length > 0) {
+                    courses = firebaseCourses;
+                    setUserData('courses', JSON.stringify(courses));
+                    console.log('✅ Cursos sincronizados desde Firebase');
+                }
+            } catch (firebaseError) {
+                // NO ES UN ERROR CRÍTICO - continuar con datos locales
+                console.warn('⚠️ Firebase no disponible, usando datos locales:', firebaseError.code);
+            }
+        }
+        
+    } catch (error) {
+        console.error('❌ Error cargando cursos:', error);
+        courses = []; // Fallback a array vacío
+    }
+}
+
+// ===== EVENTOS =====
+function setupCourseEvents() {
+    console.log('🎛️ Configurando eventos de cursos...');
     
-    if (!currentUser) {
-        console.error('❌ Usuario no autenticado');
+    // Botón para nuevo curso
+    const newCourseBtn = document.getElementById('new-course-btn');
+    if (newCourseBtn) {
+        newCourseBtn.addEventListener('click', () => {
+            console.log('📝 Abriendo modal para nuevo curso...');
+            openCourseModal();
+        });
+        console.log('✅ Botón nuevo curso configurado');
+    } else {
+        console.warn('❌ Botón #new-course-btn no encontrado');
+    }
+    
+    // Formulario de curso
+    const courseForm = document.getElementById('courseForm');
+    if (courseForm) {
+        courseForm.addEventListener('submit', handleCourseSubmit);
+        console.log('✅ Formulario de curso configurado');
+    } else {
+        console.warn('❌ Formulario #courseForm no encontrado');
+    }
+    
+    // Cerrar modal con overlay
+    const courseModal = document.getElementById('courseModal');
+    if (courseModal) {
+        courseModal.addEventListener('click', (e) => {
+            if (e.target === courseModal) {
+                closeCourseModal();
+            }
+        });
+        console.log('✅ Modal de curso configurado');
+    } else {
+        console.warn('❌ Modal #courseModal no encontrado');
+    }
+    
+    // Búsqueda de cursos
+    const searchInput = document.getElementById('course-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce(filterCourses, 300));
+    }
+    
+    // Filtros
+    const levelFilter = document.getElementById('level-filter');
+    if (levelFilter) {
+        levelFilter.addEventListener('change', filterCourses);
+    }
+    
+    const statusFilter = document.getElementById('status-filter');
+    if (statusFilter) {
+        statusFilter.addEventListener('change', filterCourses);
+    }
+    
+    console.log('✅ Eventos de cursos configurados completamente');
+}
+
+// ===== POBLADORES CORREGIDOS =====
+function populateInstitutionSelect() {
+    console.log('🏛️ Poblando selector de instituciones...');
+    
+    const courseInstitutionSelect = document.getElementById('courseInstitution');
+    
+    if (!courseInstitutionSelect) {
+        console.warn('❌ Element courseInstitution not found');
         return;
     }
     
-    // Configurar colección usando las referencias existentes
-    coursesCollection = window.db.collection('users')
-        .doc(currentUser.uid)
-        .collection('courses');
+    // Limpiar opciones existentes excepto la primera
+    courseInstitutionSelect.innerHTML = '<option value="">Seleccionar institución</option>';
     
-    // Configurar listener de cursos
-    setupCoursesListener();
+    console.log(`📋 ${institutions.length} instituciones disponibles`);
     
-    // Configurar eventos de interfaz
-    setupCourseEvents();
-    setupModal();
-    setupFilters();
+    if (institutions.length === 0) {
+        const noInstitutionOption = document.createElement('option');
+        noInstitutionOption.value = '';
+        noInstitutionOption.textContent = 'No hay instituciones disponibles';
+        noInstitutionOption.disabled = true;
+        courseInstitutionSelect.appendChild(noInstitutionOption);
+        return;
+    }
     
-    console.log('✅ Gestión de cursos inicializada');
+    // Filtrar solo instituciones del usuario actual
+    const userInstitutions = institutions.filter(institution => 
+        institution.createdBy === currentUser?.uid
+    );
+    
+    console.log(`🎯 ${userInstitutions.length} instituciones del usuario actual`);
+    
+    userInstitutions.forEach(institution => {
+        const option = document.createElement('option');
+        option.value = institution.id;
+        option.textContent = institution.name;
+        courseInstitutionSelect.appendChild(option);
+        console.log(`✅ Agregada institución: ${institution.name}`);
+    });
+    
+    if (userInstitutions.length === 0) {
+        const noUserInstitutionOption = document.createElement('option');
+        noUserInstitutionOption.value = '';
+        noUserInstitutionOption.textContent = 'Debes crear una institución primero';
+        noUserInstitutionOption.disabled = true;
+        courseInstitutionSelect.appendChild(noUserInstitutionOption);
+    }
 }
 
-// ===== LISTENER DE FIREBASE =====
-function setupCoursesListener() {
-    console.log('👂 Configurando listener de cursos...');
+// ===== MODAL FUNCTIONS CORREGIDAS =====
+function openCourseModal(courseId = null) {
+    console.log('🔓 Abriendo modal de curso...', courseId || 'nuevo');
     
-    coursesListener = coursesCollection
-        .orderBy('createdAt', 'desc')
-        .onSnapshot((snapshot) => {
-            console.log('📊 Cursos actualizados desde Firebase');
-            
-            allCourses = [];
-            snapshot.forEach((doc) => {
-                allCourses.push({
-                    id: doc.id,
-                    ...doc.data()
-                });
-            });
-            
-            console.log(`📚 ${allCourses.length} cursos cargados`);
-            
-            // Actualizar interfaz
-            displayCourses();
-            updateCoursesStats();
-            
-        }, (error) => {
-            console.error('❌ Error en listener de cursos:', error);
-            showNotification('Error al cargar cursos', 'error');
-            showErrorState();
-        });
+    const modal = document.getElementById('courseModal');
+    const form = document.getElementById('courseForm');
+    const title = document.getElementById('modal-title');
+    
+    if (!modal) {
+        console.error('❌ Modal de curso no encontrado');
+        showNotification('Error: Modal no encontrado', 'error');
+        return;
+    }
+    
+    if (!form) {
+        console.error('❌ Formulario de curso no encontrado');
+        showNotification('Error: Formulario no encontrado', 'error');
+        return;
+    }
+    
+    currentEditingCourse = courseId;
+    
+    if (courseId) {
+        // Modo edición
+        if (title) title.textContent = 'Editar Curso';
+        fillCourseForm(courseId);
+    } else {
+        // Modo creación
+        if (title) title.textContent = 'Crear Nuevo Curso';
+        form.reset();
+        // Asegurar que el checkbox esté marcado por defecto
+        const activeCheckbox = document.getElementById('courseActive');
+        if (activeCheckbox) activeCheckbox.checked = true;
+    }
+    
+    // 👇 CRÍTICO: Poblar instituciones ANTES de mostrar el modal
+    populateInstitutionSelect();
+    
+    // Mostrar modal
+    modal.classList.add('show');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    // Focus en primer campo
+    setTimeout(() => {
+        const firstInput = form.querySelector('input[type="text"]');
+        if (firstInput) {
+            firstInput.focus();
+            console.log('✅ Focus establecido en:', firstInput.id);
+        }
+    }, 200); // Aumentar el delay para dar tiempo a cargar las instituciones
+    
+    console.log('✅ Modal abierto correctamente');
 }
 
-// ===== CREAR CURSO USANDO DATABASE.JS =====
+function closeCourseModal() {
+    const modal = document.getElementById('courseModal');
+    if (modal) {
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+        
+        // Reset form
+        const form = document.getElementById('courseForm');
+        if (form) {
+            form.reset();
+        }
+        
+        currentEditingCourse = null;
+        console.log('✅ Modal cerrado');
+    }
+}
+
+function fillCourseForm(courseId) {
+    const course = courses.find(c => c.id === courseId);
+    if (!course) return;
+    
+    console.log('📝 Llenando formulario con datos del curso:', course);
+    
+    // Llenar campos del formulario
+    const fields = {
+        'courseName': course.name || '',
+        'courseDescription': course.description || '',
+        'courseInstitution': course.institutionId || '', // 👈 AGREGAR ESTA LÍNEA
+        'courseLevel': course.level || 'basico',
+        'courseSchedule': course.schedule || '',
+        'courseClassroom': course.classroom || '',
+        'courseCapacity': course.capacity || ''
+    };
+    
+    Object.entries(fields).forEach(([fieldId, value]) => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.value = value;
+            console.log(`✅ Campo ${fieldId} = ${value}`);
+        } else {
+            console.warn(`⚠️ Campo no encontrado: ${fieldId}`);
+        }
+    });
+    
+    // Checkbox de estado activo
+    const activeCheckbox = document.getElementById('courseActive');
+    if (activeCheckbox) {
+        activeCheckbox.checked = course.isActive !== false;
+    }
+}
+
+// ===== CRUD OPERATIONS =====
+async function handleCourseSubmit(e) {
+    e.preventDefault();
+    
+    console.log('📝 Procesando envío de formulario...');
+    
+    const formData = new FormData(e.target);
+    
+    // Debug: mostrar todos los datos del formulario
+    console.log('🔍 Datos del formulario:');
+    for (let [key, value] of formData.entries()) {
+        console.log(`  ${key}: ${value}`);
+    }
+    
+    const courseData = {
+        name: formData.get('name')?.trim() || formData.get('courseName')?.trim(),
+        description: formData.get('description')?.trim() || formData.get('courseDescription')?.trim(),
+        institutionId: formData.get('institutionId') || formData.get('courseInstitution'),
+        level: formData.get('level') || formData.get('courseLevel') || 'basico',
+        schedule: formData.get('schedule')?.trim() || formData.get('courseSchedule')?.trim(),
+        duration: formData.get('duration')?.trim() || formData.get('courseDuration')?.trim(),
+        capacity: parseInt(formData.get('capacity') || formData.get('courseCapacity')) || 0,
+        classroom: formData.get('classroom')?.trim() || formData.get('courseClassroom')?.trim(),
+        isActive: formData.get('isActive') === 'on' || formData.get('courseActive') === 'on'
+    };
+    
+    console.log('📊 Datos procesados:', courseData);
+    
+    // Validaciones
+    if (!courseData.name) {
+        showNotification('El nombre del curso es obligatorio', 'error');
+        return;
+    }
+    
+    if (!courseData.institutionId) {
+        showNotification('Debe seleccionar una institución', 'error');
+        return;
+    }
+    
+    try {
+        if (currentEditingCourse) {
+            await updateCourse(currentEditingCourse, courseData);
+        } else {
+            await createCourse(courseData);
+        }
+        
+        closeCourseModal();
+        updateCoursesDisplay();
+        
+    } catch (error) {
+        console.error('❌ Error al guardar curso:', error);
+        showNotification('Error al guardar el curso', 'error');
+    }
+}
+
 async function createCourse(courseData) {
-    console.log('➕ Creando nuevo curso...', courseData);
+    const newCourse = {
+        id: generateUniqueId('course'),
+        ...courseData,
+        studentsCount: 0,
+        createdBy: currentUser.uid,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
     
-    try {
-        // Usar función existente de database.js (adaptada para cursos)
-        const newCourse = {
-            ...courseData,
-            id: generateUniqueId(),
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-            userId: currentUser.uid,
-            studentsCount: 0
-        };
-        
-        // Guardar usando la estructura existente
-        const docRef = await coursesCollection.add(newCourse);
-        
-        console.log('✅ Curso creado con ID:', docRef.id);
-        showNotification('Curso creado correctamente', 'success');
-        
-        return docRef.id;
-        
-    } catch (error) {
-        console.error('❌ Error creando curso:', error);
-        showNotification('Error al crear curso: ' + error.message, 'error');
-        throw error;
+    // Guardar localmente
+    courses.unshift(newCourse);
+    setUserData('courses', JSON.stringify(courses));
+    
+    // Sincronizar con Firebase
+    if (window.db && currentUser) {
+        try {
+            await window.db.collection('users')
+                .doc(currentUser.uid)
+                .collection('courses')
+                .doc(newCourse.id)
+                .set(newCourse);
+            console.log('✅ Curso sincronizado con Firebase');
+        } catch (error) {
+            console.warn('⚠️ Error sincronizando con Firebase:', error);
+        }
     }
+    
+    showNotification('Curso creado exitosamente', 'success');
 }
 
-// ===== ACTUALIZAR CURSO =====
 async function updateCourse(courseId, courseData) {
-    console.log('✏️ Actualizando curso...', courseId, courseData);
-    
-    try {
-        const updatedCourse = {
-            ...courseData,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        };
-        
-        await coursesCollection.doc(courseId).update(updatedCourse);
-        
-        console.log('✅ Curso actualizado:', courseId);
-        showNotification('Curso actualizado correctamente', 'success');
-        
-    } catch (error) {
-        console.error('❌ Error actualizando curso:', error);
-        showNotification('Error al actualizar curso: ' + error.message, 'error');
-        throw error;
+    const courseIndex = courses.findIndex(c => c.id === courseId);
+    if (courseIndex === -1) {
+        showNotification('Curso no encontrado', 'error');
+        return;
     }
+    
+    // Actualizar curso
+    courses[courseIndex] = {
+        ...courses[courseIndex],
+        ...courseData,
+        updatedAt: new Date().toISOString()
+    };
+    
+    // Guardar localmente
+    setUserData('courses', JSON.stringify(courses));
+    
+    // Sincronizar con Firebase
+    if (window.db && currentUser) {
+        try {
+            await window.db.collection('users')
+                .doc(currentUser.uid)
+                .collection('courses')
+                .doc(courseId)
+                .update({
+                    ...courseData,
+                    updatedAt: new Date().toISOString()
+                });
+            console.log('✅ Curso actualizado en Firebase');
+        } catch (error) {
+            console.warn('⚠️ Error actualizando en Firebase:', error);
+        }
+    }
+    
+    showNotification('Curso actualizado exitosamente', 'success');
 }
 
-// ===== ELIMINAR CURSO =====
 async function deleteCourse(courseId) {
-    console.log('🗑️ Eliminando curso...', courseId);
+    if (!confirm('¿Estás seguro de que quieres eliminar este curso? Esta acción no se puede deshacer.')) {
+        return;
+    }
     
     try {
-        await coursesCollection.doc(courseId).delete();
+        // Eliminar localmente
+        courses = courses.filter(c => c.id !== courseId);
+        setUserData('courses', JSON.stringify(courses));
         
-        console.log('✅ Curso eliminado:', courseId);
-        showNotification('Curso eliminado correctamente', 'success');
+        // Eliminar de Firebase
+        if (window.db && currentUser) {
+            try {
+                await window.db.collection('users')
+                    .doc(currentUser.uid)
+                    .collection('courses')
+                    .doc(courseId)
+                    .delete();
+                console.log('✅ Curso eliminado de Firebase');
+            } catch (error) {
+                console.warn('⚠️ Error eliminando de Firebase:', error);
+            }
+        }
+        
+        // Actualizar vista
+        updateCoursesDisplay();
+        showNotification('Curso eliminado exitosamente', 'success');
         
     } catch (error) {
         console.error('❌ Error eliminando curso:', error);
-        showNotification('Error al eliminar curso: ' + error.message, 'error');
-        throw error;
+        showNotification('Error al eliminar el curso', 'error');
     }
 }
 
-// ===== MOSTRAR CURSOS =====
-function displayCourses() {
-    const coursesGrid = document.getElementById('coursesGrid');
+// ===== RENDERIZADO =====
+function updateCoursesDisplay() {
+    const container = document.getElementById('coursesGrid');
+    if (!container) return;
     
-    if (!coursesGrid) {
-        console.error('❌ coursesGrid no encontrado');
+    const userCourses = courses.filter(course => course.createdBy === currentUser?.uid);
+    
+    if (userCourses.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-illustration">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <h3>No hay cursos registrados</h3>
+                <p>Comienza creando tu primer curso para organizar tus clases y estudiantes</p>
+                <button onclick="openCourseModal()" class="empty-action-btn">
+                    <i class="fas fa-plus"></i>
+                    Crear Primer Curso
+                </button>
+            </div>
+        `;
         return;
     }
     
-    const coursesToShow = filteredCourses.length > 0 ? filteredCourses : allCourses;
+    container.innerHTML = userCourses.map(course => createCourseCard(course)).join('');
     
-    if (coursesToShow.length === 0) {
-        showEmptyState();
-        return;
+    // Actualizar contador
+    const coursesCount = document.getElementById('courses-count');
+    if (coursesCount) {
+        coursesCount.textContent = `${userCourses.length} curso${userCourses.length !== 1 ? 's' : ''}`;
     }
-    
-    const coursesHTML = coursesToShow.map(course => createCourseCard(course)).join('');
-    coursesGrid.innerHTML = coursesHTML;
-    
-    console.log(`📚 Mostrando ${coursesToShow.length} cursos`);
 }
 
 function createCourseCard(course) {
-    const createdDate = course.createdAt ? formatDate(course.createdAt) : 'Sin fecha';
-    const statusClass = course.isActive ? 'active' : 'inactive';
-    const statusText = course.isActive ? 'Activo' : 'Inactivo';
+    const institution = institutions.find(i => i.id === course.institutionId);
+    const institutionName = institution ? institution.name : 'Sin institución';
     
     return `
-        <div class="course-card" data-course-id="${course.id}">
+        <div class="course-card ${!course.isActive ? 'inactive' : ''}" data-course-id="${course.id}">
             <div class="course-header">
-                <div class="course-level">${course.level || 'Sin nivel'}</div>
-                <div class="course-status ${statusClass}">
+                <div class="course-level ${course.level || 'basico'}">
+                    ${getLevelDisplayName(course.level || 'basico')}
+                </div>
+                <div class="course-status ${course.isActive ? 'active' : 'inactive'}">
                     <i class="fas fa-circle"></i>
-                    ${statusText}
+                    <span>${course.isActive ? 'Activo' : 'Inactivo'}</span>
                 </div>
             </div>
+            
             <div class="course-content">
-                <h4>${course.name}</h4>
+                <h4 class="course-name">${course.name}</h4>
                 <p class="course-description">${course.description || 'Sin descripción'}</p>
+                
                 <div class="course-meta">
-                    <div class="meta-item">
-                        <i class="fas fa-door-open"></i>
-                        <span>${course.classroom || 'Sin aula'}</span>
-                    </div>
                     <div class="meta-item">
                         <i class="fas fa-users"></i>
                         <span>${course.studentsCount || 0} estudiantes</span>
                     </div>
                     <div class="meta-item">
-                        <i class="fas fa-user-tie"></i>
-                        <span>${course.capacity || 'Sin límite'} capacidad</span>
+                        <i class="fas fa-university"></i>
+                        <span>${institutionName}</span>
                     </div>
+                    ${course.classroom ? `
+                        <div class="meta-item">
+                            <i class="fas fa-door-open"></i>
+                            <span>${course.classroom}</span>
+                        </div>
+                    ` : ''}
+                    ${course.schedule ? `
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>${course.schedule}</span>
+                        </div>
+                    ` : ''}
+                    ${course.capacity ? `
+                        <div class="meta-item">
+                            <i class="fas fa-chair"></i>
+                            <span>Capacidad: ${course.capacity}</span>
+                        </div>
+                    ` : ''}
                 </div>
+                
                 <div class="course-date">
                     <i class="fas fa-calendar"></i>
-                    <span>Creado: ${createdDate}</span>
+                    <span>Creado: ${formatDate(course.createdAt)}</span>
                 </div>
             </div>
+            
             <div class="course-actions">
-                <button class="course-btn view" onclick="viewCourse('${course.id}')" title="Ver curso">
+                <button class="course-btn view" onclick="viewCourse('${course.id}')" title="Ver detalles">
                     <i class="fas fa-eye"></i>
-                    Ver
                 </button>
-                <button class="course-btn edit" onclick="editCourseModal('${course.id}')" title="Editar curso">
+                <button class="course-btn edit" onclick="openCourseModal('${course.id}')" title="Editar">
                     <i class="fas fa-edit"></i>
-                    Editar
                 </button>
-                <button class="course-btn delete" onclick="confirmDeleteCourse('${course.id}')" title="Eliminar curso">
+                <button class="course-btn students" onclick="manageStudents('${course.id}')" title="Gestionar estudiantes">
+                    <i class="fas fa-user-graduate"></i>
+                </button>
+                <button class="course-btn delete" onclick="deleteCourse('${course.id}')" title="Eliminar">
                     <i class="fas fa-trash"></i>
-                    Eliminar
                 </button>
             </div>
         </div>
     `;
 }
 
-// ===== UTILIDADES (USAR LAS EXISTENTES) =====
-function generateUniqueId() {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
-}
-
-function formatDate(timestamp) {
-    if (!timestamp) return 'Sin fecha';
-    
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return date.toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-}
-
-// ===== ESTADOS DE INTERFAZ =====
-function showEmptyState() {
-    const coursesGrid = document.getElementById('coursesGrid');
-    coursesGrid.innerHTML = `
-        <div class="empty-state">
-            <div class="empty-illustration">
-                <i class="fas fa-chalkboard-teacher"></i>
-            </div>
-            <h3>No hay cursos registrados</h3>
-            <p>Comienza creando tu primer curso para organizar tu enseñanza</p>
-            <button class="empty-action-btn" onclick="openCourseModal()">
-                <i class="fas fa-plus"></i>
-                <span>Crear Primer Curso</span>
-            </button>
-        </div>
-    `;
-}
-
-function showLoadingState() {
-    const coursesGrid = document.getElementById('coursesGrid');
-    coursesGrid.innerHTML = `
-        <div class="loading-placeholder">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>Cargando cursos...</p>
-        </div>
-    `;
-}
-
-function showErrorState() {
-    const coursesGrid = document.getElementById('coursesGrid');
-    coursesGrid.innerHTML = `
-        <div class="empty-state error-state">
-            <div class="empty-illustration">
-                <i class="fas fa-exclamation-triangle"></i>
-            </div>
-            <h3>Error al cargar cursos</h3>
-            <p>Hubo un problema al cargar los cursos. Intenta recargar la página.</p>
-            <button class="empty-action-btn" onclick="window.location.reload()">
-                <i class="fas fa-refresh"></i>
-                <span>Recargar Página</span>
-            </button>
-        </div>
-    `;
-}
-
-// ===== EVENTOS Y MODAL (MANTENIENDO TU ESTRUCTURA ACTUAL) =====
-function setupCourseEvents() {
-    const addCourseBtn = document.getElementById('addCourseBtn');
-    if (addCourseBtn) {
-        addCourseBtn.addEventListener('click', () => openCourseModal());
-    }
-    
-    const courseForm = document.getElementById('course-form');
-    if (courseForm) {
-        courseForm.addEventListener('submit', handleSaveCourse);
-    }
-}
-
-function setupModal() {
-    const modal = document.getElementById('course-modal');
-    const closeBtn = modal?.querySelector('.close-modal');
-    const cancelBtn = modal?.querySelector('.cancel-btn');
-    const overlay = modal?.querySelector('.modal-overlay');
-    
-    if (closeBtn) closeBtn.addEventListener('click', closeCourseModal);
-    if (cancelBtn) cancelBtn.addEventListener('click', closeCourseModal);
-    if (overlay) overlay.addEventListener('click', closeCourseModal);
-    
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal?.style.display === 'flex') {
-            closeCourseModal();
-        }
-    });
-}
-
-function setupFilters() {
-    const searchInput = document.getElementById('course-search');
-    const levelFilter = document.getElementById('level-filter');
-    const statusFilter = document.getElementById('status-filter');
-    
-    if (searchInput) searchInput.addEventListener('input', debounce(filterCourses, 300));
-    if (levelFilter) levelFilter.addEventListener('change', filterCourses);
-    if (statusFilter) statusFilter.addEventListener('change', filterCourses);
+// ===== FUNCIONES AUXILIARES =====
+function getLevelDisplayName(level) {
+    const levels = {
+        'inicial': 'Inicial',
+        'primario': 'Primario',
+        'secundario': 'Secundario',
+        'universitario': 'Universitario',
+        'mixto': 'Mixto'
+    };
+    return levels[level] || 'Básico';
 }
 
 function filterCourses() {
@@ -344,32 +592,210 @@ function filterCourses() {
     const levelFilter = document.getElementById('level-filter')?.value || '';
     const statusFilter = document.getElementById('status-filter')?.value || '';
     
-    filteredCourses = allCourses.filter(course => {
-        const matchesSearch = !searchTerm || 
-            course.name.toLowerCase().includes(searchTerm) ||
-            (course.description && course.description.toLowerCase().includes(searchTerm));
+    const courseCards = document.querySelectorAll('.course-card');
+    
+    courseCards.forEach(card => {
+        const courseId = card.dataset.courseId;
+        const course = courses.find(c => c.id === courseId);
         
-        const matchesLevel = !levelFilter || course.level === levelFilter;
+        if (!course) {
+            card.style.display = 'none';
+            return;
+        }
         
-        const matchesStatus = !statusFilter || 
-            (statusFilter === 'active' && course.isActive) ||
-            (statusFilter === 'inactive' && !course.isActive);
+        let shouldShow = true;
         
-        return matchesSearch && matchesLevel && matchesStatus;
+        // Filtro de búsqueda
+        if (searchTerm) {
+            const courseName = course.name.toLowerCase();
+            const courseDescription = (course.description || '').toLowerCase();
+            if (!courseName.includes(searchTerm) && !courseDescription.includes(searchTerm)) {
+                shouldShow = false;
+            }
+        }
+        
+        // Filtro de nivel
+        if (levelFilter) {
+            if (course.level !== levelFilter) {
+                shouldShow = false;
+            }
+        }
+        
+        // Filtro de estado
+        if (statusFilter) {
+            if (statusFilter === 'active') {
+                if (!course.isActive) shouldShow = false;
+            } else if (statusFilter === 'inactive') {
+                if (course.isActive) shouldShow = false;
+            }
+        }
+        
+        card.style.display = shouldShow ? 'block' : 'none';
     });
-    
-    console.log(`🔍 Filtrado: ${filteredCourses.length} de ${allCourses.length} cursos`);
-    displayCourses();
 }
 
-function updateCoursesStats() {
-    const totalCourses = allCourses.length;
-    const activeCourses = allCourses.filter(course => course.isActive).length;
-    const totalStudents = allCourses.reduce((sum, course) => sum + (course.studentsCount || 0), 0);
+function viewCourse(courseId) {
+    const course = courses.find(c => c.id === courseId);
+    if (!course) return;
     
-    console.log('📊 Estadísticas:', { totalCourses, activeCourses, totalStudents });
+    const institution = institutions.find(i => i.id === course.institutionId);
+    
+    // Por ahora, mostrar información básica
+    alert(`
+Curso: ${course.name}
+Institución: ${institution ? institution.name : 'Sin institución'}
+Nivel: ${getLevelDisplayName(course.level)}
+Estudiantes: ${course.studentsCount || 0}
+Estado: ${course.isActive ? 'Activo' : 'Inactivo'}
+${course.description ? 'Descripción: ' + course.description : ''}
+    `);
 }
 
+function manageStudents(courseId) {
+    // Redirigir a estudiantes con filtro de curso
+    window.location.href = `estudiantes.html?course=${courseId}`;
+}
+
+// ===== FUNCIONES DE UTILIDAD =====
+function generateUniqueId(prefix = 'course') {
+    return `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'Fecha no disponible';
+    
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    } catch (error) {
+        return 'Fecha inválida';
+    }
+}
+
+function getUserData(key) {
+    if (!currentUser) return null;
+    return localStorage.getItem(`${currentUser.uid}_${key}`);
+}
+
+function setUserData(key, value) {
+    if (!currentUser) return;
+    localStorage.setItem(`${currentUser.uid}_${key}`, value);
+}
+
+// ===== FUNCIÓN showNotification COMPLETAMENTE CORREGIDA =====
+function showNotification(message, type = 'info') {
+    console.log(`${type.toUpperCase()}: ${message}`);
+    
+    // 🔥 CORRECCIÓN: Usar window.showNotification (NO showGlobalNotification)
+    if (typeof window.showNotification === 'function' && window.showNotification !== showNotification) {
+        // Usar la función global de app.js
+        window.showNotification(message, type);
+        return;
+    }
+    
+    // ✅ Fallback local mejorado si no existe la función global
+    createLocalNotification(message, type);
+}
+
+function createLocalNotification(message, type) {
+    // Remover notificación anterior si existe
+    const existingNotification = document.querySelector('.course-notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+    
+    // Crear nueva notificación
+    const notification = document.createElement('div');
+    notification.className = `course-notification ${type}`;
+    
+    const colors = {
+        success: '#28A745',
+        error: '#DC3545',
+        warning: '#FFC107',
+        info: '#17A2B8'
+    };
+    
+    const icons = {
+        success: 'check-circle',
+        error: 'times-circle',
+        warning: 'exclamation-triangle',
+        info: 'info-circle'
+    };
+    
+    notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <i class="fas fa-${icons[type] || icons.info}" style="color: white; font-size: 1.2rem;"></i>
+            <span style="flex: 1;">${message}</span>
+        </div>
+    `;
+    
+    // Estilos inline para asegurar visibilidad
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${colors[type] || colors.info};
+        color: white;
+        padding: 16px 24px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        font-family: 'Quicksand', sans-serif;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        max-width: 400px;
+        word-wrap: break-word;
+        animation: slideInFromRight 0.3s ease-out;
+    `;
+    
+    // Agregar animación CSS inline
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideInFromRight {
+            from { 
+                transform: translateX(100%); 
+                opacity: 0; 
+            }
+            to { 
+                transform: translateX(0); 
+                opacity: 1; 
+            }
+        }
+    `;
+    if (!document.querySelector('style[data-notification-styles]')) {
+        style.setAttribute('data-notification-styles', 'true');
+        document.head.appendChild(style);
+    }
+    
+    // Agregar al documento
+    document.body.appendChild(notification);
+    
+    // Auto-remover después de 4 segundos
+    setTimeout(() => {
+        notification.style.transform = 'translateX(120%)';
+        notification.style.opacity = '0';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 300);
+    }, 4000);
+}
+
+// ===== EXPORTAR FUNCIONES GLOBALES =====
+window.openCourseModal = openCourseModal;
+window.closeCourseModal = closeCourseModal;
+window.deleteCourse = deleteCourse;
+window.viewCourse = viewCourse;
+window.manageStudents = manageStudents;
+
+// ===== FUNCIONES DE UTILIDAD =====
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -382,326 +808,50 @@ function debounce(func, wait) {
     };
 }
 
-// ===== FUNCIONES GLOBALES CORREGIDAS =====
-let editingCourseId = null;
-
-window.openCourseModal = function(courseData = null) {
-    const modal = document.getElementById('course-modal');
-    const modalTitle = document.getElementById('modal-title');
-    const saveBtnText = document.getElementById('save-btn-text');
+function debugModalElements() {
+    const elements = [
+        'courseModal',
+        'courseForm', 
+        'courseName',
+        'courseInstitution',
+        'courseLevel'
+    ];
     
-    if (!modal) return;
-    
-    if (courseData) {
-        // Modo edición
-        modalTitle.textContent = 'Editar Curso';
-        saveBtnText.textContent = 'Actualizar Curso';
-        editingCourseId = courseData.id;
-        populateForm(courseData);
-    } else {
-        // Modo creación
-        modalTitle.textContent = 'Nuevo Curso';
-        saveBtnText.textContent = 'Guardar Curso';
-        editingCourseId = null;
-        resetForm();
-    }
-    
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    
-    // Focus en primer input
-    setTimeout(() => {
-        const firstInput = modal.querySelector('input:not([type="checkbox"])');
-        if (firstInput) firstInput.focus();
-    }, 100);
-};
-
-window.closeCourseModal = function() {
-    const modal = document.getElementById('course-modal');
-    if (modal) {
-        modal.style.display = 'none';
-        document.body.style.overflow = '';
-        editingCourseId = null;
-        resetForm();
-    }
-};
-
-window.viewCourse = function(courseId) {
-    console.log('👁️ Ver curso:', courseId);
-    window.location.href = `estudiantes.html?course=${courseId}`;
-};
-
-window.editCourseModal = function(courseId) {
-    console.log('✏️ Editar curso:', courseId);
-    try {
-        const course = allCourses.find(c => c.id === courseId);
-        if (course) {
-            openCourseModal(course);
-        } else {
-            showNotification('Curso no encontrado', 'error');
-        }
-    } catch (error) {
-        console.error('❌ Error cargando curso:', error);
-        showNotification('Error al cargar curso', 'error');
-    }
-};
-
-window.confirmDeleteCourse = function(courseId) {
-    console.log('🗑️ Confirmar eliminación:', courseId);
-    
-    const course = allCourses.find(c => c.id === courseId);
-    const courseName = course ? course.name : 'este curso';
-    
-    // Crear modal de confirmación personalizado
-    const confirmModal = document.createElement('div');
-    confirmModal.className = 'confirm-modal';
-    confirmModal.innerHTML = `
-        <div class="confirm-overlay"></div>
-        <div class="confirm-content">
-            <div class="confirm-header">
-                <i class="fas fa-exclamation-triangle"></i>
-                <h3>Confirmar eliminación</h3>
-            </div>
-            <div class="confirm-body">
-                <p>¿Estás seguro de eliminar el curso <strong>"${courseName}"</strong>?</p>
-                <p class="warning">Esta acción no se puede deshacer y eliminará todos los estudiantes asociados.</p>
-            </div>
-            <div class="confirm-actions">
-                <button class="confirm-cancel">Cancelar</button>
-                <button class="confirm-delete">Eliminar Curso</button>
-            </div>
-        </div>
-    `;
-    
-    // Agregar estilos del modal de confirmación
-    if (!document.querySelector('#confirm-modal-styles')) {
-        const styles = document.createElement('style');
-        styles.id = 'confirm-modal-styles';
-        styles.textContent = `
-            .confirm-modal {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                background: rgba(15, 23, 42, 0.9);
-                backdrop-filter: blur(8px);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 9999;
-                animation: fadeIn 0.3s ease;
-            }
-            
-            .confirm-overlay {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-            }
-            
-            .confirm-content {
-                background: var(--edu-bg-primary);
-                border: 1px solid var(--edu-border);
-                border-radius: var(--edu-radius-2xl);
-                box-shadow: var(--edu-shadow-2xl);
-                max-width: 500px;
-                width: 90%;
-                position: relative;
-                z-index: 1;
-                animation: slideInUp 0.4s ease;
-            }
-            
-            .confirm-header {
-                padding: var(--edu-space-2xl);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
-                color: white;
-                border-radius: var(--edu-radius-2xl) var(--edu-radius-2xl) 0 0;
-                display: flex;
-                align-items: center;
-                gap: var(--edu-space-md);
-            }
-            
-            .confirm-header i {
-                font-size: 1.5rem;
-            }
-            
-            .confirm-header h3 {
-                margin: 0;
-                font-size: 1.3rem;
-                font-weight: 700;
-            }
-            
-            .confirm-body {
-                padding: var(--edu-space-2xl);
-            }
-            
-            .confirm-body p {
-                margin: 0 0 var(--edu-space-md) 0;
-                color: var(--edu-text-primary);
-                font-size: 1rem;
-                line-height: 1.6;
-            }
-            
-            .confirm-body .warning {
-                color: #ef4444;
-                font-weight: 600;
-                font-size: 0.9rem;
-            }
-            
-            .confirm-actions {
-                padding: var(--edu-space-2xl);
-                border-top: 1px solid var(--edu-border);
-                display: flex;
-                gap: var(--edu-space-lg);
-                justify-content: flex-end;
-            }
-            
-            .confirm-cancel,
-            .confirm-delete {
-                padding: var(--edu-space-md) var(--edu-space-xl);
-                border-radius: var(--edu-radius-lg);
-                font-family: inherit;
-                font-size: 0.95rem;
-                font-weight: 700;
-                cursor: pointer;
-                transition: var(--edu-transition);
-                border: none;
-                text-transform: uppercase;
-                letter-spacing: 0.3px;
-            }
-            
-            .confirm-cancel {
-                background: var(--edu-bg-secondary);
-                color: var(--edu-text-secondary);
-                border: 2px solid var(--edu-border);
-            }
-            
-            .confirm-cancel:hover {
-                background: var(--edu-bg-tertiary);
-                transform: translateY(-2px);
-            }
-            
-            .confirm-delete {
-                background: linear-gradient(135deg, #ef4444, #dc2626);
-                color: white;
-                box-shadow: var(--edu-shadow-md);
-            }
-            
-            .confirm-delete:hover {
-                transform: translateY(-2px);
-                box-shadow: var(--edu-shadow-lg);
-            }
-        `;
-        document.head.appendChild(styles);
-    }
-    
-    document.body.appendChild(confirmModal);
-    document.body.style.overflow = 'hidden';
-    
-    // Configurar eventos
-    const cancelBtn = confirmModal.querySelector('.confirm-cancel');
-    const deleteBtn = confirmModal.querySelector('.confirm-delete');
-    const overlay = confirmModal.querySelector('.confirm-overlay');
-    
-    const closeModal = () => {
-        confirmModal.remove();
-        document.body.style.overflow = '';
-    };
-    
-    const confirmDelete = async () => {
-        closeModal();
-        try {
-            await deleteCourse(courseId);
-        } catch (error) {
-            console.error('❌ Error eliminando curso:', error);
-        }
-    };
-    
-    cancelBtn.addEventListener('click', closeModal);
-    deleteBtn.addEventListener('click', confirmDelete);
-    overlay.addEventListener('click', closeModal);
-    
-    // Escape key
-    const handleEscape = (e) => {
-        if (e.key === 'Escape') {
-            closeModal();
-            document.removeEventListener('keydown', handleEscape);
-        }
-    };
-    document.addEventListener('keydown', handleEscape);
-};
-
-// ===== AGREGAR FUNCIÓN PARA RESETEAR FORMULARIO =====
-function resetForm() {
-    const form = document.getElementById('course-form');
-    if (form) {
-        form.reset();
-        // Marcar curso como activo por defecto
-        const activeCheckbox = document.getElementById('courseActive');
-        if (activeCheckbox) {
-            activeCheckbox.checked = true;
-        }
-    }
+    console.log('🔍 Diagnóstico de elementos del modal:');
+    elements.forEach(id => {
+        const element = document.getElementById(id);
+        console.log(`  ${id}: ${element ? '✅' : '❌'}`);
+    });
 }
 
-// ===== CORREGIR FUNCIÓN PARA MANEJAR GUARDADO =====
-async function handleSaveCourse(event) {
-    event.preventDefault();
+
+// ===== FUNCIÓN DE DEBUG =====
+function debugCourseForm() {
+    console.log('🔍 ===== DEBUG FORMULARIO DE CURSO =====');
     
-    const form = event.target;
-    const formData = new FormData(form);
+    const elements = [
+        'courseModal',
+        'courseForm',
+        'courseName',
+        'courseInstitution', // 👈 VERIFICAR ESTE ELEMENTO
+        'courseLevel',
+        'courseDescription'
+    ];
     
-    const courseData = {
-        name: formData.get('name'),
-        level: formData.get('level'),
-        classroom: formData.get('classroom'),
-        capacity: parseInt(formData.get('capacity')) || null,
-        description: formData.get('description'),
-        isActive: formData.get('isActive') === 'on'
-    };
-    
-    if (!courseData.name || !courseData.level) {
-        showNotification('Por favor completa los campos obligatorios', 'error');
-        return;
-    }
-    
-    try {
-        if (editingCourseId) {
-            // Actualizar curso existente
-            await updateCourse(editingCourseId, courseData);
-        } else {
-            // Crear nuevo curso
-            await createCourse(courseData);
+    elements.forEach(id => {
+        const element = document.getElementById(id);
+        console.log(`  ${id}: ${element ? '✅ Encontrado' : '❌ No encontrado'}`);
+        if (element && element.tagName === 'SELECT') {
+            console.log(`    Opciones: ${element.options.length}`);
         }
-        
-        closeCourseModal();
-        
-    } catch (error) {
-        console.error('❌ Error guardando curso:', error);
-        showNotification('Error al guardar curso', 'error');
-    }
-}
-
-// ===== AGREGAR FUNCIÓN showNotification SI NO EXISTE =====
-function showNotification(message, type = 'info', duration = 3000) {
-    // Si ya existe en app.js, no duplicar
-    if (window.showNotification) {
-        window.showNotification(message, type, duration);
-        return;
-    }
+    });
     
-    // Implementación básica si no existe
-    console.log(`${type.toUpperCase()}: ${message}`);
-    alert(message);
+    console.log(`  Instituciones cargadas: ${institutions.length}`);
+    console.log(`  Usuario actual: ${currentUser?.uid || 'No disponible'}`);
+    console.log('🔍 ===== FIN DEBUG =====');
 }
 
-// ===== LIMPIEZA =====
-window.addEventListener('beforeunload', () => {
-    if (coursesListener) {
-        coursesListener();
-    }
-});
+// Exponer función de debug globalmente
+window.debugCourseForm = debugCourseForm;
 
-console.log('✅ Cursos.js integrado con sistema existente cargado');
+console.log('✅ Módulo de cursos cargado completamente - v2.2 CORREGIDO FINAL');

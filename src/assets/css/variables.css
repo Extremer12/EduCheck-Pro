@@ -1,0 +1,283 @@
+/**
+ * EduCheck Pro - Variables CSS Centralizadas v2.0
+ * Sistema de diseño unificado para toda la aplicación
+ */
+
+/* ===== PALETA DE COLORES PRINCIPAL ===== */
+:root {
+    /* 🎨 COLORES PRIMARIOS EDUCHECK PRO */
+    --educheck-primary: #FFB6C1;           /* Rosa pastel principal */
+    --educheck-primary-rgb: 255, 182, 193;
+    --educheck-primary-light: #FFD1DC;     /* Rosa más claro */
+    --educheck-primary-dark: #FF69B4;      /* Rosa más intenso */
+    
+    --educheck-secondary: #B0E0E6;         /* Azul claro complementario */
+    --educheck-secondary-rgb: 176, 224, 230;
+    --educheck-secondary-light: #E0F6FF;   /* Azul muy claro */
+    --educheck-secondary-dark: #87CEEB;    /* Azul más intenso */
+    
+    --educheck-accent: #98FB98;            /* Verde menta */
+    --educheck-accent-rgb: 152, 251, 152;
+    --educheck-accent-secondary: #DDA0DD;  /* Ciruela */
+    --educheck-accent-tertiary: #F0E68C;   /* Khaki */
+    
+    /* 🌈 GRADIENTES PROFESIONALES */
+    --educheck-gradient-primary: linear-gradient(135deg, 
+        var(--educheck-primary) 0%, 
+        var(--educheck-accent-secondary) 50%, 
+        var(--educheck-secondary) 100%);
+    
+    --educheck-gradient-soft: linear-gradient(135deg, 
+        rgba(255, 182, 193, 0.1) 0%, 
+        rgba(176, 224, 230, 0.1) 100%);
+    
+    --educheck-gradient-card: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.95) 0%, 
+        rgba(255, 255, 255, 0.98) 100%);
+    
+    --educheck-gradient-header: linear-gradient(135deg, 
+        var(--educheck-primary) 0%, 
+        var(--educheck-accent-secondary) 100%);
+    
+    --educheck-gradient-button: linear-gradient(135deg, 
+        var(--educheck-primary) 0%, 
+        var(--educheck-primary-dark) 100%);
+    
+    /* 🎯 SISTEMA DE COLORES SEMÁNTICOS */
+    --educheck-success: #28A745;
+    --educheck-success-light: #D4EDDA;
+    --educheck-success-dark: #155724;
+    
+    --educheck-warning: #FFC107;
+    --educheck-warning-light: #FFF3CD;
+    --educheck-warning-dark: #856404;
+    
+    --educheck-danger: #DC3545;
+    --educheck-danger-light: #F8D7DA;
+    --educheck-danger-dark: #721C24;
+    
+    --educheck-info: #17A2B8;
+    --educheck-info-light: #D1ECF1;
+    --educheck-info-dark: #0C5460;
+    
+    /* 📝 SISTEMA DE TIPOGRAFÍA */
+    --educheck-font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --educheck-font-family-mono: 'Fira Code', 'JetBrains Mono', 'Monaco', monospace;
+    
+    --educheck-font-size-xs: 0.75rem;      /* 12px */
+    --educheck-font-size-sm: 0.875rem;     /* 14px */
+    --educheck-font-size-base: 1rem;       /* 16px */
+    --educheck-font-size-lg: 1.125rem;     /* 18px */
+    --educheck-font-size-xl: 1.25rem;      /* 20px */
+    --educheck-font-size-2xl: 1.5rem;      /* 24px */
+    --educheck-font-size-3xl: 1.875rem;    /* 30px */
+    --educheck-font-size-4xl: 2.25rem;     /* 36px */
+    --educheck-font-size-5xl: 3rem;        /* 48px */
+    
+    --educheck-font-weight-light: 300;
+    --educheck-font-weight-normal: 400;
+    --educheck-font-weight-medium: 500;
+    --educheck-font-weight-semibold: 600;
+    --educheck-font-weight-bold: 700;
+    --educheck-font-weight-extrabold: 800;
+    
+    --educheck-line-height-tight: 1.25;
+    --educheck-line-height-normal: 1.5;
+    --educheck-line-height-relaxed: 1.75;
+    
+    /* 📏 SISTEMA DE ESPACIADO */
+    --educheck-space-0: 0;
+    --educheck-space-px: 1px;
+    --educheck-space-0-5: 0.125rem;        /* 2px */
+    --educheck-space-1: 0.25rem;           /* 4px */
+    --educheck-space-1-5: 0.375rem;        /* 6px */
+    --educheck-space-2: 0.5rem;            /* 8px */
+    --educheck-space-2-5: 0.625rem;        /* 10px */
+    --educheck-space-3: 0.75rem;           /* 12px */
+    --educheck-space-3-5: 0.875rem;        /* 14px */
+    --educheck-space-4: 1rem;              /* 16px */
+    --educheck-space-5: 1.25rem;           /* 20px */
+    --educheck-space-6: 1.5rem;            /* 24px */
+    --educheck-space-7: 1.75rem;           /* 28px */
+    --educheck-space-8: 2rem;              /* 32px */
+    --educheck-space-9: 2.25rem;           /* 36px */
+    --educheck-space-10: 2.5rem;           /* 40px */
+    --educheck-space-11: 2.75rem;          /* 44px */
+    --educheck-space-12: 3rem;             /* 48px */
+    --educheck-space-14: 3.5rem;           /* 56px */
+    --educheck-space-16: 4rem;             /* 64px */
+    --educheck-space-20: 5rem;             /* 80px */
+    --educheck-space-24: 6rem;             /* 96px */
+    --educheck-space-28: 7rem;             /* 112px */
+    --educheck-space-32: 8rem;             /* 128px */
+    
+    /* 🔲 SISTEMA DE BORDES Y RADIOS */
+    --educheck-border-width-0: 0;
+    --educheck-border-width-1: 1px;
+    --educheck-border-width-2: 2px;
+    --educheck-border-width-4: 4px;
+    --educheck-border-width-8: 8px;
+    
+    --educheck-radius-none: 0;
+    --educheck-radius-sm: 0.125rem;        /* 2px */
+    --educheck-radius-base: 0.25rem;       /* 4px */
+    --educheck-radius-md: 0.375rem;        /* 6px */
+    --educheck-radius-lg: 0.5rem;          /* 8px */
+    --educheck-radius-xl: 0.75rem;         /* 12px */
+    --educheck-radius-2xl: 1rem;           /* 16px */
+    --educheck-radius-3xl: 1.5rem;         /* 24px */
+    --educheck-radius-full: 9999px;
+    
+    /* 🌘 SOMBRAS PROFESIONALES */
+    --educheck-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --educheck-shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --educheck-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --educheck-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --educheck-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --educheck-shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    --educheck-shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+    
+    /* 🎭 TRANSICIONES Y ANIMACIONES */
+    --educheck-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --educheck-transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --educheck-transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    
+    --educheck-ease-linear: linear;
+    --educheck-ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --educheck-ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --educheck-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* 📱 BREAKPOINTS */
+    --educheck-screen-sm: 640px;
+    --educheck-screen-md: 768px;
+    --educheck-screen-lg: 1024px;
+    --educheck-screen-xl: 1280px;
+    --educheck-screen-2xl: 1536px;
+    
+    /* 🔢 Z-INDEX SYSTEM */
+    --educheck-z-0: 0;
+    --educheck-z-10: 10;
+    --educheck-z-20: 20;
+    --educheck-z-30: 30;
+    --educheck-z-40: 40;
+    --educheck-z-50: 50;
+    --educheck-z-dropdown: 1000;
+    --educheck-z-sticky: 1020;
+    --educheck-z-fixed: 1030;
+    --educheck-z-modal-backdrop: 1040;
+    --educheck-z-modal: 1050;
+    --educheck-z-popover: 1060;
+    --educheck-z-tooltip: 1070;
+    --educheck-z-toast: 1080;
+    
+    /* 🌞 TEMA CLARO (por defecto) */
+    --educheck-bg-primary: #FFFFFF;
+    --educheck-bg-secondary: #F8FAFC;
+    --educheck-bg-tertiary: #F1F5F9;
+    --educheck-bg-quaternary: #E2E8F0;
+    
+    --educheck-text-primary: #1F2937;
+    --educheck-text-secondary: #374151;
+    --educheck-text-tertiary: #6B7280;
+    --educheck-text-quaternary: #9CA3AF;
+    --educheck-text-inverse: #FFFFFF;
+    
+    --educheck-border-primary: #E5E7EB;
+    --educheck-border-secondary: #D1D5DB;
+    --educheck-border-tertiary: #9CA3AF;
+    
+    --educheck-surface-primary: #FFFFFF;
+    --educheck-surface-secondary: #F9FAFB;
+    --educheck-surface-tertiary: #F3F4F6;
+}
+
+/* 🌙 TEMA OSCURO */
+[data-theme="dark"],
+body.dark-mode {
+    --educheck-primary: #FF69B4;
+    --educheck-secondary: #87CEEB;
+    --educheck-accent: #90EE90;
+    
+    --educheck-bg-primary: #111827;
+    --educheck-bg-secondary: #1F2937;
+    --educheck-bg-tertiary: #374151;
+    --educheck-bg-quaternary: #4B5563;
+    
+    --educheck-text-primary: #F9FAFB;
+    --educheck-text-secondary: #F3F4F6;
+    --educheck-text-tertiary: #D1D5DB;
+    --educheck-text-quaternary: #9CA3AF;
+    --educheck-text-inverse: #111827;
+    
+    --educheck-border-primary: #374151;
+    --educheck-border-secondary: #4B5563;
+    --educheck-border-tertiary: #6B7280;
+    
+    --educheck-surface-primary: #1F2937;
+    --educheck-surface-secondary: #111827;
+    --educheck-surface-tertiary: #0F172A;
+    
+    /* Ajustar sombras para modo oscuro */
+    --educheck-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --educheck-shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+    --educheck-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --educheck-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    --educheck-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    --educheck-shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+}
+
+/* 🎨 UTILIDADES DE COLOR */
+.text-primary { color: var(--educheck-text-primary); }
+.text-secondary { color: var(--educheck-text-secondary); }
+.text-tertiary { color: var(--educheck-text-tertiary); }
+.text-success { color: var(--educheck-success); }
+.text-warning { color: var(--educheck-warning); }
+.text-danger { color: var(--educheck-danger); }
+.text-info { color: var(--educheck-info); }
+
+.bg-primary { background-color: var(--educheck-bg-primary); }
+.bg-secondary { background-color: var(--educheck-bg-secondary); }
+.bg-tertiary { background-color: var(--educheck-bg-tertiary); }
+
+/* 📐 UTILIDADES DE ESPACIADO */
+.p-0 { padding: var(--educheck-space-0); }
+.p-1 { padding: var(--educheck-space-1); }
+.p-2 { padding: var(--educheck-space-2); }
+.p-3 { padding: var(--educheck-space-3); }
+.p-4 { padding: var(--educheck-space-4); }
+.p-5 { padding: var(--educheck-space-5); }
+.p-6 { padding: var(--educheck-space-6); }
+.p-8 { padding: var(--educheck-space-8); }
+
+.m-0 { margin: var(--educheck-space-0); }
+.m-1 { margin: var(--educheck-space-1); }
+.m-2 { margin: var(--educheck-space-2); }
+.m-3 { margin: var(--educheck-space-3); }
+.m-4 { margin: var(--educheck-space-4); }
+.m-5 { margin: var(--educheck-space-5); }
+.m-6 { margin: var(--educheck-space-6); }
+.m-8 { margin: var(--educheck-space-8); }
+
+/* 🔄 UTILIDADES DE TRANSICIÓN */
+.transition-fast { transition: all var(--educheck-transition-fast); }
+.transition-base { transition: all var(--educheck-transition-base); }
+.transition-slow { transition: all var(--educheck-transition-slow); }
+
+/* 🌘 UTILIDADES DE SOMBRA */
+.shadow-sm { box-shadow: var(--educheck-shadow-sm); }
+.shadow-base { box-shadow: var(--educheck-shadow-base); }
+.shadow-md { box-shadow: var(--educheck-shadow-md); }
+.shadow-lg { box-shadow: var(--educheck-shadow-lg); }
+.shadow-xl { box-shadow: var(--educheck-shadow-xl); }
+
+/* 🔲 UTILIDADES DE RADIO */
+.rounded-none { border-radius: var(--educheck-radius-none); }
+.rounded-sm { border-radius: var(--educheck-radius-sm); }
+.rounded-base { border-radius: var(--educheck-radius-base); }
+.rounded-md { border-radius: var(--educheck-radius-md); }
+.rounded-lg { border-radius: var(--educheck-radius-lg); }
+.rounded-xl { border-radius: var(--educheck-radius-xl); }
+.rounded-2xl { border-radius: var(--educheck-radius-2xl); }
+.rounded-full { border-radius: var(--educheck-radius-full); }
+
+console.log('✅ Variables CSS centralizadas v2.0 cargadas');

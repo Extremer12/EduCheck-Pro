@@ -146,6 +146,8 @@ html {
     font-size: 16px;
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
     text-size-adjust: 100%;
 }
 
@@ -249,8 +251,8 @@ body {
 /* ===== HEADER PRINCIPAL PROFESIONAL ===== */
 .main-header {
     background: var(--edu-gradient-header);
-    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--edu-border);
     position: sticky;
     top: 0;
@@ -311,8 +313,8 @@ body {
     transition: var(--edu-transition);
     position: relative;
     z-index: calc(var(--edu-z-dropdown) + 1);
-    backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 }
 
 .menu-toggle:hover {
@@ -352,8 +354,8 @@ body {
     width: 380px;
     height: 100vh;
     background: var(--edu-bg-card);
-    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
     border-left: 1px solid var(--edu-border);
     box-shadow: var(--edu-shadow-2xl);
     z-index: var(--edu-z-dropdown);
@@ -372,8 +374,8 @@ body {
     width: 100vw;
     height: 100vh;
     background: rgba(15, 23, 42, 0.7);
-    backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
     z-index: calc(var(--edu-z-dropdown) - 1);
     opacity: 0;
     visibility: hidden;
@@ -638,8 +640,8 @@ input:checked + .toggle-slider:before {
 /* ===== WELCOME SECTION ELEGANTE ===== */
 .welcome-section {
     background: var(--edu-gradient-card);
-    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
     border: 1px solid var(--edu-border);
     border-radius: var(--edu-radius-2xl);
     padding: var(--edu-space-2xl);
@@ -771,8 +773,8 @@ input:checked + .toggle-slider:before {
     align-items: center;
     justify-content: center;
     font-size: 2.5rem;
-    backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     border: 2px solid rgba(255, 255, 255, 0.3);
     transition: var(--edu-transition);
 }
@@ -811,8 +813,8 @@ input:checked + .toggle-slider:before {
     gap: var(--edu-space-sm);
     transition: var(--edu-transition);
     z-index: 1;
-    backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
@@ -877,8 +879,8 @@ input:checked + .toggle-slider:before {
 /* ===== CARDS SYSTEM PROFESIONAL ===== */
 .edu-card {
     background: var(--edu-gradient-card);
-    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
     border: 1px solid var(--edu-border);
     border-radius: var(--edu-radius-2xl);
     padding: var(--edu-space-2xl);
@@ -916,8 +918,8 @@ input:checked + .toggle-slider:before {
 .tools-section,
 .recent-gallery-section {
     background: var(--edu-gradient-card);
-    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
     border: 1px solid var(--edu-border);
     border-radius: var(--edu-radius-2xl);
     padding: var(--edu-space-2xl);
@@ -1305,8 +1307,8 @@ input:checked + .toggle-slider:before {
     align-items: center;
     justify-content: center;
     z-index: 100;
-    backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 }
 
 .scroll-to-top:hover {
@@ -1322,8 +1324,8 @@ input:checked + .toggle-slider:before {
 /* ===== FORMULARIOS PROFESIONALES ===== */
 .edu-form {
     background: var(--edu-gradient-card);
-    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
     border: 1px solid var(--edu-border);
     border-radius: var(--edu-radius-2xl);
     padding: var(--edu-space-2xl);
@@ -1441,8 +1443,8 @@ input:checked + .toggle-slider:before {
     justify-content: center;
     letter-spacing: 0.01em;
     box-shadow: var(--edu-shadow-sm);
-    backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 }
 
 .edu-btn:hover {
@@ -1572,8 +1574,8 @@ input:checked + .toggle-slider:before {
     right: 0;
     bottom: 0;
     background: rgba(15, 23, 42, 0.8);
-    backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
     z-index: var(--edu-z-modal);
     display: flex;
     align-items: center;
@@ -1591,8 +1593,8 @@ input:checked + .toggle-slider:before {
 
 .edu-modal {
     background: var(--edu-gradient-card);
-    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
     border: 1px solid var(--edu-border);
     border-radius: var(--edu-radius-2xl);
     box-shadow: var(--edu-shadow-2xl);
@@ -1669,8 +1671,8 @@ input:checked + .toggle-slider:before {
     min-width: 320px;
     max-width: 480px;
     background: var(--edu-gradient-card);
-    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
     border: 1px solid var(--edu-border);
     border-radius: var(--edu-radius-xl);
     box-shadow: var(--edu-shadow-2xl);
@@ -2368,8 +2370,8 @@ input:checked + .toggle-slider:before {
 /* ===== FORMULARIO DE ACTIVIDADES ===== */
 .activity-form-section {
     background: var(--edu-gradient-card);
-    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
     border: 1px solid var(--edu-border);
     border-radius: var(--edu-radius-2xl);
     padding: var(--edu-space-2xl);
@@ -2530,8 +2532,8 @@ input:checked + .toggle-slider:before {
 /* ===== ACTIVIDADES GRID ===== */
 .activities-filters-section {
     background: var(--edu-gradient-card);
-    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
     border: 1px solid var(--edu-border);
     border-radius: var(--edu-radius-2xl);
     padding: var(--edu-space-2xl);
@@ -3018,8 +3020,8 @@ input:checked + .toggle-slider:before {
 
 .last-class-card {
     background: var(--edu-gradient-card);
-    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
     border: 1px solid var(--edu-border);
     border-radius: var(--edu-radius-2xl);
     padding: var(--edu-space-xl);
@@ -3096,8 +3098,8 @@ input:checked + .toggle-slider:before {
 /* ===== ACCESOS RÁPIDOS ===== */
 .quick-access-section {
     background: var(--edu-gradient-card);
-    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
     border: 1px solid var(--edu-border);
     border-radius: var(--edu-radius-2xl);
     padding: var(--edu-space-2xl);
@@ -3231,8 +3233,8 @@ input:checked + .toggle-slider:before {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
     z-index: var(--edu-z-modal);
     display: none;
     align-items: center;
@@ -3300,8 +3302,8 @@ input:checked + .toggle-slider:before {
 /* ===== ACTIVIDADES RECIENTES RENOMBRADA ===== */
 .recent-activities-section {
     background: var(--edu-gradient-card);
-    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
     border: 1px solid var(--edu-border);
     border-radius: var(--edu-radius-2xl);
     padding: var(--edu-space-2xl);

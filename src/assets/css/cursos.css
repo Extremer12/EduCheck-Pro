@@ -27,8 +27,8 @@
   margin-bottom: var(--edu-space-2xl);
   padding: var(--edu-space-2xl);
   background: var(--edu-gradient-card);
-  backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
   border: 1px solid var(--edu-border);
   border-radius: var(--edu-radius-2xl);
   box-shadow: var(--edu-shadow-lg);
@@ -114,8 +114,8 @@
   gap: var(--edu-space-lg);
   align-items: center;
   background: var(--edu-gradient-card);
-  backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
   border: 1px solid var(--edu-border);
   border-radius: var(--edu-radius-xl);
   padding: var(--edu-space-xl);
@@ -209,8 +209,8 @@
   text-align: center;
   padding: var(--edu-space-4xl) var(--edu-space-2xl);
   background: var(--edu-gradient-card);
-  backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
   border: 2px dashed var(--edu-border);
   border-radius: var(--edu-radius-2xl);
   box-shadow: var(--edu-shadow-lg);
@@ -293,8 +293,8 @@
   padding: var(--edu-space-4xl) var(--edu-space-2xl);
   color: var(--edu-text-muted);
   background: var(--edu-gradient-card);
-  backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
   border: 1px solid var(--edu-border);
   border-radius: var(--edu-radius-2xl);
   box-shadow: var(--edu-shadow-sm);
@@ -321,8 +321,8 @@
   width: 100vw;
   height: 100vh;
   background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   display: none;
   align-items: center;
   justify-content: center;
@@ -698,8 +698,8 @@
 /* ===== TARJETAS DE CURSOS ===== */
 .course-card {
     background: var(--edu-gradient-card);
-    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
     border: 1px solid var(--edu-border);
     border-radius: var(--edu-radius-2xl);
     box-shadow: var(--edu-shadow-md);
@@ -733,8 +733,8 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 }
 
 .course-status {
@@ -745,8 +745,8 @@
     font-weight: 600;
     padding: var(--edu-space-sm) var(--edu-space-md);
     border-radius: var(--edu-radius-lg);
-    backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 }
 
 .course-status.active {

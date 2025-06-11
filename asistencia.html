@@ -190,7 +190,7 @@
         </section>
 
         <!-- Panel de Asistencia -->
-        <section class="attendance-panel" id="attendancePanel" style="display: none;">
+        <section class="attendance-panel hidden" id="attendancePanel">
             <!-- Información de la Sesión -->
             <div class="session-info-card">
                 <div class="session-header">
@@ -296,7 +296,7 @@
                     </div>
                     
                     <div class="filter-controls">
-                        <select id="statusFilter" class="filter-select">
+                        <select id="statusFilter" class="filter-select" aria-label="Filtrar estudiantes por estado de asistencia">
                             <option value="all">Todos los estados</option>
                             <option value="present">Solo presentes</option>
                             <option value="absent">Solo ausentes</option>
@@ -336,7 +336,7 @@
                     </button>
                 </div>
             </div>
-        </section>
+        </>
 
         <!-- Historial de Asistencias -->
         <section class="attendance-history" id="attendanceHistory" style="display: none;">
@@ -406,7 +406,7 @@
                     <i class="fas fa-user-graduate"></i>
                     Detalles del Estudiante
                 </h3>
-                <buttonbutton class="close-modal" onclick="closeStudentDetailsModal()" aria-label="Cerrar modal">
+                <button class="close-modal" onclick="closeStudentDetailsModal()" aria-label="Cerrar modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>

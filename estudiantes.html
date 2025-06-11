@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <!-- Meta tags primero -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Gestión de Estudiantes - EduCheck Pro">
@@ -18,7 +17,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="edu-system-ready students-page">
-    <!-- ===== HEADER UNIFICADO IDÉNTICO A OTRAS PÁGINAS ===== -->
+    <!-- ===== HEADER UNIFICADO ===== -->
     <header class="main-header">
         <div class="header-container">
             <div class="header-brand">
@@ -39,7 +38,7 @@
     <!-- ===== OVERLAY DEL MENÚ ===== -->
     <div class="menu-overlay" id="menuOverlay"></div>
 
-    <!-- ===== MENÚ DESPLEGABLE IDÉNTICO A OTRAS PÁGINAS ===== -->
+    <!-- ===== MENÚ DESPLEGABLE ===== -->
     <div class="dropdown-menu" id="dropdownMenu">
         <div class="menu-header">
             <button class="menu-close" id="menuClose" aria-label="Cerrar menú">
@@ -73,6 +72,10 @@
                 <i class="fas fa-user-graduate"></i>
                 <span>Estudiantes</span>
             </a>
+            <a href="asistencia.html" class="menu-item">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Asistencia</span>
+            </a>
             <a href="actividades.html" class="menu-item">
                 <i class="fas fa-calendar-check"></i>
                 <span>Actividades</span>
@@ -101,10 +104,9 @@
                 <span>Cerrar Sesión</span>
             </a>
         </nav>
-        </div>
     </div>
 
-    <!-- ===== CONTENIDO PRINCIPAL (CORREGIDO PARA HEADER UNIFICADO) ===== -->
+    <!-- ===== CONTENIDO PRINCIPAL ===== -->
     <main class="main-content">
         <!-- Controles principales -->
         <section class="students-controls">
@@ -124,13 +126,13 @@
                     </button>
                     
                     <button class="action-btn secondary" id="bulk-import-btn">
-                        <i class="fas fa-upload"></i>
-                        Importación Masiva
+                        <i class="fas fa-file-import"></i>
+                        Importar
                     </button>
                     
                     <button class="action-btn tertiary" id="export-students-btn">
-                        <i class="fas fa-download"></i>
-                        Exportar Lista
+                        <i class="fas fa-file-export"></i>
+                        Exportar
                     </button>
                 </div>
             </div>
@@ -142,7 +144,7 @@
                 <div class="filter-group">
                     <label for="search-students">
                         <i class="fas fa-search"></i>
-                        Buscar estudiante
+                        Buscar
                     </label>
                     <input type="text" id="search-students" placeholder="Nombre, apellido o documento...">
                 </div>
@@ -169,11 +171,11 @@
                 
                 <div class="filter-group">
                     <label for="filter-status">
-                        <i class="fas fa-toggle-on"></i>
+                        <i class="fas fa-user-check"></i>
                         Estado
                     </label>
                     <select id="filter-status">
-                        <option value="">Todos</option>
+                        <option value="">Todos los estados</option>
                         <option value="active">Activos</option>
                         <option value="inactive">Inactivos</option>
                     </select>
@@ -198,10 +200,10 @@
                 <div class="list-info">
                     <h3 id="students-count">0 estudiantes</h3>
                     <div class="view-toggles">
-                        <button class="view-toggle active" id="grid-view" title="Vista de tarjetas">
+                        <button class="view-toggle active" data-view="grid" title="Vista en cuadrícula">
                             <i class="fas fa-th-large"></i>
                         </button>
-                        <button class="view-toggle" id="list-view" title="Vista de lista">
+                        <button class="view-toggle" data-view="list" title="Vista en lista">
                             <i class="fas fa-list"></i>
                         </button>
                     </div>
@@ -211,22 +213,10 @@
             <div id="students-grid" class="students-grid">
                 <!-- Estudiantes se cargan dinámicamente -->
             </div>
-            
-            <div id="empty-state" class="empty-state" style="display: none;">
-                <div class="empty-icon">
-                    <i class="fas fa-user-graduate"></i>
-                </div>
-                <h3>No hay estudiantes registrados</h3>
-                <p>Comienza agregando tu primer estudiante o importa una lista existente</p>
-                <button class="empty-action-btn" onclick="openAddStudentModal()">
-                    <i class="fas fa-plus"></i>
-                    Agregar Primer Estudiante
-                </button>
-            </div>
         </section>
     </main>
 
-    <!-- Modal: Agregar/Editar Estudiante -->
+    <!-- ===== MODAL: AGREGAR/EDITAR ESTUDIANTE ===== -->
     <div class="modal" id="student-modal">
         <div class="modal-content student-modal-content">
             <div class="modal-header">
@@ -247,22 +237,34 @@
                             <i class="fas fa-user"></i>
                             Información Personal
                         </h4>
-                        
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="student-name">Nombre Completo *</label>
-                                <input type="text" id="student-name" name="studentName" required placeholder="Nombre y apellido">
+                                <label for="student-name">
+                                    <i class="fas fa-user"></i>
+                                    Nombre Completo *
+                                </label>
+                                <input type="text" id="student-name" name="name" required 
+                                       placeholder="Ingresa el nombre completo del estudiante">
                             </div>
                         </div>
                         
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="student-email">Email</label>
-                                <input type="email" id="student-email" name="studentEmail" placeholder="estudiante@email.com">
+                                <label for="student-email">
+                                    <i class="fas fa-envelope"></i>
+                                    Correo Electrónico
+                                </label>
+                                <input type="email" id="student-email" name="email" 
+                                       placeholder="correo@ejemplo.com">
                             </div>
+                            
                             <div class="form-group">
-                                <label for="student-phone">Teléfono</label>
-                                <input type="tel" id="student-phone" name="studentPhone" placeholder="+1234567890">
+                                <label for="student-phone">
+                                    <i class="fas fa-phone"></i>
+                                    Teléfono
+                                </label>
+                                <input type="tel" id="student-phone" name="phone" 
+                                       placeholder="+1234567890">
                             </div>
                         </div>
                     </div>
@@ -273,29 +275,42 @@
                             <i class="fas fa-graduation-cap"></i>
                             Información Académica
                         </h4>
-                        
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="student-institution">Institución *</label>
-                                <select id="student-institution" name="institutionSelect" required>
+                                <label for="student-institution">
+                                    <i class="fas fa-university"></i>
+                                    Institución *
+                                </label>
+                                <select id="student-institution" name="institutionId" required>
                                     <option value="">Seleccionar institución</option>
                                 </select>
                             </div>
+                            
                             <div class="form-group">
-                                <label for="student-course">Curso *</label>
-                                <select id="student-course" name="courseSelect" required>
-                                    <option value="">Primero selecciona una institución</option>
+                                <label for="student-course">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                    Curso *
+                                </label>
+                                <select id="student-course" name="courseId" required>
+                                    <option value="">Seleccionar curso</option>
                                 </select>
                             </div>
                         </div>
                         
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="student-enrollment-date">Fecha de Ingreso</label>
+                                <label for="student-enrollment-date">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    Fecha de Inscripción
+                                </label>
                                 <input type="date" id="student-enrollment-date" name="enrollmentDate">
                             </div>
+                            
                             <div class="form-group">
-                                <label for="student-status">Estado</label>
+                                <label for="student-status">
+                                    <i class="fas fa-user-check"></i>
+                                    Estado
+                                </label>
                                 <select id="student-status" name="status">
                                     <option value="active">Activo</option>
                                     <option value="inactive">Inactivo</option>
@@ -307,13 +322,16 @@
                     <!-- Información adicional -->
                     <div class="form-section">
                         <h4>
-                            <i class="fas fa-info-circle"></i>
+                            <i class="fas fa-sticky-note"></i>
                             Información Adicional
                         </h4>
-                        
-                        <div class="form-group">
-                            <label for="student-notes">Notas</label>
-                            <textarea id="student-notes" name="studentNotes" rows="3" placeholder="Observaciones, alergias, información relevante..."></textarea>
+                        <div class="form-group full-width">
+                            <label for="student-notes">
+                                <i class="fas fa-note-sticky"></i>
+                                Notas
+                            </label>
+                            <textarea id="student-notes" name="notes" rows="3" 
+                                      placeholder="Información adicional sobre el estudiante..."></textarea>
                         </div>
                     </div>
                 </form>
@@ -332,7 +350,7 @@
         </div>
     </div>
 
-    <!-- ===== SCRIPTS UNIFICADOS COMO OTRAS PÁGINAS ===== -->
+    <!-- ===== SCRIPTS UNIFICADOS ===== -->
     <script src="src/assets/js/theme-manager.js"></script>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>

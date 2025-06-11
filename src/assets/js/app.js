@@ -79,7 +79,12 @@ function setupUnifiedInterface() {
         setupMenuNavigation();
     }, 100);
     
-    // Configurar modo oscuro
+    // Inicializar configuración global
+    if (typeof window.initializeGlobalSettings === 'function') {
+        window.initializeGlobalSettings();
+    }
+    
+    // Configurar modo oscuro (mantener por compatibilidad)
     initializeDarkMode();
     
     // Actualizar fecha
@@ -454,29 +459,18 @@ window.setupMenuToggle = setupMenuToggle;
 window.getUserData = getUserData;
 window.setUserData = setUserData;
 
-// AGREGAR al final del setupUnifiedInterface():
+// ===== DIAGNÓSTICO DE FUNCIONES GLOBALES =====
+console.log('🔍 Funciones globales expuestas:', {
+    showNotification: typeof window.showNotification,
+    setupMenuToggle: typeof window.setupMenuToggle,
+    getUserData: typeof window.getUserData,
+    setUserData: typeof window.setUserData
+});
 
-function setupUnifiedInterface() {
-    console.log('🎨 Configurando interfaz unificada...');
-    
-    // Configurar menú toggle
-    setTimeout(() => {
-        setupMenuToggle();
-        setupMenuNavigation();
-    }, 100);
-    
-    // 👇 AGREGAR ESTA LÍNEA
-    // Inicializar configuración global
-    if (typeof window.initializeGlobalSettings === 'function') {
-        window.initializeGlobalSettings();
-    }
-    
-    // Configurar modo oscuro (mantener por compatibilidad)
-    initializeDarkMode();
-    
-    // Actualizar fecha
-    updateCurrentDate();
-    
-    console.log('✅ Interfaz unificada configurada');
+// Test de showNotification
+if (typeof window.showNotification === 'function') {
+    console.log('✅ window.showNotification está disponible');
+} else {
+    console.error('❌ window.showNotification NO está disponible');
 }
 

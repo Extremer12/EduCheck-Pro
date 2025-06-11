@@ -1,12 +1,9 @@
 /**
- * EduCheck Pro - Sistema de Gestión de Estudiantes ACTUALIZADO
- * Compatible con header unificado y app.js
+ * EduCheck Pro - Sistema de Gestión de Estudiantes COMPLETO
+ * Compatible con header unificado y completamente funcional
  */
 
-// ===== ELIMINAR FUNCIONES DE MENÚ DUPLICADAS =====
-// Ya no necesitamos initializeMenuToggle() ni updateUserInfo() porque app.js las maneja
-
-// ===== VARIABLES GLOBALES (SIN CAMBIOS) =====
+// ===== VARIABLES GLOBALES =====
 let currentStudents = [];
 let filteredStudents = [];
 let currentFilter = 'all';
@@ -24,45 +21,43 @@ let elements = {
     form: null
 };
 
-// ===== INICIALIZACIÓN ACTUALIZADA =====
+// ===== INICIALIZACIÓN =====
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('👥 Inicializando sistema de estudiantes con header unificado...');
+    console.log('👥 Inicializando sistema de estudiantes...');
     
     // Esperar a que app.js configure Firebase y el menú
     const waitForApp = setInterval(() => {
         if (window.auth && typeof window.setupMenuToggle === 'function') {
             clearInterval(waitForApp);
-            console.log('🔗 Estudiantes.js - App.js detectado, configurando listener...');
+            console.log('🔗 Estudiantes.js - App.js detectado');
             
             // Configurar listener de autenticación
             window.auth.onAuthStateChanged((user) => {
                 if (user) {
                     currentUser = user;
-                    console.log(`👤 Estudiantes - Usuario autenticado: ${user.email}`);
+                    console.log(`👤 Usuario autenticado: ${user.email}`);
                     
-                    // Esperar un poco para que app.js termine de configurar el header
                     setTimeout(() => {
                         initializeStudentsSystem();
                     }, 1000);
                     
                 } else {
-                    console.log('❌ Estudiantes - Usuario no autenticado, redirigiendo...');
+                    console.log('❌ Usuario no autenticado, redirigiendo...');
                     window.location.href = 'login.html';
                 }
             });
         }
     }, 100);
     
-    // Timeout de seguridad
     setTimeout(() => {
         clearInterval(waitForApp);
         if (!window.auth) {
-            console.error('❌ Estudiantes.js - App.js no se cargó correctamente');
+            console.error('❌ App.js no se cargó correctamente');
         }
     }, 10000);
 });
 
-// ===== FUNCIÓN PRINCIPAL DE INICIALIZACIÓN (SIMPLIFICADA) =====
+// ===== FUNCIÓN PRINCIPAL DE INICIALIZACIÓN =====
 function initializeStudentsSystem() {
     console.log('🎯 Inicializando sistema completo de estudiantes...');
     
@@ -70,119 +65,30 @@ function initializeStudentsSystem() {
         // Inicializar elementos DOM
         initializeDOMElements();
         
-        // YA NO NECESITAMOS initializeMenuToggle() ni updateUserInfo() porque app.js lo maneja
-        
         // Cargar datos
         loadStudents();
+        loadInstitutionOptions();
+        loadCourseOptions();
+        
+        // Verificar si hay filtro de curso en URL
+        filterStudentsByCourse();
         
         // Configurar interfaz
         setupEventListeners();
         
-        // Renderizar datos
-        renderStudents();
-        updateStudentsCount();
+        // Renderizar datos (solo si no se filtró por curso)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (!urlParams.get('course')) {
+            renderStudents();
+            updateStudentsCount();
+        }
         
-        console.log('✅ Sistema de estudiantes inicializado correctamente con header unificado');
+        console.log('✅ Sistema de estudiantes inicializado correctamente');
         
     } catch (error) {
         console.error('❌ Error inicializando sistema:', error);
         showNotification('Error al cargar el sistema de estudiantes', 'error');
     }
-}
-
-// ===== ELIMINAR FUNCIONES DUPLICADAS =====
-// Ya no necesitamos:
-// - initializeMenuToggle() 
-// - updateUserInfo()
-// - initializeTheme() (app.js lo maneja)
-
-// ===== RESTO DE FUNCIONES SIN CAMBIOS =====
-function getUserData(key) {
-    const user = window.auth?.currentUser;
-    if (!user) return null;
-    return localStorage.getItem(`${user.uid}_${key}`);
-}
-
-function setUserData(key, value) {
-    const user = window.auth?.currentUser;
-    if (!user) return false;
-    localStorage.setItem(`${user.uid}_${key}`, value);
-    return true;
-}
-
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-function getStudentInitials(student) {
-    if (!student.name) return 'NN';
-    const names = student.name.trim().split(' ');
-    if (names.length === 1) {
-        return names[0].substring(0, 2).toUpperCase();
-    }
-    return (names[0][0] + names[names.length - 1][0]).toUpperCase();
-}
-
-function generateUniqueId() {
-    return 'std_' + Date.now().toString(36) + Math.random().toString(36).substr(2);
-}
-
-function showNotification(message, type = 'info') {
-    // Usar la función global de app.js si existe
-    if (window.showNotification) {
-        window.showNotification(message, type);
-        return;
-    }
-    
-    // Fallback si no existe
-    console.log(`📢 ${type.toUpperCase()}: ${message}`);
-    
-    let notification = document.querySelector('.notification');
-    
-    if (!notification) {
-        notification = document.createElement('div');
-        notification.className = 'notification';
-        document.body.appendChild(notification);
-    }
-    
-    const icons = {
-        success: 'fa-check-circle',
-        error: 'fa-times-circle',
-        warning: 'fa-exclamation-triangle',
-        info: 'fa-info-circle'
-    };
-    
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas ${icons[type] || icons.info}"></i>
-            <span>${message}</span>
-        </div>
-        <button class="close-notification">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-    
-    notification.classList.add('show');
-    
-    const closeBtn = notification.querySelector('.close-notification');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            notification.classList.remove('show');
-        });
-    }
-    
-    setTimeout(() => {
-        notification.classList.remove('show');
-    }, 5000);
 }
 
 // ===== INICIALIZACIÓN DE ELEMENTOS DOM =====
@@ -193,10 +99,16 @@ function initializeDOMElements() {
     elements.modal = document.getElementById('student-modal');
     elements.form = document.getElementById('student-form');
     
-    console.log('🔧 Elementos DOM inicializados');
+    console.log('🔧 Elementos DOM inicializados', {
+        container: !!elements.container,
+        searchInput: !!elements.searchInput,
+        addButton: !!elements.addButton,
+        modal: !!elements.modal,
+        form: !!elements.form
+    });
 }
 
-// ===== GESTIÓN DE DATOS (SIN CAMBIOS) =====
+// ===== GESTIÓN DE DATOS =====
 function loadStudents() {
     try {
         if (!currentUser) {
@@ -236,8 +148,10 @@ function saveStudents() {
     console.log(`💾 ${userStudents.length} estudiantes guardados para usuario ${currentUser.uid}`);
 }
 
-// ===== RESTO DE FUNCIONES MANTIENEN SU ESTRUCTURA ORIGINAL =====
+// ===== CONFIGURACIÓN DE EVENTOS =====
 function setupEventListeners() {
+    console.log('🎛️ Configurando event listeners...');
+    
     // Búsqueda con debounce
     if (elements.searchInput) {
         const debouncedSearch = debounce(handleSearch, 300);
@@ -276,7 +190,41 @@ function setupEventListeners() {
         cancelBtn.addEventListener('click', closeAllModals);
     }
     
-    console.log('🎛️ Event listeners configurados');
+    // Filtros
+    setupFilterListeners();
+    
+    console.log('✅ Event listeners configurados');
+}
+
+function setupFilterListeners() {
+    // Filtro de institución
+    const institutionFilter = document.getElementById('filter-institution');
+    if (institutionFilter) {
+        institutionFilter.addEventListener('change', applyFilters);
+    }
+    
+    // Filtro de curso
+    const courseFilter = document.getElementById('filter-course');
+    if (courseFilter) {
+        courseFilter.addEventListener('change', applyFilters);
+    }
+    
+    // Filtro de estado
+    const statusFilter = document.getElementById('filter-status');
+    if (statusFilter) {
+        statusFilter.addEventListener('change', applyFilters);
+    }
+    
+    // Botones de filtro
+    const clearFiltersBtn = document.getElementById('clear-filters');
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', clearAllFilters);
+    }
+    
+    const applyFiltersBtn = document.getElementById('apply-filters');
+    if (applyFiltersBtn) {
+        applyFiltersBtn.addEventListener('click', applyFilters);
+    }
 }
 
 // ===== MANEJADORES DE EVENTOS =====
@@ -296,6 +244,153 @@ function handleSearch(e) {
     renderStudents();
     updateStudentsCount();
     console.log(`🔍 Búsqueda: "${query}" - ${filteredStudents.length} resultados`);
+}
+
+async function handleSaveStudent(e) {
+    e.preventDefault();
+    
+    console.log('💾 Guardando estudiante...');
+    
+    const formData = new FormData(e.target);
+    const studentData = {
+        name: formData.get('name')?.trim(),
+        email: formData.get('email')?.trim(),
+        phone: formData.get('phone')?.trim(),
+        institutionId: formData.get('institutionId'),
+        courseId: formData.get('courseId'),
+        enrollmentDate: formData.get('enrollmentDate'),
+        status: formData.get('status') || 'active',
+        notes: formData.get('notes')?.trim(),
+        isActive: formData.get('status') === 'active'
+    };
+    
+    // Validaciones
+    if (!studentData.name) {
+        showNotification('El nombre es obligatorio', 'error');
+        return;
+    }
+    
+    if (!studentData.institutionId) {
+        showNotification('Debe seleccionar una institución', 'error');
+        return;
+    }
+    
+    if (!studentData.courseId) {
+        showNotification('Debe seleccionar un curso', 'error');
+        return;
+    }
+    
+    if (studentData.email && !isValidEmail(studentData.email)) {
+        showNotification('El formato del email no es válido', 'error');
+        return;
+    }
+    
+    try {
+        if (currentEditingStudent) {
+            await updateStudent(currentEditingStudent.id, studentData);
+        } else {
+            await createStudent(studentData);
+        }
+        
+        closeAllModals();
+        
+    } catch (error) {
+        console.error('❌ Error al guardar estudiante:', error);
+        showNotification('Error al guardar el estudiante', 'error');
+    }
+}
+
+// ===== CRUD OPERATIONS =====
+async function createStudent(studentData) {
+    const newStudent = {
+        id: generateUniqueId(),
+        ...studentData,
+        attendanceHistory: [],
+        createdBy: currentUser.uid,
+        createdAt: new Date().toISOString(),
+        lastModified: new Date().toISOString()
+    };
+    
+    currentStudents.unshift(newStudent);
+    saveStudents();
+    
+    // Actualizar contador de estudiantes en el curso
+    updateCourseStudentCount(studentData.courseId);
+    
+    // Actualizar interfaz
+    filteredStudents = [...currentStudents];
+    renderStudents();
+    updateStudentsCount();
+    
+    showNotification(`✅ Estudiante "${newStudent.name}" creado correctamente`, 'success');
+    console.log(`👥 Estudiante creado: ${newStudent.name} (ID: ${newStudent.id})`);
+}
+
+async function updateStudent(studentId, studentData) {
+    const studentIndex = currentStudents.findIndex(s => s.id === studentId);
+    if (studentIndex === -1) {
+        throw new Error('Estudiante no encontrado');
+    }
+    
+    const oldCourseId = currentStudents[studentIndex].courseId;
+    
+    // Actualizar estudiante
+    currentStudents[studentIndex] = {
+        ...currentStudents[studentIndex],
+        ...studentData,
+        lastModified: new Date().toISOString()
+    };
+    
+    saveStudents();
+    
+    // Actualizar contadores si cambió de curso
+    if (oldCourseId !== studentData.courseId) {
+        updateCourseStudentCount(oldCourseId);
+        updateCourseStudentCount(studentData.courseId);
+    }
+    
+    // Actualizar interfaz
+    filteredStudents = [...currentStudents];
+    renderStudents();
+    updateStudentsCount();
+    
+    showNotification(`✅ Estudiante "${studentData.name}" actualizado correctamente`, 'success');
+    console.log(`📝 Estudiante actualizado: ${studentData.name} (ID: ${studentId})`);
+}
+
+function deleteStudent(studentId) {
+    const student = currentStudents.find(s => s.id === studentId);
+    if (!student) {
+        showNotification('Estudiante no encontrado', 'error');
+        return;
+    }
+    
+    // Verificar permisos
+    if (student.createdBy !== currentUser.uid) {
+        showNotification('No tienes permisos para eliminar este estudiante', 'error');
+        return;
+    }
+    
+    if (!confirm(`¿Estás seguro de eliminar al estudiante "${student.name}"? Esta acción no se puede deshacer.`)) {
+        return;
+    }
+    
+    const courseId = student.courseId;
+    
+    const studentIndex = currentStudents.findIndex(s => s.id === studentId);
+    currentStudents.splice(studentIndex, 1);
+    saveStudents();
+    
+    // Actualizar contador de estudiantes en el curso
+    updateCourseStudentCount(courseId);
+    
+    // Actualizar interfaz
+    filteredStudents = [...currentStudents];
+    renderStudents();
+    updateStudentsCount();
+    
+    showNotification(`✅ Estudiante "${student.name}" eliminado correctamente`, 'success');
+    console.log(`🗑️ Estudiante eliminado: ${student.name} (ID: ${studentId})`);
 }
 
 // ===== RENDERIZADO =====
@@ -318,20 +413,17 @@ function renderStudents() {
 }
 
 function createStudentCard(student) {
-    const initials = getStudentInitials(student);
-    const statusClass = student.status === 'active' ? 'active' : 'inactive';
-    
     return `
-        <div class="student-card ${statusClass}" data-student-id="${student.id}">
+        <div class="student-card" data-student-id="${student.id}">
             <div class="student-header">
                 <div class="student-avatar">
-                    <span>${initials}</span>
+                    <span>${getStudentInitials(student)}</span>
                 </div>
                 <div class="student-actions">
-                    <button class="student-action edit" onclick="editStudent('${student.id}')" title="Editar estudiante">
+                    <button class="student-action edit" onclick="editStudent('${student.id}')" title="Editar">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="student-action delete" onclick="deleteStudent('${student.id}')" title="Eliminar estudiante">
+                    <button class="student-action delete" onclick="deleteStudent('${student.id}')" title="Eliminar">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -349,19 +441,32 @@ function createStudentCard(student) {
                         <span>${student.phone || 'Sin teléfono'}</span>
                     </div>
                     <div class="student-detail">
-                        <i class="fas fa-university"></i>
-                        <span>${getInstitutionName(student.institutionId)}</span>
-                    </div>
-                    <div class="student-detail">
                         <i class="fas fa-chalkboard-teacher"></i>
                         <span>${getCourseName(student.courseId)}</span>
                     </div>
+                    <div class="student-detail">
+                        <i class="fas fa-university"></i>
+                        <span>${getInstitutionName(student.institutionId)}</span>
+                    </div>
+                    ${student.enrollmentDate ? `
+                        <div class="student-detail">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Inscrito: ${formatDate(student.enrollmentDate)}</span>
+                        </div>
+                    ` : ''}
                 </div>
                 
-                <div class="student-status ${statusClass}">
+                <div class="student-status ${student.isActive ? 'active' : 'inactive'}">
                     <i class="fas fa-circle"></i>
-                    ${student.status === 'active' ? 'Activo' : 'Inactivo'}
+                    <span>${student.isActive ? 'Activo' : 'Inactivo'}</span>
                 </div>
+                
+                ${student.notes ? `
+                    <div class="student-notes">
+                        <i class="fas fa-sticky-note"></i>
+                        <span>${student.notes}</span>
+                    </div>
+                ` : ''}
             </div>
         </div>
     `;
@@ -370,7 +475,7 @@ function createStudentCard(student) {
 function renderEmptyState() {
     const emptyMessage = currentStudents.length === 0 ? 
         'No hay estudiantes registrados' : 
-        'No hay estudiantes que coincidan con la búsqueda';
+        'No hay estudiantes que coincidan con los filtros';
     
     elements.container.innerHTML = `
         <div class="empty-state">
@@ -390,37 +495,15 @@ function renderEmptyState() {
 function updateStudentsCount() {
     const countElement = document.getElementById('students-count');
     if (countElement) {
-        const count = filteredStudents.length;
-        countElement.textContent = `${count} estudiante${count !== 1 ? 's' : ''}`;
+        const total = currentStudents.length;
+        const filtered = filteredStudents.length;
+        
+        if (total === filtered) {
+            countElement.textContent = `${total} estudiante${total !== 1 ? 's' : ''}`;
+        } else {
+            countElement.textContent = `${filtered} de ${total} estudiantes`;
+        }
     }
-}
-
-// ===== FUNCIONES AUXILIARES DE RENDERIZADO =====
-function getInstitutionName(institutionId) {
-    if (!institutionId) return 'Sin institución';
-    
-    const institutions = JSON.parse(getUserData('institutions') || '[]');
-    const institution = institutions.find(i => i.id === institutionId);
-    return institution ? institution.name : 'Institución no encontrada';
-}
-
-function getCourseName(courseId) {
-    if (!courseId) return 'Sin curso';
-    
-    const courses = JSON.parse(getUserData('courses') || '[]');
-    const course = courses.find(c => c.id === courseId);
-    return course ? course.name : 'Curso no encontrado';
-}
-
-function formatDate(dateString) {
-    if (!dateString) return 'No definido';
-    
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-    });
 }
 
 // ===== MODALES Y FORMULARIOS =====
@@ -438,10 +521,6 @@ function openAddStudentModal() {
         elements.modal.classList.add('show');
         elements.modal.style.display = 'flex';
     }
-    
-    // Cargar opciones de instituciones y cursos
-    loadInstitutionOptions();
-    loadCourseOptions();
     
     console.log('📝 Modal de agregar estudiante abierto');
 }
@@ -466,9 +545,6 @@ function editStudent(studentId) {
         elements.modal.classList.add('show');
         elements.modal.style.display = 'flex';
     }
-    
-    loadInstitutionOptions();
-    loadCourseOptions();
     
     console.log(`📝 Editando estudiante: ${student.name}`);
 }
@@ -503,185 +579,268 @@ function fillStudentForm(student) {
     });
 }
 
+// ===== CARGAR OPCIONES DE SELECTS =====
 function loadInstitutionOptions() {
     const institutionSelect = document.getElementById('student-institution');
-    if (!institutionSelect) return;
+    const institutionFilter = document.getElementById('filter-institution');
     
-    const institutions = JSON.parse(getUserData('institutions') || '[]')
-        .filter(inst => inst.createdBy === currentUser.uid);
+    if (!institutionSelect && !institutionFilter) return;
     
-    institutionSelect.innerHTML = '<option value="">Seleccionar institución</option>';
+    const institutionsData = getUserData('institutions');
+    const institutions = institutionsData ? JSON.parse(institutionsData) : [];
     
-    institutions.forEach(institution => {
-        const option = document.createElement('option');
-        option.value = institution.id;
-        option.textContent = institution.name;
-        institutionSelect.appendChild(option);
-    });
+    // Poblar select del formulario
+    if (institutionSelect) {
+        institutionSelect.innerHTML = '<option value="">Seleccionar institución</option>';
+        institutions.forEach(institution => {
+            const option = document.createElement('option');
+            option.value = institution.id;
+            option.textContent = institution.name;
+            institutionSelect.appendChild(option);
+        });
+    }
     
-    console.log(`📋 ${institutions.length} instituciones cargadas en selector`);
+    // Poblar filtro de instituciones
+    if (institutionFilter) {
+        institutionFilter.innerHTML = '<option value="">Todas las instituciones</option>';
+        institutions.forEach(institution => {
+            const option = document.createElement('option');
+            option.value = institution.id;
+            option.textContent = institution.name;
+            institutionFilter.appendChild(option);
+        });
+    }
 }
 
 function loadCourseOptions() {
     const courseSelect = document.getElementById('student-course');
-    if (!courseSelect) return;
+    const courseFilterSelect = document.getElementById('filter-course');
     
-    const courses = JSON.parse(getUserData('courses') || '[]')
-        .filter(course => course.createdBy === currentUser.uid);
+    if (!courseSelect && !courseFilterSelect) return;
     
-    courseSelect.innerHTML = '<option value="">Seleccionar curso</option>';
+    const coursesData = getUserData('courses');
+    const courses = coursesData ? JSON.parse(coursesData) : [];
     
-    courses.forEach(course => {
-        const option = document.createElement('option');
-        option.value = course.id;
-        option.textContent = course.name;
-        courseSelect.appendChild(option);
+    // Poblar select del formulario
+    if (courseSelect) {
+        courseSelect.innerHTML = '<option value="">Seleccionar curso</option>';
+        courses.forEach(course => {
+            const option = document.createElement('option');
+            option.value = course.id;
+            option.textContent = course.name;
+            courseSelect.appendChild(option);
+        });
+    }
+    
+    // Poblar filtro de cursos
+    if (courseFilterSelect) {
+        courseFilterSelect.innerHTML = '<option value="">Todos los cursos</option>';
+        courses.forEach(course => {
+            const option = document.createElement('option');
+            option.value = course.id;
+            option.textContent = course.name;
+            courseFilterSelect.appendChild(option);
+        });
+    }
+}
+
+// ===== FILTROS =====
+function applyFilters() {
+    const institutionFilter = document.getElementById('filter-institution').value;
+    const courseFilter = document.getElementById('filter-course').value;
+    const statusFilter = document.getElementById('filter-status').value;
+    const searchQuery = elements.searchInput.value.toLowerCase().trim();
+    
+    filteredStudents = currentStudents.filter(student => {
+        // Filtro de búsqueda
+        const matchesSearch = !searchQuery || 
+            student.name.toLowerCase().includes(searchQuery) ||
+            (student.email && student.email.toLowerCase().includes(searchQuery)) ||
+            (student.phone && student.phone.includes(searchQuery));
+        
+        // Filtro de institución
+        const matchesInstitution = !institutionFilter || student.institutionId === institutionFilter;
+        
+        // Filtro de curso
+        const matchesCourse = !courseFilter || student.courseId === courseFilter;
+        
+        // Filtro de estado
+        const matchesStatus = !statusFilter || 
+            (statusFilter === 'active' && student.isActive) ||
+            (statusFilter === 'inactive' && !student.isActive);
+        
+        return matchesSearch && matchesInstitution && matchesCourse && matchesStatus;
     });
     
-    console.log(`📋 ${courses.length} cursos cargados en selector`);
+    renderStudents();
+    updateStudentsCount();
+    
+    console.log(`🔍 Filtros aplicados: ${filteredStudents.length} estudiantes mostrados`);
 }
 
-function handleSaveStudent(e) {
-    e.preventDefault();
+function clearAllFilters() {
+    // Limpiar todos los filtros
+    document.getElementById('filter-institution').value = '';
+    document.getElementById('filter-course').value = '';
+    document.getElementById('filter-status').value = '';
+    elements.searchInput.value = '';
     
-    const formData = new FormData(e.target);
-    const studentData = {
-        name: formData.get('studentName')?.trim(),
-        email: formData.get('studentEmail')?.trim(),
-        phone: formData.get('studentPhone')?.trim(),
-        institutionId: formData.get('institutionSelect'),
-        courseId: formData.get('courseSelect'),
-        enrollmentDate: formData.get('enrollmentDate') || new Date().toISOString(),
-        status: formData.get('status') || 'active',
-        notes: formData.get('studentNotes')?.trim() || ''
-    };
+    // Mostrar todos los estudiantes
+    filteredStudents = [...currentStudents];
+    renderStudents();
+    updateStudentsCount();
     
-    // Validaciones
-    if (!studentData.name) {
-        showNotification('El nombre del estudiante es obligatorio', 'error');
-        return;
+    console.log('🔄 Filtros limpiados');
+}
+
+// ===== FUNCIONES PARA FILTRAR POR CURSO DESDE URL =====
+function filterStudentsByCourse() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const courseId = urlParams.get('course');
+    
+    if (courseId) {
+        console.log('🔗 Filtrando estudiantes por curso:', courseId);
+        
+        filteredStudents = currentStudents.filter(student => 
+            student.courseId === courseId
+        );
+        
+        updateHeaderForCourse(courseId);
+        renderStudents();
+        updateStudentsCount();
+        addBackToAllButton();
     }
+}
+
+function updateHeaderForCourse(courseId) {
+    const coursesData = getUserData('courses');
+    const courses = coursesData ? JSON.parse(coursesData) : [];
+    const course = courses.find(c => c.id === courseId);
     
-    if (studentData.email && !isValidEmail(studentData.email)) {
-        showNotification('El email no tiene un formato válido', 'error');
-        return;
-    }
-    
-    try {
-        if (currentEditingStudent) {
-            updateStudent(currentEditingStudent.id, studentData);
-        } else {
-            createStudent(studentData);
+    if (course) {
+        const headerTitle = document.querySelector('.controls-title h2');
+        if (headerTitle) {
+            headerTitle.innerHTML = `
+                <i class="fas fa-users"></i>
+                Estudiantes de ${course.name}
+            `;
         }
         
-        closeAllModals();
+        const headerDescription = document.querySelector('.controls-title p');
+        if (headerDescription) {
+            headerDescription.textContent = `Administra los estudiantes del curso "${course.name}"`;
+        }
+    }
+}
+
+function addBackToAllButton() {
+    const controlsActions = document.querySelector('.controls-actions');
+    if (controlsActions && !document.getElementById('back-to-all-btn')) {
+        const backButton = document.createElement('button');
+        backButton.id = 'back-to-all-btn';
+        backButton.className = 'action-btn tertiary';
+        backButton.innerHTML = '<i class="fas fa-arrow-left"></i> Ver Todos';
+        backButton.addEventListener('click', () => {
+            window.location.href = 'estudiantes.html';
+        });
         
-    } catch (error) {
-        console.error('❌ Error guardando estudiante:', error);
-        showNotification('Error al guardar el estudiante', 'error');
+        controlsActions.insertBefore(backButton, controlsActions.firstChild);
     }
 }
 
-function createStudent(studentData) {
-    const newStudent = {
-        id: generateUniqueId(),
-        ...studentData,
-        attendanceHistory: [],
-        createdBy: currentUser.uid,
-        createdAt: new Date().toISOString(),
-        lastModified: new Date().toISOString()
-    };
+// ===== ACTUALIZAR CONTADOR DE ESTUDIANTES EN CURSO =====
+function updateCourseStudentCount(courseId) {
+    if (!courseId) return;
     
-    currentStudents.push(newStudent);
-    saveStudents();
+    const coursesData = getUserData('courses');
+    const courses = coursesData ? JSON.parse(coursesData) : [];
     
-    // Actualizar interfaz
-    filteredStudents = [...currentStudents];
-    renderStudents();
-    updateStudentsCount();
-    
-    showNotification(`✅ Estudiante "${newStudent.name}" creado correctamente`, 'success');
-    console.log(`👥 Estudiante creado: ${newStudent.name} (ID: ${newStudent.id})`);
-}
-
-function updateStudent(studentId, studentData) {
-    const studentIndex = currentStudents.findIndex(s => s.id === studentId);
-    
-    if (studentIndex === -1) {
-        showNotification('Estudiante no encontrado', 'error');
-        return;
+    const courseIndex = courses.findIndex(c => c.id === courseId);
+    if (courseIndex !== -1) {
+        const studentCount = currentStudents.filter(s => s.courseId === courseId).length;
+        courses[courseIndex].studentsCount = studentCount;
+        setUserData('courses', JSON.stringify(courses));
+        
+        console.log(`📊 Curso ${courses[courseIndex].name}: ${studentCount} estudiantes`);
     }
-    
-    const originalStudent = currentStudents[studentIndex];
-    
-    // Verificar permisos
-    if (originalStudent.createdBy !== currentUser.uid) {
-        showNotification('No tienes permisos para editar este estudiante', 'error');
-        return;
-    }
-    
-    // Actualizar datos
-    currentStudents[studentIndex] = {
-        ...originalStudent,
-        ...studentData,
-        lastModified: new Date().toISOString()
-    };
-    
-    saveStudents();
-    
-    // Actualizar interfaz
-    filteredStudents = [...currentStudents];
-    renderStudents();
-    updateStudentsCount();
-    
-    showNotification(`✅ Estudiante "${studentData.name}" actualizado correctamente`, 'success');
-    console.log(`👥 Estudiante actualizado: ${studentData.name} (ID: ${studentId})`);
-}
-
-function deleteStudent(studentId) {
-    const student = currentStudents.find(s => s.id === studentId);
-    if (!student) {
-        showNotification('Estudiante no encontrado', 'error');
-        return;
-    }
-    
-    // Verificar permisos
-    if (student.createdBy !== currentUser.uid) {
-        showNotification('No tienes permisos para eliminar este estudiante', 'error');
-        return;
-    }
-    
-    if (!confirm(`¿Estás seguro de eliminar al estudiante "${student.name}"? Esta acción no se puede deshacer.`)) {
-        return;
-    }
-    
-    const studentIndex = currentStudents.findIndex(s => s.id === studentId);
-    currentStudents.splice(studentIndex, 1);
-    saveStudents();
-    
-    // Actualizar interfaz
-    filteredStudents = [...currentStudents];
-    renderStudents();
-    updateStudentsCount();
-    
-    showNotification(`✅ Estudiante "${student.name}" eliminado correctamente`, 'success');
-    console.log(`🗑️ Estudiante eliminado: ${student.name} (ID: ${studentId})`);
 }
 
 // ===== FUNCIONES AUXILIARES =====
+function getUserData(key) {
+    const user = window.auth?.currentUser;
+    if (!user) return null;
+    return localStorage.getItem(`${user.uid}_${key}`);
+}
+
+function setUserData(key, value) {
+    const user = window.auth?.currentUser;
+    if (!user) return false;
+    localStorage.setItem(`${user.uid}_${key}`, value);
+    return true;
+}
+
+function generateUniqueId() {
+    return 'std_' + Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+function getStudentInitials(student) {
+    if (!student.name) return 'NN';
+    const names = student.name.trim().split(' ');
+    if (names.length === 1) {
+        return names[0].substring(0, 2).toUpperCase();
+    }
+    return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+}
+
+function getInstitutionName(institutionId) {
+    if (!institutionId) return 'Sin institución';
+    
+    const institutions = JSON.parse(getUserData('institutions') || '[]');
+    const institution = institutions.find(i => i.id === institutionId);
+    return institution ? institution.name : 'Institución no encontrada';
+}
+
+function getCourseName(courseId) {
+    if (!courseId) return 'Sin curso';
+    
+    const courses = JSON.parse(getUserData('courses') || '[]');
+    const course = courses.find(c => c.id === courseId);
+    return course ? course.name : 'Curso no encontrado';
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'No definido';
+    
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}
+
 function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
 }
 
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
 function setupCardEventListeners() {
-    // Configurar eventos para tarjetas de estudiantes
     const studentCards = document.querySelectorAll('.student-card');
     
     studentCards.forEach(card => {
-        // Click en la tarjeta para ver detalles
         card.addEventListener('click', function(e) {
-            // Solo si no se clickeó en un botón de acción
             if (!e.target.closest('.student-actions')) {
                 const studentId = this.dataset.studentId;
                 console.log(`👁️ Mostrando detalles de estudiante: ${studentId}`);
@@ -699,9 +858,20 @@ function closeAllModals() {
     currentEditingStudent = null;
 }
 
+function showNotification(message, type = 'info') {
+    if (window.showNotification) {
+        window.showNotification(message, type);
+        return;
+    }
+    
+    console.log(`📢 ${type.toUpperCase()}: ${message}`);
+}
+
 // ===== FUNCIONES GLOBALES =====
 window.editStudent = editStudent;
 window.deleteStudent = deleteStudent;
 window.openAddStudentModal = openAddStudentModal;
+window.filterStudentsByCourse = filterStudentsByCourse;
+window.updateCourseStudentCount = updateCourseStudentCount;
 
-console.log('✅ estudiantes.js actualizado para header unificado');
+console.log('✅ estudiantes.js COMPLETO cargado correctamente');

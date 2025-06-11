@@ -199,8 +199,8 @@ body.activities-page {
     gap: var(--activities-space-sm);
     cursor: pointer;
     transition: var(--activities-transition);
-    backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     font-weight: 600;
     font-family: inherit;
     font-size: 1rem;
@@ -659,6 +659,8 @@ body.activities-page {
     justify-content: center;
     z-index: 1000;
     padding: var(--activities-space-xl);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
 }
 
 .modal.show {
@@ -971,12 +973,10 @@ body.dark-mode .interaction-btn:hover {
 
 /* ... todo el CSS anterior ... */
 
-/* ===== MEJORAS PARA FORMULARIOS Y MODALES ===== */
-
 /* Modal mejorado */
 .modal {
-    backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
 }
 
 .modal-content {
@@ -1089,12 +1089,9 @@ body.dark-mode .interaction-btn:hover {
 
 /* Notificaciones mejoradas */
 .activities-notification {
-    backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 182, 193, 0.2);
-}
-
-.activities-notification.success {
     border-left-color: var(--activities-success);
 }
 
