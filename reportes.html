@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Reportes y Estadísticas - EduCheck Pro">
+    <meta name="keywords" content="reportes, estadísticas, análisis, educación">
+    <meta name="author" content="EduCheck Pro Team">
+    <meta name="theme-color" content="#FFB6C1">
+    <link rel="icon" href="src/assets/icons/icon-192x192.png" type="image/png">
+    <title>Reportes y Estadísticas - EduCheck Pro</title>
+    
+    <!-- CSS EN EL MISMO ORDEN QUE OTRAS PÁGINAS -->
+    <link rel="stylesheet" href="src/assets/css/styles.css">
+    <link rel="stylesheet" href="src/assets/css/responsive.css">
+    <link rel="stylesheet" href="src/assets/css/reportes.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="edu-system-ready reports-page">
+    <!-- ===== HEADER UNIFICADO IDÉNTICO A OTRAS PÁGINAS ===== -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-brand">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h1>EduCheck Pro</h1>
+            </div>
+            
+            <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ===== OVERLAY DEL MENÚ ===== -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- ===== MENÚ DESPLEGABLE IDÉNTICO A OTRAS PÁGINAS ===== -->
+    <div class="dropdown-menu" id="dropdownMenu">
+        <div class="menu-header">
+            <button class="menu-close" id="menuClose" aria-label="Cerrar menú">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <h3 id="menuTeacherName">Cargando...</h3>
+                    <p>Docente</p>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="menu-items">
+            <a href="index.html" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="instituciones.html" class="menu-item">
+                <i class="fas fa-university"></i>
+                <span>Instituciones</span>
+            </a>
+            <a href="cursos.html" class="menu-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Cursos</span>
+            </a>
+            <a href="estudiantes.html" class="menu-item">
+                <i class="fas fa-user-graduate"></i>
+                <span>Estudiantes</span>
+            </a>
+            <a href="asistencia.html" class="menu-item">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Asistencia</span>
+            </a>
+            <a href="actividades.html" class="menu-item">
+                <i class="fas fa-calendar-check"></i>
+                <span>Actividades</span>
+            </a>
+            <a href="gallery.html" class="menu-item">
+                <i class="fas fa-images"></i>
+                <span>Galería</span>
+            </a>
+            <a href="reportes.html" class="menu-item active">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reportes</span>
+            </a>
+            
+            <div class="menu-divider"></div>
+            
+            <a href="profile.html" class="menu-item">
+                <i class="fas fa-user-cog"></i>
+                <span>Perfil</span>
+            </a>
+            <a href="ajustes.html" class="menu-item">
+                <i class="fas fa-cogs"></i>
+                <span>Ajustes</span>
+            </a>
+            <a href="#" class="menu-item" id="logoutOption">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- ===== CONTENIDO PRINCIPAL ===== -->
+    <main class="reports-main">
+        <!-- Header de la página -->
+        <section class="reports-page-header">
+            <div class="page-header-content">
+                <div class="page-title">
+                    <h2>
+                        <i class="fas fa-chart-line"></i>
+                        Reportes y Estadísticas
+                    </h2>
+                    <p>Analiza el rendimiento académico y genera reportes personalizados</p>
+                </div>
+                
+                <div class="page-actions">
+                    <button class="reports-action-btn" id="generateReportBtn">
+                        <i class="fas fa-file-pdf"></i>
+                        Generar Reporte
+                    </button>
+                    <button class="reports-action-btn" id="exportDataBtn">
+                        <i class="fas fa-download"></i>
+                        Exportar Datos
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filtros de reportes -->
+        <section class="reports-filters">
+            <div class="filters-card">
+                <div class="filters-header">
+                    <h3>
+                        <i class="fas fa-filter"></i>
+                        Filtros de Análisis
+                    </h3>
+                </div>
+                
+                <div class="filters-content">
+                    <div class="filter-group">
+                        <label for="reportType">
+                            <i class="fas fa-chart-bar"></i>
+                            Tipo de Reporte
+                        </label>
+                        <select id="reportType" class="filter-select">
+                            <option value="general">Resumen General</option>
+                            <option value="attendance">Análisis de Asistencia</option>
+                            <option value="performance">Rendimiento Académico</option>
+                            <option value="activities">Reporte de Actividades</option>
+                            <option value="institutions">Comparativa de Instituciones</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="institutionFilter">
+                            <i class="fas fa-university"></i>
+                            Institución
+                        </label>
+                        <select id="institutionFilter" class="filter-select">
+                            <option value="">Todas las instituciones</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="courseFilter">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            Curso
+                        </label>
+                        <select id="courseFilter" class="filter-select">
+                            <option value="">Todos los cursos</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="dateRangeFilter">
+                            <i class="fas fa-calendar-alt"></i>
+                            Período
+                        </label>
+                        <select id="dateRangeFilter" class="filter-select">
+                            <option value="week">Última semana</option>
+                            <option value="month">Último mes</option>
+                            <option value="quarter">Último trimestre</option>
+                            <option value="year">Último año</option>
+                            <option value="custom">Personalizado</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-actions">
+                        <button class="filter-btn clear" id="clearFiltersBtn">
+                            <i class="fas fa-times"></i>
+                            Limpiar
+                        </button>
+                        <button class="filter-btn apply" id="applyFiltersBtn">
+                            <i class="fas fa-search"></i>
+                            Aplicar Filtros
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Métricas principales -->
+        <section class="key-metrics">
+            <div class="metrics-grid">
+                <div class="metric-card primary">
+                    <div class="metric-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3 id="totalStudents">0</h3>
+                        <p>Total Estudiantes</p>
+                        <span class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +5% vs mes anterior
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="metric-card success">
+                    <div class="metric-icon">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3 id="averageAttendance">0%</h3>
+                        <p>Asistencia Promedio</p>
+                        <span class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +2.3% vs período anterior
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="metric-card warning">
+                    <div class="metric-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3 id="totalActivities">0</h3>
+                        <p>Actividades Realizadas</p>
+                        <span class="metric-change neutral">
+                            <i class="fas fa-minus"></i>
+                            Sin cambios
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="metric-card info">
+                    <div class="metric-icon">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3 id="activeInstitutions">0</h3>
+                        <p>Instituciones Activas</p>
+                        <span class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +1 nueva institución
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gráficos y análisis -->
+        <section class="charts-section">
+            <div class="charts-grid">
+                <!-- Gráfico de asistencia -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>
+                            <i class="fas fa-chart-line"></i>
+                            Tendencia de Asistencia
+                        </h3>
+                        <div class="chart-controls">
+                            <button class="chart-btn" data-period="week">Semana</button>
+                            <button class="chart-btn active" data-period="month">Mes</button>
+                            <button class="chart-btn" data-period="year">Año</button>
+                        </div>
+                    </div>
+                    <div class="chart-content">
+                        <canvas id="attendanceChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Gráfico de distribución por institución -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>
+                            <i class="fas fa-chart-pie"></i>
+                            Distribución por Institución
+                        </h3>
+                    </div>
+                    <div class="chart-content">
+                        <canvas id="institutionChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Gráfico de actividades por mes -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>
+                            <i class="fas fa-chart-bar"></i>
+                            Actividades por Mes
+                        </h3>
+                    </div>
+                    <div class="chart-content">
+                        <canvas id="activitiesChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Ranking de cursos -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>
+                            <i class="fas fa-trophy"></i>
+                            Ranking de Cursos
+                        </h3>
+                    </div>
+                    <div class="chart-content">
+                        <div class="ranking-list" id="coursesRanking">
+                            <div class="ranking-item">
+                                <div class="ranking-position">1</div>
+                                <div class="ranking-info">
+                                    <h4>Matemáticas Básicas</h4>
+                                    <p>95% asistencia promedio</p>
+                                </div>
+                                <div class="ranking-score">95%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tabla de datos detallados -->
+        <section class="detailed-data">
+            <div class="data-card">
+                <div class="data-header">
+                    <h3>
+                        <i class="fas fa-table"></i>
+                        Datos Detallados de Estudiantes
+                    </h3>
+                    <div class="data-actions">
+                        <button class="data-action-btn" id="refreshDataBtn">
+                            <i class="fas fa-sync-alt"></i>
+                            Actualizar
+                        </button>
+                        <button class="data-action-btn secondary" id="exportExcelBtn">
+                            <i class="fas fa-file-excel"></i>
+                            Exportar Excel
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="data-content">
+                    <div class="data-table-wrapper">
+                        <table class="data-table" id="studentsDetailTable">
+                            <thead>
+                                <tr>
+                                    <th>Estudiante</th>
+                                    <th>Institución</th>
+                                    <th>Curso</th>
+                                    <th>Asistencia</th>
+                                    <th>Estado</th>
+                                    <th>Fecha Inscripción</th>
+                                    <th>Actividades</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsDetailBody">
+                                <!-- Los datos se cargarán dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Estado vacío -->
+        <section class="empty-reports" id="emptyReports" style="display: none;">
+            <div class="empty-icon">
+                <i class="fas fa-chart-area"></i>
+            </div>
+            <h3>No hay datos para mostrar</h3>
+            <p>Crea instituciones, cursos y registra actividades para generar reportes detallados</p>
+            <button class="empty-action-btn" onclick="window.location.href='instituciones.html'">
+                <i class="fas fa-plus"></i>
+                Crear Primera Institución
+            </button>
+        </section>
+    </main>
+
+    <!-- ===== MODAL PARA GENERAR REPORTE PERSONALIZADO ===== -->
+    <div class="modal" id="generateReportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-chart-line"></i>
+                    Generar Reporte Personalizado
+                </h3>
+                <button class="close-modal" onclick="closeModal('generateReportModal')" title="Cerrar modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="reportForm">
+                    <div class="form-group">
+                        <label for="reportType">
+                            <i class="fas fa-file-alt"></i>
+                            Tipo de Reporte
+                        </label>
+                        <select id="reportType" required>
+                            <option value="">Seleccionar tipo</option>
+                            <option value="asistencia">Reporte de Asistencia</option>
+                            <option value="estudiantes">Reporte de Estudiantes</option>
+                            <option value="actividades">Reporte de Actividades</option>
+                            <option value="instituciones">Reporte de Instituciones</option>
+                            <option value="completo">Reporte Completo</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reportPeriod">
+                            <i class="fas fa-calendar-alt"></i>
+                            Período
+                        </label>
+                        <select id="reportPeriod" required>
+                            <option value="">Seleccionar período</option>
+                            <option value="ultima-semana">Última semana</option>
+                            <option value="ultimo-mes">Último mes</option>
+                            <option value="ultimos-3-meses">Últimos 3 meses</option>
+                            <option value="ultimo-semestre">Último semestre</option>
+                            <option value="ultimo-año">Último año</option>
+                            <option value="personalizado">Período personalizado</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" id="customDateRange" style="display: none;">
+                        <label>
+                            <i class="fas fa-calendar-week"></i>
+                            Rango de Fechas Personalizado
+                        </label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <input type="date" id="startDate" placeholder="Fecha inicio">
+                            <input type="date" id="endDate" placeholder="Fecha fin">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reportFormat">
+                            <i class="fas fa-download"></i>
+                            Formato de Exportación
+                        </label>
+                        <select id="reportFormat" required>
+                            <option value="excel">Excel (.xlsx)</option>
+                            <option value="pdf">PDF</option>
+                            <option value="csv">CSV</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-filter"></i>
+                            Opciones Adicionales
+                        </label>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                                <input type="checkbox" id="includeCharts">
+                                Incluir gráficos y estadísticas
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                                <input type="checkbox" id="includeDetails">
+                                Incluir datos detallados
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                                <input type="checkbox" id="includeAnalysis">
+                                Incluir análisis y recomendaciones
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeModal('generateReportModal')">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button class="btn-primary" id="confirmGenerateBtn">
+                    <i class="fas fa-chart-bar"></i>
+                    Generar Reporte
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SCRIPTS UNIFICADOS COMO OTRAS PÁGINAS ===== -->
+    <script src="src/assets/js/theme-manager.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Core scripts EN EL MISMO ORDEN QUE OTRAS PÁGINAS -->
+    <script src="src/assets/js/constants.js"></script>
+    <script src="src/config/firebase.js"></script>
+    <script src="src/assets/js/syncManager.js"></script>
+    <script src="src/assets/js/app.js"></script>
+    
+    <!-- Script específico de reportes -->
+    <script src="src/assets/js/reportes.js"></script>
+    
+    <!-- Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(registration => console.log('✅ SW registrado'))
+                .catch(error => console.log('❌ SW error:', error));
+        }
+    </script>
+</body>
+</html>

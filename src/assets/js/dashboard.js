@@ -32,37 +32,22 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function initializeDashboard() {
-    if (isDashboardInitialized) {
-        console.log('⚠️ Dashboard ya inicializado');
-        return;
-    }
-    
     try {
         console.log('🚀 Inicializando dashboard...');
-        
-        // Verificar dependencias
-        if (!window.auth) {
-            throw new Error('Firebase Auth no configurado');
-        }
         
         // Configurar listener de autenticación
         setupAuthListener();
         
-        // Configurar menú toggle
-        setupMenuToggle();
+        // Configurar botones de asistencia INMEDIATAMENTE
+        setupAttendanceButtons();
         
-        // Inicializar modo oscuro
-        initializeDarkMode();
+        // Cargar datos del dashboard
+        await loadDashboardData();
         
-        // Actualizar fecha
-        updateCurrentDate();
-        
-        isDashboardInitialized = true;
         console.log('✅ Dashboard inicializado correctamente');
         
     } catch (error) {
         console.error('❌ Error inicializando dashboard:', error);
-        showNotification('Error al cargar el dashboard: ' + error.message, 'error');
     }
 }
 
@@ -486,82 +471,75 @@ function setupScrollToTop() {
 
 // ===== CONFIGURAR BOTONES DE ASISTENCIA =====
 function setupAttendanceButtons() {
+    console.log('🎯 Configurando botones de asistencia...');
+    
     const startAttendanceBtn = document.getElementById('startAttendanceBtn');
     const repeatAttendanceBtn = document.getElementById('repeatAttendanceBtn');
-    const courseSelectorModal = document.getElementById('courseSelectorModal');
-    const closeCourseSelector = document.getElementById('closeCourseSelector');
     
     if (startAttendanceBtn) {
+        console.log('✅ Botón iniciar asistencia encontrado');
         startAttendanceBtn.addEventListener('click', function() {
-            console.log('🎯 Iniciando proceso de asistencia...');
+            console.log('🎯 Botón iniciar asistencia clicked');
             showCourseSelector();
         });
+    } else {
+        console.error('❌ Botón startAttendanceBtn NO encontrado');
     }
     
     if (repeatAttendanceBtn) {
+        console.log('✅ Botón repetir asistencia encontrado');
         repeatAttendanceBtn.addEventListener('click', function() {
-            console.log('🔄 Repitiendo última asistencia...');
+            console.log('🔄 Botón repetir asistencia clicked');
             repeatLastAttendance();
         });
-    }
-    
-    if (closeCourseSelector) {
-        closeCourseSelector.addEventListener('click', function() {
-            hideCourseSelector();
-        });
-    }
-    
-    if (courseSelectorModal) {
-        courseSelectorModal.addEventListener('click', function(e) {
-            if (e.target === courseSelectorModal) {
-                hideCourseSelector();
-            }
-        });
+    } else {
+        console.log('⚠️ Botón repeatAttendanceBtn no encontrado (normal si no hay clases previas)');
     }
 }
 
 function showCourseSelector() {
+    console.log('📚 Mostrando selector de curso...');
+    
     const modal = document.getElementById('courseSelectorModal');
     const coursesList = document.getElementById('coursesList');
     const noCoursesMessage = document.getElementById('noCoursesMessage');
     
-    if (!modal) return;
+    if (!modal) {
+        console.error('❌ Modal courseSelectorModal no encontrado');
+        return;
+    }
     
     // Cargar cursos disponibles
     const savedCourses = getUserData('courses');
     const courses = savedCourses ? JSON.parse(savedCourses) : [];
     
+    console.log(`📋 ${courses.length} cursos encontrados`);
+    
     if (courses.length === 0) {
-        coursesList.style.display = 'none';
-        noCoursesMessage.style.display = 'block';
+        if (coursesList) coursesList.style.display = 'none';
+        if (noCoursesMessage) noCoursesMessage.style.display = 'block';
     } else {
-        coursesList.style.display = 'block';
-        noCoursesMessage.style.display = 'none';
-        
-        coursesList.innerHTML = courses.map(course => `
-            <div class="course-item" data-course-id="${course.id}">
-                <div class="course-item-info">
-                    <h5>${course.name}</h5>
-                    <p>${course.institution || 'Sin institución'} • ${course.level || 'Sin nivel'}</p>
+        if (noCoursesMessage) noCoursesMessage.style.display = 'none';
+        if (coursesList) {
+            coursesList.style.display = 'block';
+            coursesList.innerHTML = courses.map(course => `
+                <div class="course-option" onclick="startAttendanceForCourse('${course.id}')">
+                    <div class="course-info">
+                        <h4>${course.name}</h4>
+                        <p>${course.level || 'Sin nivel'} - ${course.studentsCount || 0} estudiantes</p>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
                 </div>
-                <div class="course-students-count">
-                    ${course.studentsCount || 0} estudiantes
-                </div>
-            </div>
-        `).join('');
-        
-        // Agregar event listeners a cada curso
-        document.querySelectorAll('.course-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const courseId = this.dataset.courseId;
-                startAttendanceForCourse(courseId);
-                hideCourseSelector();
-            });
-        });
+            `).join('');
+        }
     }
     
+    // Mostrar modal
     modal.classList.add('show');
+    modal.style.display = 'flex';
     document.body.classList.add('menu-open');
+    
+    console.log('✅ Modal de selector de curso mostrado');
 }
 
 function hideCourseSelector() {
